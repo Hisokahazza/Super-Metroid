@@ -68,7 +68,7 @@ enum CrouchState
 class Samus : public Collisionlistener
 {
 private:
-	void createCapsuleFixture();
+	void createFixture();
 	void createActiveAnimations();
 
 	void updateBullet(float deltaTime);
@@ -123,7 +123,6 @@ private:
 	};
 	AnimationState m_CurrentAnimationState;
 	void setAnimationState(AnimationState animationState);
-	std::queue<AnimationState> m_ResetQueue;
 
 	bool m_Sprint = false;
 
@@ -134,6 +133,8 @@ private:
 	Direction currentDirection();
 
 	int m_CurrentHealthOffset;
+
+	bool m_SamusHit = false;
 public:
 	b2Fixture* currentHitbox;
 

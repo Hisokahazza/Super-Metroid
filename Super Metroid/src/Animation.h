@@ -37,6 +37,8 @@ public:
 	void reset();
 
 	sf::Texture getCurrentFrame();
+
+	inline bool const checkPlaying() { return m_Playing; }
 };
 
 class SheetlessAnimation
@@ -58,14 +60,12 @@ private:
 	bool m_Playing = true;
 
 	int m_FrameCount = 0;
-
-	void reset();
-
 public:
 	SheetlessAnimation(std::vector<sf::Texture> animationTextures, float switchTime = 0.0f, bool loop = false, int timesPlayed = -1, bool reverse = false);
 
 	void begin();
 	void update(float deltaTime);
+	void reset();
 
 	sf::Texture getCurrentFrame();
 	

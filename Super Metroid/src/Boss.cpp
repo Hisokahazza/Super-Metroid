@@ -118,7 +118,7 @@ void SporeSpawn::createFixture()
 	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
 	fixtureDef.shape = &circleShape;
 	fixtureDef.friction = 0.0f;
-	body->CreateFixture(&fixtureDef);
+	m_CoreClosed = body->CreateFixture(&fixtureDef);
 
 	b2PolygonShape polygonShape{};
 	polygonShape.SetAsBox(0.3f, 1.0f);
@@ -183,10 +183,15 @@ void SporeSpawn::update(float deltaTime)
 {	
 	if (m_CoreOpen == true)
 	{
-		m_CurrentAnimationState = COREOPENED;
-		m_Hittable = true;
+		m_CurrentAnimationState = COREOPENING;
+
+		if (m_SheetlessAnimations[COREOPENING]->checkPlaying() == false)
+		{
+			m_CurrentAnimationState = COREOPENED;
+			m_Hittable = true;
+		}
 	}
-	else
+	else if (m_CoreOpen == false)
 	{
 		m_Hittable = false;
 		m_CurrentAnimationState = COREFLASHING;
@@ -194,6 +199,23 @@ void SporeSpawn::update(float deltaTime)
 		if (m_SheetlessAnimations[COREFLASHING]->checkPlaying() == false)
 		{
 			m_CurrentAnimationState = CORECLOSING;
+		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+	{
+		m_CoreOpen = true;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
+	{
+		for (auto state : m_ActiveStates)
+		{
+			if (state != m_CurrentAnimationState)
+			{
+				std::cout << "Reset" << std::endl;
+				m_SheetlessAnimations[state]->reset();
+			}
 		}
 	}
 
@@ -299,8 +321,16 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 
 	if (otherData->type == SAMUS)
 	{
-		playerHealthOffset -= 20;
+		if (m_CoreOpen == false && self == m_CoreClosed)
+		{
+			playerHealthOffset -= 20;
+		}
+		else if (m_CoreOpen == true && (self == m_CoreOpenBottom || self == m_CoreOpenTop || self == m_CoreFixture))
+		{
+			playerHealthOffset -= 20;
+		}
 	}
+
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
 		if (m_CoreOpen == true)

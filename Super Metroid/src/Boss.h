@@ -128,7 +128,9 @@ private:
 
 	b2Fixture* m_CoreOpenTop;
 	b2Fixture* m_CoreOpenBottom;
+	b2Fixture* m_CoreClosed;
 	b2Fixture* m_CoreFixture;
+
 	bool m_CoreOpen = true;
 	bool m_Hittable = false;
 

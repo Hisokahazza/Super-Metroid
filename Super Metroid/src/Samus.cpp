@@ -5,10 +5,6 @@
 void Samus::setAnimationState(AnimationState state)
 {
 	m_CurrentAnimationState = state;
-	if (m_CurrentAnimationState != state)
-	{
-		m_ResetQueue.push(state);
-	}
 }
 
 // Assign current direction every frame so that each bullet object can be assigned its own direction
@@ -99,7 +95,7 @@ void Samus::updateMissile(float deltaTime)
 	}
 }
 
-void Samus::createCapsuleFixture()
+void Samus::createFixture()
 {	
 	fixtureData.listener = this;
 	fixtureData.type = SAMUS;
@@ -195,7 +191,7 @@ Samus::Samus() : m_NumGroundContacts(0), m_JumpDelayCount(0)
 // Call functions relating to samus character initialisation
 void Samus::begin()
 {
-	createCapsuleFixture();
+	createFixture();
 
 	createActiveAnimations();
 
@@ -248,7 +244,7 @@ void Samus::update(float deltaTime)
 		move *= 2;
 		m_Sprint = true;
 	}
-		
+
 	// Handle left right movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right))
 	{
@@ -266,7 +262,7 @@ void Samus::update(float deltaTime)
 		{
 			velocity.x += move / 1.3;
 		}
-		
+
 		if (m_NumGroundContacts < 1)
 		{
 			setAnimationState(JUMPRIGHT);
@@ -288,11 +284,11 @@ void Samus::update(float deltaTime)
 			setAnimationState(SHOOTRIGHTMOVING);
 			m_ProjectileInitialPos = b2Vec2(position.x + 1.0f, position.y - 0.1f);
 		}
-	
+
 		// Set orientation based on players last movement
 		m_Orientation = RIGHT;
 	}
-		
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
 	{
 		if (m_CrouchState == CROUCH)
@@ -335,8 +331,8 @@ void Samus::update(float deltaTime)
 		// Set orientation based on players last movement
 		m_Orientation = LEFT;
 	}
-		
-	
+
+
 	// Handle jumping
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Up) && m_NumGroundContacts >= 1 && m_CrouchState != MORPHBALL)
 	{
@@ -379,7 +375,7 @@ void Samus::update(float deltaTime)
 	{
 		m_ReleasedCrouch = true;
 	}
-	
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Up) && m_NumGroundContacts >= 1)
 	{
 		if (m_CrouchState == CROUCH && m_ReleasedCrouch == true)
@@ -493,7 +489,7 @@ void Samus::update(float deltaTime)
 			if (m_ProjectileDelayCount >= m_ProjectileDelay && m_MissilesUsed < 15)
 			{
 				m_ProjectileDelayCount = 0;
-				 
+
 				// Push new bullet object to array so that multiple existing bullets can be handled
 				Missile* missile = new Missile(currentDirection());
 				m_Missiles.push_back(missile);
@@ -552,14 +548,27 @@ void Samus::update(float deltaTime)
 		currentHitbox = jumpHitbox;
 	}
 
-	m_Animations[m_CurrentAnimationState]->update(deltaTime);
-
-	if (m_ResetQueue.size() > 0)
+	// handle samus getting hit by bosses
+	if (m_SamusHit == true)
 	{
-		m_Animations[m_ResetQueue.front()]->reset();
-		m_ResetQueue.pop();
-		std::cout << m_ResetQueue.size();
+		velocity = { 0, 0 };
+
+		b2Vec2 knockBackImpluse;
+		float m_KnockBackSpeed = 20000.0f;
+		if (m_Orientation == RIGHT)
+		{
+			knockBackImpluse = b2Vec2(-m_KnockBackSpeed, -m_KnockBackSpeed / 10);
+		}
+		if (m_Orientation == LEFT)
+		{
+			knockBackImpluse = b2Vec2(m_KnockBackSpeed, -m_KnockBackSpeed / 10);
+		}
+
+		m_Body->ApplyForceToCenter(knockBackImpluse, true);
+		m_SamusHit = false;
 	}
+
+	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
 	// Set the current samus hitbox from bosses
 	sporeSpawn.setPlayerHitbox(currentHitbox);
@@ -620,8 +629,10 @@ void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		m_NumGroundContacts++;
 	}
-	if (otherData->type == BOSSCOMPONENT)
+	if (self == currentHitbox && (otherData->type == BOSSCOMPONENT || otherData->type == BOSS))
 	{
+		std::cout << "COLLIDED" << std::endl;
+		m_SamusHit = true;
 	}
 }
 void Samus::onEndContact(b2Fixture* self, b2Fixture* other)

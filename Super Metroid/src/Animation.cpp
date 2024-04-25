@@ -91,6 +91,9 @@ void Animation::update(float deltaTime)
 void Animation::reset()
 {
     m_FrameCount = 0;
+    m_TotalTime = 0;
+    m_CurrentRect = m_InitialRect;
+    m_Playing = true;
 }
 
 sf::Texture Animation::getCurrentFrame()
@@ -135,7 +138,6 @@ void SheetlessAnimation::update(float deltaTime)
         if (m_FrameCount == m_NumTextures * m_TimesPlayed)
         {
             m_Playing = false;
-            reset();
         }
 
         m_TotalTime += deltaTime;
@@ -152,7 +154,6 @@ void SheetlessAnimation::update(float deltaTime)
             {
                 m_NextTextureIndex--;
             }
-
 
             m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
             
@@ -192,6 +193,7 @@ void SheetlessAnimation::update(float deltaTime)
             }
 
             m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
+            std::cout << m_NextTextureIndex << std::endl;
         }
     }
 }
@@ -204,4 +206,17 @@ sf::Texture SheetlessAnimation::getCurrentFrame()
 void SheetlessAnimation::reset()
 {
     m_FrameCount = 0;
+
+    if (m_Reverse == true)
+    {
+        m_NextTextureIndex = m_NumTextures;
+        m_CurrentTexture = m_AnimationTextures[m_NumTextures];
+    }
+    else if (m_Reverse == false)
+    {
+        m_NextTextureIndex = 0;
+        m_CurrentTexture = m_AnimationTextures[0];
+    }
+
+    m_Playing = true;
 }
