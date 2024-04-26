@@ -16,7 +16,7 @@ extern Camera camera;
 class Game
 {
 private:
-	std::string m_CurrentStage = "res/Level_Spore_Spawn.png";
+	std::string m_CurrentStage = "res/Level_Hub.png";
 public:
 	Game();
 	~Game();

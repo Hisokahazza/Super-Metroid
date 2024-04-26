@@ -16,7 +16,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 		{
 			sf::Color colour = image.getPixel(x, y);
 
-			if (colour == colours[BLACK])
+			if (colour == colours[DARKGREEN])
 			{
 				m_Grid[x][y] = 1;
 
@@ -39,7 +39,41 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 				fixtureDef.density = 0.0f;
 				body->CreateFixture(&fixtureDef);
 			}
+			else if (colour == colours[GREEN])
+			{
+				m_Grid[x][y] = 2;
+			}
+			else if (colour == colours[BLUE])
+			{
+				m_Grid[x][y] = 3;
+			}
+			else if (colour == colours[YELLOW])
+			{
+				m_Grid[x][y] = 4;
 
+				b2BodyDef bodyDef{};
+				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+				b2Body* body = Physics::world.CreateBody(&bodyDef);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
+
+				FixtureData* fixtureData = new FixtureData();
+				fixtureData->type = MAPTILE;
+				fixtureData->mapPosx = x;
+				fixtureData->mapPosY = y;
+
+				b2FixtureDef fixtureDef{};
+				fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = 0.0f;
+				body->CreateFixture(&fixtureDef);
+			}
+			else if (colour == colours[LIGHTBLUE])
+			{
+				m_Grid[x][y] = 5;
+			}
 			else if (colour == colours[RED])
 			{
 				samusPosition = sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
@@ -62,7 +96,34 @@ void StageHub::draw(Renderer& renderer)
 			{
 				if (m_Grid[x][y] == 1)
 				{
-					renderer.draw(Resources::textures["Eg_tile.png"],
+					renderer.draw(Resources::textures["HUB_Floor_Tile_02.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 2)
+				{
+					renderer.draw(Resources::textures["HUB_Floor_Tile_01.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 3)
+				{
+					renderer.draw(Resources::textures["HUB_Floor_Tile_03.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 4)
+				{
+					renderer.draw(Resources::textures["HUB_Mountains.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize * 8, m_CellSize * 2));
+				}
+				else if (m_Grid[x][y] == 5)
+				{
+				}
+				else if (m_Grid[x][y] == 6)
+				{
+					renderer.draw(Resources::textures["HUB_Floor_Tile_03.png"],
 						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
 							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
 				}

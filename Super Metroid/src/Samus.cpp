@@ -554,7 +554,7 @@ void Samus::update(float deltaTime)
 		velocity = { 0, 0 };
 
 		b2Vec2 knockBackImpluse;
-		float m_KnockBackSpeed = 20000.0f;
+		float m_KnockBackSpeed = 10.0f;
 		if (m_Orientation == RIGHT)
 		{
 			knockBackImpluse = b2Vec2(-m_KnockBackSpeed, -m_KnockBackSpeed / 10);

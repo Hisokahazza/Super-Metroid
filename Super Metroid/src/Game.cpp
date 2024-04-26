@@ -32,9 +32,9 @@ void Game::Begin(const sf::Window& window)
 
 	// render map and return initial samus and boss position
 	std::vector<sf::Vector2f> mapPositions;
-	mapPositions = sporeSpawnStage.createFromImg(image);
+	mapPositions = hubStage.createFromImg(image);
 	samus.position = mapPositions[0];
-	sporeSpawn.position = mapPositions[1];
+	//sporeSpawn.position = mapPositions[1];
 	samus.begin();
 
 	playerHUD.begin();
@@ -48,18 +48,17 @@ void Game::update(float deltaTime)
 	Physics::update(deltaTime);
 	samus.update(deltaTime);
 
-	sporeSpawn.update(deltaTime);
+	//sporeSpawn.update(deltaTime);
 }
 
 // Final rendering step
 void Game::draw(Renderer& renderer)
 {
-	// map.setBackground(renderer, "background_Eg2.png", sf::Vector2f(1920, 1080));
-
-	sporeSpawnStage.draw(renderer);
+	//sporeSpawnStage.draw(renderer);
+	hubStage.draw(renderer);
 	samus.draw(renderer);
 
-	sporeSpawn.draw(renderer);
+	//sporeSpawn.draw(renderer);
 
 	Physics::debugDraw(renderer);
 }
