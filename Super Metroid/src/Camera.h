@@ -14,5 +14,7 @@ public:
 
 	sf::View getView(sf::Vector2u windowSize);
 	sf::View getHUDView();
+
 	sf::Vector2f position;
+	sf::Vector2f scaleView = { 1, 1 };
 };

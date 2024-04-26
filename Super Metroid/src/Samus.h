@@ -138,7 +138,7 @@ private:
 public:
 	b2Fixture* currentHitbox;
 
-	const float movementSpeed = 7.0f;
+	const float movementSpeed = 8.0f;
 	const float jumpVelocity = 11.0f;
 
 	sf::Texture spriteSheet;

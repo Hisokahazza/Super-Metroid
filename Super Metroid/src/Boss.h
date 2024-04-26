@@ -25,6 +25,7 @@ enum BossAnimationState
 	COREOPENING,
 	COREOPENED,
 	CORECLOSING,
+	CORECLOSED,
 	COREFLASHING
 };
 
@@ -132,6 +133,7 @@ private:
 	b2Fixture* m_CoreFixture;
 
 	bool m_CoreOpen = true;
+	bool m_CoreClosing = false;
 	bool m_Hittable = false;
 
 	FixtureData* m_ProjectileDestroyed;

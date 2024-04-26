@@ -16,7 +16,10 @@ extern Camera camera;
 class Game
 {
 private:
-	std::string m_CurrentStage = "res/Level_Hub.png";
+	std::string m_CurrentStage = "res/Level_Spore_Spawn.png";
+
+	void createStages();
+	std::unordered_map<std::string, Level*> m_Stages;
 public:
 	Game();
 	~Game();

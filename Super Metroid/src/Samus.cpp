@@ -116,6 +116,7 @@ void Samus::createFixture()
 	fixtureDef.shape = &polygonShape;
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
+	fixtureDef.restitution = 0.0f;
 	m_Body->CreateFixture(&fixtureDef);
 
 	polygonShape.SetAsBox(0.5f, 0.3f, b2Vec2(0.0f, 1.2f), 0.0f);
@@ -128,7 +129,6 @@ void Samus::createFixture()
 	fixtureDef.shape = &circleShape;
 	fixtureDef.isSensor = false;
 	m_Body->CreateFixture(&fixtureDef);
-
 	circleShape.m_p.Set(0.0f, 0.65f);
 	m_Body->CreateFixture(&fixtureDef);
 
@@ -167,8 +167,8 @@ void Samus::createActiveAnimations()
 	m_Animations[SHOOTUPORIENTATIONLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Orientation_Left.png"], "Shoot_Static_Up_Orientation_Left.png", sf::Vector2u(2, 1), 2, false, 0.1, 1, false);
 	m_Animations[SHOOTRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Right.png"], "Shoot_Static_Right.png", sf::Vector2u(4, 1), 4, true);
 	m_Animations[SHOOTLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Left.png"], "Shoot_Static_Left.png", sf::Vector2u(4, 1), 4, true);
-	m_Animations[SHOOTRIGHTMOVING] = new Animation(Resources::textures["Shoot_Moving_Right.png"], "Shoot_Moving_Right.png", sf::Vector2u(10, 1), 7, false, 0.07f);
-	m_Animations[SHOOTLEFTMOVING] = new Animation(Resources::textures["Shoot_Moving_Left.png"], "Shoot_Moving_Left.png", sf::Vector2u(10, 1), 7, false, 0.07f);
+	m_Animations[SHOOTRIGHTMOVING] = new Animation(Resources::textures["Shoot_Moving_Right.png"], "Shoot_Moving_Right.png", sf::Vector2u(10, 1), 10, false, 0.07f);
+	m_Animations[SHOOTLEFTMOVING] = new Animation(Resources::textures["Shoot_Moving_Left.png"], "Shoot_Moving_Left.png", sf::Vector2u(10, 1), 10, false, 0.07f);
 	m_Animations[SHOOTUPRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Right.png"], "Shoot_Static_Up_Right.png", sf::Vector2u(1, 1));
 	m_Animations[SHOOTUPLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Left.png"], "Shoot_Static_Up_Left.png", sf::Vector2u(1, 1));
 	m_Animations[SHOOTDOWNRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Down_Right.png"], "Shoot_Static_Down_Right.png", sf::Vector2u(1, 1));
@@ -595,7 +595,7 @@ void Samus::update(float deltaTime)
 void Samus::draw(Renderer& renderer)
 {
 	renderer.draw(m_Animations[m_CurrentAnimationState]->getCurrentFrame(), position,
-		sf::Vector2f(3.25f, 3.5f));
+		sf::Vector2f(4.0f, 3.7f));
 
 	if (m_Bullets.size() != 0)
 	{

@@ -39,7 +39,7 @@ Spore::~Spore()
 
 void Spore::begin(unsigned int positionIndex)
 {
-	
+	// Set initial spore position based on response from sporespawn class
 	position = m_SporeInitialPositions[positionIndex];
 	createFixture();
 
@@ -57,6 +57,7 @@ void Spore::update(float deltaTime)
 	{
 		m_TotalTime -= m_SwitchTime;
 
+		// Simulate a sin wave rotated 180 degrees for spore movement
 		position.y += 0.025f;
 		position.x += sin(position.y) / 50;
 		body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
@@ -80,6 +81,7 @@ void Spore::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// Handle spore collision with samus
 	if (otherData->type == SAMUS && m_PlayerHitbox == other)
 	{
 		destroyed = true;
@@ -87,6 +89,7 @@ void Spore::onBeginContact(b2Fixture* self, b2Fixture* other)
 		m_PlayerHealthOffset = -20;
 		collided = true;
 	}
+	// Handle spore collision with bullets and missiles
 	else if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
 		destroyed = true;
@@ -136,8 +139,9 @@ void SporeSpawn::createFixture()
 
 void SporeSpawn::createActiveAnimations()
 {
-	m_ActiveStates = { COREOPENING, COREOPENED, CORECLOSING, COREFLASHING };
+	m_ActiveStates = { COREOPENING, COREOPENED, CORECLOSING, CORECLOSED, COREFLASHING };
 
+	// Initialise textures for sheetless animations
 	std::vector<sf::Texture> coreOpeningTextures = {
 		Resources::textures["SSP_Idle.png"],
 		Resources::textures["SSP_Anim_01.png"],
@@ -152,6 +156,9 @@ void SporeSpawn::createActiveAnimations()
 		Resources::textures["SSP_Open_02.png"],
 		Resources::textures["SSP_Open_03.png"]
 	};
+	std::vector<sf::Texture> coreClosedTextures = {
+		Resources::textures["SSP_Idle.png"]
+	};
 	std::vector<sf::Texture> coreFlashingTextures = {
 		Resources::textures["SSP_Open_Flash_01.png"],
 		Resources::textures["SSP_Open_Flash_02.png"],
@@ -159,9 +166,11 @@ void SporeSpawn::createActiveAnimations()
 		Resources::textures["SSP_Open_Flash_02.png"]
 	};
 
+	// Initialise sheetless animations
 	m_SheetlessAnimations[COREOPENING] = new SheetlessAnimation(coreOpeningTextures, 0.2f, false, 1);
 	m_SheetlessAnimations[COREOPENED] = new SheetlessAnimation(coreOpenedTextures, 0.2f, false);
 	m_SheetlessAnimations[CORECLOSING] = new SheetlessAnimation(coreOpeningTextures, 0.1f, false, 1, true);
+	m_SheetlessAnimations[CORECLOSED] = new SheetlessAnimation(coreClosedTextures);
 	m_SheetlessAnimations[COREFLASHING] = new SheetlessAnimation(coreFlashingTextures, 0.1f, false, 2);
 }
 
@@ -181,6 +190,10 @@ void SporeSpawn::begin()
 
 void SporeSpawn::update(float deltaTime)
 {	
+	// Set base animation state to core closed
+	m_CurrentAnimationState = CORECLOSED;
+
+	// Check if core is open
 	if (m_CoreOpen == true)
 	{
 		m_CurrentAnimationState = COREOPENING;
@@ -191,7 +204,8 @@ void SporeSpawn::update(float deltaTime)
 			m_Hittable = true;
 		}
 	}
-	else if (m_CoreOpen == false)
+	// Check if core is closing to play closing animation
+	else if (m_CoreClosing == false)
 	{
 		m_Hittable = false;
 		m_CurrentAnimationState = COREFLASHING;
@@ -199,26 +213,20 @@ void SporeSpawn::update(float deltaTime)
 		if (m_SheetlessAnimations[COREFLASHING]->checkPlaying() == false)
 		{
 			m_CurrentAnimationState = CORECLOSING;
+			if (m_SheetlessAnimations[CORECLOSING]->checkPlaying() == false)
+			{
+				m_CoreClosing = true;
+			}
 		}
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
 	{
 		m_CoreOpen = true;
+		m_CoreClosing = false;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
-	{
-		for (auto state : m_ActiveStates)
-		{
-			if (state != m_CurrentAnimationState)
-			{
-				std::cout << "Reset" << std::endl;
-				m_SheetlessAnimations[state]->reset();
-			}
-		}
-	}
-
+	// Update and check for collisions of spore objects
 	for (auto spore : m_Spores)
 	{
 		if (spore->collided == true)
@@ -240,6 +248,7 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 
+	// Handle Spore Spawning
 	m_SporeTotalTime += deltaTime;
 
 	if (m_SporeTotalTime >= m_SporeSwitchTime)
@@ -260,8 +269,10 @@ void SporeSpawn::update(float deltaTime)
 		m_Spore->begin(m_SpawnPosIndexSpore);
 	}
 
+	// Handle boss movement
 	for (int count = 0; count < m_BossSpeed; count++)
 	{
+		// Change boss direction if it reaches the bounds of the arena
 		if (position.x >= 12.7f)
 		{
 			m_BossChangedDirection = true;
@@ -271,6 +282,7 @@ void SporeSpawn::update(float deltaTime)
 			m_BossChangedDirection = false;
 		}
 
+		// Simulate sin wave for boss movement
 		if (m_BossChangedDirection == false && m_CoreOpen == false)
 		{
 			position.x += 0.01f;
@@ -282,6 +294,19 @@ void SporeSpawn::update(float deltaTime)
 			position.x -= 0.01f;
 			position.y -= sin(position.x) / 30;
 			body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
+		}
+	}
+
+	// Handle animatin resetting
+	if (m_CurrentAnimationState == CORECLOSED)
+	{
+		for (auto state : m_ActiveStates)
+		{
+			// When in idle state reset all other states
+			if (state != m_CurrentAnimationState)
+			{
+				m_SheetlessAnimations[state]->reset();
+			}
 		}
 	}
 
@@ -308,6 +333,7 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
 	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
 
+	// Handle boss collisions with missiles when vulnerable
 	if (m_CoreFixture == self && otherData->type == MISSILE)
 	{
 		attributes.health -= 200;
@@ -319,6 +345,7 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 		m_ProjectileDestroyed = otherData;
 	}
 
+	// Handle boss collision with player
 	if (otherData->type == SAMUS)
 	{
 		if (m_CoreOpen == false && self == m_CoreClosed)
@@ -331,6 +358,7 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 		}
 	}
 
+	// Handle boss collisions with missiles and bullets when invulnerable
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
 		if (m_CoreOpen == true)

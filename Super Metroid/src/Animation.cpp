@@ -127,12 +127,15 @@ void SheetlessAnimation::begin()
         m_CurrentTexture = m_AnimationTextures[0];
 
     }
-
-   
 }
 
 void SheetlessAnimation::update(float deltaTime)
 {
+    if (m_FrameCount == 0)
+    {
+        m_Playing = true;
+    }
+
     if (m_Loop == false)
     {
         if (m_FrameCount == m_NumTextures * m_TimesPlayed)
