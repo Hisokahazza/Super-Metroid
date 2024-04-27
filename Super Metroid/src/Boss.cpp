@@ -63,6 +63,12 @@ void Spore::update(float deltaTime)
 		body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
 	}
 
+	// Ensure uncollided spore objects are destroyed
+	if (position.y > 20.0f)
+	{
+		destroyed = true;
+	}
+
 	m_SporeAnimation->update(deltaTime);
 }
 
@@ -115,7 +121,7 @@ void SporeSpawn::createFixture()
 	body = Physics::world.CreateBody(&bodyDef);
 
 	b2CircleShape circleShape{};
-	circleShape.m_radius = 1.5f;
+	circleShape.m_radius = 2.0f;
 	circleShape.m_p.Set(0, 0);
 	b2FixtureDef fixtureDef{};
 	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
@@ -124,17 +130,42 @@ void SporeSpawn::createFixture()
 	m_CoreClosed = body->CreateFixture(&fixtureDef);
 
 	b2PolygonShape polygonShape{};
-	polygonShape.SetAsBox(0.3f, 1.0f);
+	polygonShape.SetAsBox(0.4f, 1.3f);
 	fixtureDef.shape = &polygonShape;
 	fixtureDef.isSensor = true;
 	m_CoreFixture = body->CreateFixture(&fixtureDef);
 
 	// Create bottom and top fixtures for when core is open
-	polygonShape.SetAsBox(1.3f, 0.5f, b2Vec2(0.0f, -1.1f), 0.0f);
+	polygonShape.SetAsBox(1.7f, 0.65f, b2Vec2(0.0f, -1.45f), 0.0f);
 	m_CoreOpenTop = body->CreateFixture(&fixtureDef);
 
-	polygonShape.SetAsBox(1.3f, 0.5f, b2Vec2(0.0f, 1.65f), 0.0f);
+	polygonShape.SetAsBox(1.7f, 0.65f, b2Vec2(0.0f, 2.2f), 0.0f);
 	m_CoreOpenBottom = body->CreateFixture(&fixtureDef);
+}
+
+void SporeSpawn::closeCore(float deltaTime)
+{
+	m_CoreTotalTime += deltaTime;
+
+	if (m_CoreTotalTime >= m_CoreClosedSwitchTime)
+	{
+		m_CoreTotalTime -= m_CoreClosedSwitchTime;
+		m_IsCoreOpen = false;
+		m_IsCoreHit = false;
+		m_IsCoreClosing = true;
+	}
+}
+
+void SporeSpawn::openCore(float deltaTime)
+{
+	m_CoreTotalTime += deltaTime;
+
+	if (m_CoreTotalTime >= m_CoreOpenSwitchTime)
+	{
+		m_CoreTotalTime -= m_CoreOpenSwitchTime;
+		m_IsCoreOpen = true;
+		m_IsCoreClosing = false;
+	}
 }
 
 void SporeSpawn::createActiveAnimations()
@@ -174,6 +205,27 @@ void SporeSpawn::createActiveAnimations()
 	m_SheetlessAnimations[COREFLASHING] = new SheetlessAnimation(coreFlashingTextures, 0.1f, false, 2);
 }
 
+sf::Vector2f SporeSpawn::determineSegmentPos(float positionOnLine)
+{
+	// Calculate the gradient of the line between the tether point and the boss
+	float gradient = (m_TetherPoint.y - position.y) / (m_TetherPoint.x - position.x);
+
+	// Calculate the y-intercept of the line
+	float yIntercept = position.y - (gradient * position.x);
+
+	// Calculate the range between the x-coordinates of the tether point and the boss
+	float range = m_TetherPoint.x - position.x;
+
+	// Calculate the x-coordinate of the segment position on the line
+	float segmentX = position.x + (range / positionOnLine);
+
+	// Calculate the y-coordinate of the segment position on the line
+	float segmentY = (gradient * segmentX) + yIntercept;
+
+	// Return the calculated segment position
+	return sf::Vector2f(segmentX, segmentY);
+}
+
 void SporeSpawn::begin()
 {
 	createFixture();
@@ -190,40 +242,65 @@ void SporeSpawn::begin()
 
 void SporeSpawn::update(float deltaTime)
 {	
+	// Reset timer when core is hit 
+	if (m_IsCoreHit == true)
+	{
+		m_CoreTotalTime = 0;
+	}
+
 	// Set base animation state to core closed
 	m_CurrentAnimationState = CORECLOSED;
 
 	// Check if core is open
-	if (m_CoreOpen == true)
+	if (m_IsCoreOpen == true)
 	{
 		m_CurrentAnimationState = COREOPENING;
 
 		if (m_SheetlessAnimations[COREOPENING]->checkPlaying() == false)
 		{
 			m_CurrentAnimationState = COREOPENED;
-			m_Hittable = true;
+			m_IsHittable = true;
 		}
 	}
 	// Check if core is closing to play closing animation
-	else if (m_CoreClosing == false)
+	else if (m_IsCoreClosing == true)
 	{
-		m_Hittable = false;
-		m_CurrentAnimationState = COREFLASHING;
+		m_IsHittable = false;
+
+		if (m_IsCoreHit == true)
+		{
+			m_CurrentAnimationState = COREFLASHING;
+		}
+		else if (m_IsCoreHit == false)
+		{
+			m_CurrentAnimationState = CORECLOSING;
+
+			if (m_SheetlessAnimations[CORECLOSING]->checkPlaying() == false)
+			{
+				m_IsCoreOpen = false;
+				m_IsCoreClosing = false;
+			}
+		}
 
 		if (m_SheetlessAnimations[COREFLASHING]->checkPlaying() == false)
 		{
 			m_CurrentAnimationState = CORECLOSING;
 			if (m_SheetlessAnimations[CORECLOSING]->checkPlaying() == false)
 			{
-				m_CoreClosing = true;
+					m_IsCoreClosing = false;
+					m_IsCoreHit = false;
 			}
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+	// Close and open core based on a switch time
+	if (m_IsCoreOpen == true)
 	{
-		m_CoreOpen = true;
-		m_CoreClosing = false;
+		closeCore(deltaTime);
+	}
+	if (m_IsCoreOpen == false)
+	{
+		openCore(deltaTime);
 	}
 
 	// Update and check for collisions of spore objects
@@ -269,35 +346,51 @@ void SporeSpawn::update(float deltaTime)
 		m_Spore->begin(m_SpawnPosIndexSpore);
 	}
 
-	// Handle boss movement
-	for (int count = 0; count < m_BossSpeed; count++)
+	switch (attributes.health)
 	{
-		// Change boss direction if it reaches the bounds of the arena
-		if (position.x >= 12.7f)
-		{
-			m_BossChangedDirection = true;
-		}
-		else if (position.x <= 2.3f)
-		{
-			m_BossChangedDirection = false;
-		}
-
-		// Simulate sin wave for boss movement
-		if (m_BossChangedDirection == false && m_CoreOpen == false)
-		{
-			position.x += 0.01f;
-			position.y += sin(position.x) / 30;
-			body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
-		}
-		else if (m_BossChangedDirection == true && m_CoreOpen == false)
-		{
-			position.x -= 0.01f;
-			position.y -= sin(position.x) / 30;
-			body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
-		}
+	case 800:
+		m_BossSpeed = 4;
+		break;
+	case 600:
+		m_BossSpeed = 5;
+		break;
+	case 0:
+		m_BossComplete = true;
+		break;
 	}
 
-	// Handle animatin resetting
+	// Handle boss movement
+	if (m_BossComplete == false)
+	{
+		for (int count = 0; count < m_BossSpeed; count++)
+		{
+			// Change boss direction if it reaches the bounds of the arena
+			if (position.x >= 12.7f)
+			{
+				m_BossChangedDirection = true;
+			}
+			else if (position.x <= 2.3f)
+			{
+				m_BossChangedDirection = false;
+			}
+
+			// Simulate sin wave for boss movement
+			if (m_BossChangedDirection == false && m_IsCoreOpen == false)
+			{
+				position.x += 0.01f;
+				position.y += sin(position.x) / 30;
+				body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
+			}
+			else if (m_BossChangedDirection == true && m_IsCoreOpen == false)
+			{
+				position.x -= 0.01f;
+				position.y -= sin(position.x) / 30;
+				body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
+			}
+		}
+	}
+	
+	// Handle animation resetting
 	if (m_CurrentAnimationState == CORECLOSED)
 	{
 		for (auto state : m_ActiveStates)
@@ -310,17 +403,31 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 
+	if (m_BossComplete == true)
+	{
+		m_CurrentAnimationState = CORECLOSING;
+		if (m_SheetlessAnimations[CORECLOSING]->checkPlaying() == false)
+		{
+			m_CurrentAnimationState = CORECLOSED;
+		}
+	}
+
 	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
+
+	if (m_BossComplete == true && m_CurrentAnimationState == CORECLOSED)
+	{
+		switchScreens = true;
+	}
 }
 
 void SporeSpawn::draw(Renderer& renderer)
 {
-	for (int count = 0; count <= 3; count++)
+	for (float count = 1; count <= 1.8f; count += 0.4f)
 	{
-		//renderer.draw(Resources::textures["SSP_Segment.png"], sf::Vector2f((position.x / count) + 6.0f, (position.y / count * 2) + 6.0f), sf::Vector2f(1.0f, 1.0f));
+		renderer.draw(Resources::textures["SSP_Segment.png"], determineSegmentPos(count), sf::Vector2f(1.0f, 1.0f));
 	}
 
-	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), position, sf::Vector2f(3.0f, 4.5f));
+	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), position, sf::Vector2f(4.0f, 6.0f));
 
 	for (auto spore : m_Spores)
 	{
@@ -337,7 +444,9 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	if (m_CoreFixture == self && otherData->type == MISSILE)
 	{
 		attributes.health -= 200;
-		m_CoreOpen = false;
+		m_IsCoreOpen = false;
+		m_IsCoreClosing = true;
+		m_IsCoreHit = true;
 		m_ProjectileDestroyed = otherData;
 	}
 	else if (m_CoreFixture == self && otherData->type == BULLET)
@@ -348,11 +457,11 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	// Handle boss collision with player
 	if (otherData->type == SAMUS)
 	{
-		if (m_CoreOpen == false && self == m_CoreClosed)
+		if (m_IsCoreOpen == false && self == m_CoreClosed)
 		{
 			playerHealthOffset -= 20;
 		}
-		else if (m_CoreOpen == true && (self == m_CoreOpenBottom || self == m_CoreOpenTop || self == m_CoreFixture))
+		else if (m_IsCoreOpen == true && (self == m_CoreOpenBottom || self == m_CoreOpenTop || self == m_CoreFixture))
 		{
 			playerHealthOffset -= 20;
 		}
@@ -361,14 +470,14 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	// Handle boss collisions with missiles and bullets when invulnerable
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
-		if (m_CoreOpen == true)
+		if (m_IsCoreOpen == true)
 		{
 			if (self == m_CoreOpenTop || self == m_CoreOpenBottom)
 			{
 				m_ProjectileDestroyed = otherData;
 			}
 		}
-		else if (m_CoreOpen == false)
+		else if (m_IsCoreOpen == false)
 		{
 			m_ProjectileDestroyed = otherData;
 		}

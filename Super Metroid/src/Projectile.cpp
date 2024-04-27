@@ -15,7 +15,7 @@ void Projectile::onBeginContact(b2Fixture* self, b2Fixture* other)
 	if (otherData->type == MAPTILE)
 	{
 		destroyed = true;
-		otherData->isActive = false;
+		selfData->isActive = false;
 	}
 }
 

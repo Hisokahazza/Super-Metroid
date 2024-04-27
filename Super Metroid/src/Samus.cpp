@@ -568,6 +568,17 @@ void Samus::update(float deltaTime)
 		m_SamusHit = false;
 	}
 
+	/*if (m_CurrentAnimationState == SHOOTRIGHTSTATIC || m_CurrentAnimationState == SHOOTLEFTSTATIC)
+	{
+		for (auto state : m_ActiveStates)
+		{
+			if (state != SHOOTRIGHTSTATIC || state != SHOOTLEFTSTATIC)
+			{
+				m_Animations[state]->reset();
+			}
+		}
+	}*/
+
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
 	// Set the current samus hitbox from bosses

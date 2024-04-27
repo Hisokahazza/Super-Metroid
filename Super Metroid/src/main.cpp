@@ -50,6 +50,8 @@ int main()
 
 		game.drawUI(renderer);
 
+		game.drawMenu(renderer);
+
 		window.display();
 	}
 }

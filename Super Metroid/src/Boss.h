@@ -93,7 +93,6 @@ private:
 	std::vector<sf::Texture> m_SporeFrames;
 	SheetlessAnimation* m_SporeAnimation;
 public:
-	
 	bool destroyed = false;
 	bool collided = false;
 
@@ -115,10 +114,19 @@ class SporeSpawn : public Boss
 private:
 	FixtureData m_FixtureData{};
 	void createFixture();
+	void closeCore(float deltaTime);
+	void openCore(float deltaTime);
 	void createActiveAnimations();
+	sf::Vector2f determineSegmentPos(float positionOnLine);
+
+	sf::Vector2f m_TetherPoint = {7.5f, 5.0f};
 
 	float m_SporeSwitchTime = 2.0f;
 	float m_SporeTotalTime = 2.0f;
+
+	float m_CoreTotalTime = 0.0f;
+	float m_CoreOpenSwitchTime = 10.0f;
+	float m_CoreClosedSwitchTime = 5.0f;
 
 	int m_BossSpeed = 3;
 	bool m_BossChangedDirection = false;
@@ -132,12 +140,17 @@ private:
 	b2Fixture* m_CoreClosed;
 	b2Fixture* m_CoreFixture;
 
-	bool m_CoreOpen = true;
-	bool m_CoreClosing = false;
-	bool m_Hittable = false;
+	bool m_IsCoreOpen = false;
+	bool m_IsCoreClosing = false;
+	bool m_IsCoreHit = false;
+	bool m_IsHittable = false;
 
 	FixtureData* m_ProjectileDestroyed;
+
+	bool m_BossComplete = false;
 public:
+	bool switchScreens = false;
+
 	void begin();
 	void update(float deltaTime);
 	void draw(Renderer& renderer);

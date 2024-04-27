@@ -241,7 +241,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
 
 				b2PolygonShape shape{};
-				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
+				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
 
 				FixtureData* fixtureData = new FixtureData();
 				fixtureData->type = MAPTILE;
@@ -254,7 +254,6 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				fixtureDef.density = 0.0f;
 				fixtureDef.friction = 0.0f;
 				body->CreateFixture(&fixtureDef);
-
 			}
 			else if (colour == colours[GREEN])
 			{
@@ -374,7 +373,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 
 				b2BodyDef bodyDef{};
 				bodyDef.position.Set(m_CellSize* x + m_CellSize / 2.0f,
-					m_CellSize* y + m_CellSize / 2.0f);
+					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
 
 				b2PolygonShape shape{};
@@ -398,7 +397,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 
 				b2BodyDef bodyDef{};
 				bodyDef.position.Set(m_CellSize* x + m_CellSize / 2.0f,
-					m_CellSize* y + m_CellSize / 2.0f);
+					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
 
 				b2PolygonShape shape{};
