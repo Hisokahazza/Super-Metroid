@@ -19,7 +19,20 @@ void Game::createMenus()
 {
 	m_Menus[VICTORY] = new Victory();
 	m_Menus[GAMEOVER] = new GameOver();
-	m_Menus[NOMENU] = nullptr;
+	m_Menus[NOMENU] = new NoMenu();
+}
+
+void Game::setCurrentStage(std::string& currentStage)
+{
+	m_Stages[m_CurrentStage]->clearLevel();
+
+	m_CurrentStage = currentStage;
+
+	m_MapImage.loadFromFile(currentStage);
+	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
+	camera.position = sf::Vector2f(m_MapImage.getSize().x / 2.0f, m_MapImage.getSize().y / 2.0f);
+	samus.position = m_MapPositions[0];
+
 }
 
 Game::Game()
@@ -39,23 +52,14 @@ void Game::Begin(const sf::Window& window)
 	Physics::init();
 
 	//load map image
-	m_MapImage.loadFromFile(m_CurrentStage);
-
-	camera.position = sf::Vector2f(m_MapImage.getSize().x / 2.0f, m_MapImage.getSize().y / 2.0f);
-	camera.scaleView = sf::Vector2f(1.0f, 1.0f);
-
-	// render map and return initial samus and boss position
-	m_MapPositions = m_Stages[m_CurrentStage]->createFromImg(m_MapImage);
-	
-	samus.position = m_MapPositions[0];
+	setCurrentStage(m_CurrentStage);
 	samus.begin();
 
 	playerHUD.begin();
 
-	if (m_Menus[m_CurrentMenuState] != nullptr)
-	{
-		m_Menus[m_CurrentMenuState]->begin();
-	}
+	
+	m_Menus[VICTORY]->begin();
+	m_Menus[GAMEOVER]->begin();
 
 	sporeSpawn.position = m_MapPositions[1];
 	sporeSpawn.begin();
@@ -64,51 +68,70 @@ void Game::Begin(const sf::Window& window)
 // update function(called every frame)
 void Game::update(float deltaTime)
 {
+	m_Menued = false;
+
 	if (sporeSpawn.switchScreens == true)
 	{
+		m_Menued = true;
 		m_CurrentMenuState = VICTORY;
 	}
 
-	if (m_Menus[m_CurrentMenuState] != nullptr)
+	if (m_Menus[m_CurrentMenuState]->returnToHub == true)
 	{
-		if (m_Menus[m_CurrentMenuState]->returnToHub == true)
-		{
-			m_CurrentMenuState = NOMENU;
-			//m_CurrentStage = "res/Level_Hub.png";
-		}
+		m_CurrentMenuState = NOMENU;
+		sporeSpawn.switchScreens = false;
+
+		std::string hubStage = "res/Level_Hub.png";
+		setCurrentStage(hubStage);
 	}
 	
-	if (m_Menus[m_CurrentMenuState] != nullptr)
+	m_Menus[m_CurrentMenuState]->update(deltaTime);
+
+	if (m_Menued == true)
 	{
-		m_Menus[m_CurrentMenuState]->update(deltaTime);
+		return;
 	}
 	
 	Physics::update(deltaTime);
 	samus.update(deltaTime);
 
-	sporeSpawn.update(deltaTime);
+	if (m_CurrentStage != "res/Level_Hub.png")
+	{
+		// determine which boss to play
+		sporeSpawn.update(deltaTime);
+	}
 }
 
 // Final rendering step
 void Game::draw(Renderer& renderer)
 {
+	if (m_Menued)
+	{
+		return;
+	}
+
 	m_Stages[m_CurrentStage]->draw(renderer);
 	samus.draw(renderer);
 
-	sporeSpawn.draw(renderer);
-
+	if (m_CurrentStage != "res/Level_Hub.png")
+	{
+		sporeSpawn.draw(renderer);
+	}
+	
 	Physics::debugDraw(renderer);
 }
 
 void Game::drawUI(Renderer& renderer)
 {
+	if (m_Menued == true)
+	{
+		return;
+	}
+
 	playerHUD.draw(renderer);
 }
 
 void Game::drawMenu(Renderer& renderer)
 {
-	if (m_Menus[m_CurrentMenuState] != nullptr)
-	{
-		m_Menus[m_CurrentMenuState]->draw(renderer);
-	}
+	m_Menus[m_CurrentMenuState]->draw(renderer);
 }

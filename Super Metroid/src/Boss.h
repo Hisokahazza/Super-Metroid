@@ -36,12 +36,15 @@ protected:
 	b2Body* body;
 	BossAttributes attributes;
 	int playerHealthOffset = 0;
+	FixtureData* projectileDestroyed;
 
-	std::unordered_map<BossAnimationState, SheetlessAnimation*> m_SheetlessAnimations;
+	std::unordered_map<BossAnimationState, Animation*> m_SheetlessAnimations;
 	std::vector<BossAnimationState> m_ActiveStates = {};
 	BossAnimationState m_CurrentAnimationState;
 public:
 	b2Fixture* playerHitbox;
+	bool isPlayerInvulnerable = false;
+	bool m_IsSamusHit = false;
 
 	sf::Vector2f position;
 
@@ -54,7 +57,14 @@ public:
 	int const getPlayerHealthOffset() { return playerHealthOffset; };
 	void setPlayerHealthOffset(int newOffset) { playerHealthOffset = newOffset; };
 
+	bool const getIsSamusHit() { return m_IsSamusHit; };
+	void const setIsSamusHit(bool isSamusHit) { m_IsSamusHit = isSamusHit; };
+
+	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
+
 	void setPlayerHitbox(b2Fixture* hitbox) { playerHitbox = hitbox; };
+
+	void setPlayerinvulnerabillity(bool isInvulnerable) { isPlayerInvulnerable = isInvulnerable; };
 };
 
 class BossComponent : public Collisionlistener
@@ -66,13 +76,17 @@ protected:
 	sf::Vector2f position;
 	virtual void createFixture() = 0;
 
+	FixtureData* projectileDestroyed;
 	b2Fixture* m_PlayerHitbox;
+	bool m_IsPlayerInvulnerable;
 
 public:
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 
 	void setPlayerHitbox(b2Fixture* hitbox) { m_PlayerHitbox = hitbox; };
+	void setPlayerinvulnerabillity(bool isInvulnerable) { m_IsPlayerInvulnerable = isInvulnerable; };
+	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 };
 
 class Spore : public BossComponent
@@ -145,7 +159,6 @@ private:
 	bool m_IsCoreHit = false;
 	bool m_IsHittable = false;
 
-	FixtureData* m_ProjectileDestroyed;
 
 	bool m_BossComplete = false;
 public:
@@ -158,7 +171,5 @@ public:
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
-
-	FixtureData* const getProjectileDestroyed() { return m_ProjectileDestroyed; }
 };
 

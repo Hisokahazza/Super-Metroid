@@ -52,7 +52,7 @@ DefaultBullet::DefaultBullet(Direction bulletDirection) : m_BulletDirection(bull
 
 DefaultBullet::~DefaultBullet()
 {
-	m_CurrentSheetlessAnimation = m_BulletDestruction;
+	currentSheetlessAnimation = m_BulletDestructionAnim;
 
 	if (body)
 	{
@@ -73,6 +73,7 @@ void DefaultBullet::begin(b2Vec2 initialPosition)
 	createFixture(initialPosition);
 
 	std::vector <sf::Texture> bulletDestructionTextures = {
+		Resources::textures["Default_Bullet.png"],
 		Resources::textures["Default_Bullet_Destroy_01.png"],
 		Resources::textures["Default_Bullet_Destroy_02.png"],
 		Resources::textures["Default_Bullet_Destroy_03.png"],
@@ -82,12 +83,13 @@ void DefaultBullet::begin(b2Vec2 initialPosition)
 		Resources::textures["Default_Bullet.png"]
 	};
 
-	m_BulletDestruction = new SheetlessAnimation(bulletDestructionTextures, 0.1f, false, 1);
-	m_Bullet = new SheetlessAnimation(defaultBulletTextures, 0.1f);
+	m_BulletDestructionAnim = new SheetlessAnimation(bulletDestructionTextures, 0.1f, false, 1);
+	m_BulletAnim = new SheetlessAnimation(defaultBulletTextures, 0.1f);
 
-	m_CurrentSheetlessAnimation = m_Bullet;
+	currentSheetlessAnimation = m_BulletAnim;
 
-	m_CurrentSheetlessAnimation->begin();
+	m_BulletAnim->begin();
+	m_BulletDestructionAnim->begin();
 }
 
 void DefaultBullet::update(float deltaTime)
@@ -134,12 +136,19 @@ void DefaultBullet::update(float deltaTime)
 	// alter position each frame
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
-	m_CurrentSheetlessAnimation->update(deltaTime);
+	currentSheetlessAnimation->update(deltaTime);
 }
 
 void DefaultBullet::draw(Renderer& renderer)
 {
-	renderer.draw(m_CurrentSheetlessAnimation->getCurrentFrame(), position, sf::Vector2f(0.3f, 0.3f));
+	if (currentSheetlessAnimation == m_BulletAnim)
+	{
+		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, sf::Vector2f(0.3f, 0.3f));
+	}
+	else if (currentSheetlessAnimation == m_BulletDestructionAnim)
+	{
+		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, sf::Vector2f(0.6f, 0.6f));
+	}
 }
 
 void Missile::createFixture(b2Vec2 initialPosition)
@@ -171,6 +180,8 @@ Missile::Missile(Direction missileDirection) : m_MissileDirection(missileDirecti
 
 Missile::~Missile()
 {
+	currentSheetlessAnimation = m_MissileDestructionAnim;
+
 	if (body)
 	{
 		// Destroy the fixture
@@ -185,6 +196,28 @@ Missile::~Missile()
 
 void Missile::begin(b2Vec2 initialPosition)
 {
+	std::vector <sf::Texture> missileDestructionTextures = {
+		Resources::textures["Missile_Destroy_01.png"],
+		Resources::textures["Missile_Destroy_02.png"],
+		Resources::textures["Missile_Destroy_03.png"],
+		Resources::textures["Missile_Destroy_04.png"],
+		Resources::textures["Missile_Destroy_05.png"],
+		Resources::textures["Missile_Destroy_06.png"]
+
+	};
+
+	std::vector<sf::Vector2f> missileDestructionFrameSizes = {
+		sf::Vector2f(0.6f, 0.6f),
+		sf::Vector2f(0.8f, 0.8f),
+		sf::Vector2f(1.0f, 1.0f),
+		sf::Vector2f(1.2f, 1.2f),
+		sf::Vector2f(1.4f, 1.4f),
+		sf::Vector2f(1.6f, 1.6f),
+	};
+
+	m_MissileDestructionAnim = new SheetlessAnimation(missileDestructionTextures, 0.1f, false, 1, false, missileDestructionFrameSizes);
+	m_MissileDestructionAnim->begin();
+
 	createFixture(initialPosition);
 	projectileSpeed = 0.5f;
 }
@@ -265,5 +298,10 @@ void Missile::draw(Renderer& renderer)
 	case DOWNLEFT:
 		renderer.draw(Resources::textures["Missile_Up.png"], position, sf::Vector2f(0.3f, 0.5f), 225.0f);
 		break;
+	}
+
+	if (destroyed == true)
+	{
+		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, currentSheetlessAnimation->getCurrentFrameSize());
 	}
 }

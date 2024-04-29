@@ -68,3 +68,4 @@ public:
 	static DebugDrawImp* debugDrawObj;
 	static b2World world;
 };
+

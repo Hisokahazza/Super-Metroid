@@ -37,6 +37,7 @@ class Level
 private:
 protected:
 	std::vector<std::vector<int>> m_Grid;
+	std::vector<b2Body*> m_BodiesToDelete;
 
 	std::unordered_map<Colour, sf::Color> colours = { 
 		{RED, sf::Color(255, 0, 0)},
@@ -60,8 +61,10 @@ protected:
 	sf::Vector2f bossPosition;
 
 public:
+	void clearLevel();
 	virtual std::vector<sf::Vector2f> createFromImg(const sf::Image& image) = 0;
 	virtual void draw(Renderer& renderer) = 0;
+	
 };
 
 class StageHub : public Level

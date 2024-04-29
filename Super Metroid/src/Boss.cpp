@@ -88,7 +88,7 @@ void Spore::onBeginContact(b2Fixture* self, b2Fixture* other)
 	}
 
 	// Handle spore collision with samus
-	if (otherData->type == SAMUS && m_PlayerHitbox == other)
+	if (otherData->type == SAMUS && m_PlayerHitbox == other && m_IsPlayerInvulnerable == false)
 	{
 		destroyed = true;
 		selfData->isActive = false;
@@ -100,6 +100,8 @@ void Spore::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		destroyed = true;
 		selfData->isActive = false;
+
+		projectileDestroyed = otherData;
 	}
 }
 
@@ -172,7 +174,7 @@ void SporeSpawn::createActiveAnimations()
 {
 	m_ActiveStates = { COREOPENING, COREOPENED, CORECLOSING, CORECLOSED, COREFLASHING };
 
-	// Initialise textures for sheetless animations
+	// Initialise textures for sheetless Animations
 	std::vector<sf::Texture> coreOpeningTextures = {
 		Resources::textures["SSP_Idle.png"],
 		Resources::textures["SSP_Anim_01.png"],
@@ -197,7 +199,7 @@ void SporeSpawn::createActiveAnimations()
 		Resources::textures["SSP_Open_Flash_02.png"]
 	};
 
-	// Initialise sheetless animations
+	// Initialise sheetless Animations
 	m_SheetlessAnimations[COREOPENING] = new SheetlessAnimation(coreOpeningTextures, 0.2f, false, 1);
 	m_SheetlessAnimations[COREOPENED] = new SheetlessAnimation(coreOpenedTextures, 0.2f, false);
 	m_SheetlessAnimations[CORECLOSING] = new SheetlessAnimation(coreOpeningTextures, 0.1f, false, 1, true);
@@ -248,7 +250,7 @@ void SporeSpawn::update(float deltaTime)
 		m_CoreTotalTime = 0;
 	}
 
-	// Set base animation state to core closed
+	// Set base Animation state to core closed
 	m_CurrentAnimationState = CORECLOSED;
 
 	// Check if core is open
@@ -262,7 +264,7 @@ void SporeSpawn::update(float deltaTime)
 			m_IsHittable = true;
 		}
 	}
-	// Check if core is closing to play closing animation
+	// Check if core is closing to play closing Animation
 	else if (m_IsCoreClosing == true)
 	{
 		m_IsHittable = false;
@@ -312,6 +314,11 @@ void SporeSpawn::update(float deltaTime)
 			spore->collided = false;
 		}
 
+		if (spore->getProjectileDestroyed() != nullptr)
+		{
+			projectileDestroyed = spore->getProjectileDestroyed();
+		}
+
 		if (spore->destroyed == true)
 		{
 			m_Spores.erase(std::find(m_Spores.begin(), m_Spores.end(), spore));
@@ -322,6 +329,7 @@ void SporeSpawn::update(float deltaTime)
 		{
 			spore->update(deltaTime);
 			spore->setPlayerHitbox(playerHitbox);
+			spore->setPlayerinvulnerabillity(isPlayerInvulnerable);
 		}
 	}
 
@@ -390,7 +398,7 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 	
-	// Handle animation resetting
+	// Handle Animation resetting
 	if (m_CurrentAnimationState == CORECLOSED)
 	{
 		for (auto state : m_ActiveStates)
@@ -412,11 +420,15 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 
-	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
-
+	if (switchScreens == false)
+	{
+		m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
+	}
+	
 	if (m_BossComplete == true && m_CurrentAnimationState == CORECLOSED)
 	{
 		switchScreens = true;
+		m_BossComplete = false;
 	}
 }
 
@@ -441,45 +453,48 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
 
 	// Handle boss collisions with missiles when vulnerable
-	if (m_CoreFixture == self && otherData->type == MISSILE)
+	if (m_CoreFixture == self && otherData->type == MISSILE && m_IsCoreOpen == true)
 	{
 		attributes.health -= 200;
 		m_IsCoreOpen = false;
 		m_IsCoreClosing = true;
 		m_IsCoreHit = true;
-		m_ProjectileDestroyed = otherData;
+		projectileDestroyed = otherData;
 	}
 	else if (m_CoreFixture == self && otherData->type == BULLET)
 	{
-		m_ProjectileDestroyed = otherData;
+		projectileDestroyed = otherData;
 	}
 
 	// Handle boss collision with player
-	if (otherData->type == SAMUS)
+	if (other == playerHitbox && otherData->type == SAMUS && isPlayerInvulnerable == false)
 	{
-		if (m_IsCoreOpen == false && self == m_CoreClosed)
+		if (m_CurrentAnimationState == CORECLOSED && self == m_CoreClosed)
 		{
 			playerHealthOffset -= 20;
+			m_IsSamusHit = true;
 		}
-		else if (m_IsCoreOpen == true && (self == m_CoreOpenBottom || self == m_CoreOpenTop || self == m_CoreFixture))
+		else if (m_CurrentAnimationState != CORECLOSED && (self == m_CoreOpenBottom || self == m_CoreOpenTop || self == m_CoreFixture))
 		{
 			playerHealthOffset -= 20;
+			m_IsSamusHit = true;
 		}
 	}
 
 	// Handle boss collisions with missiles and bullets when invulnerable
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
-		if (m_IsCoreOpen == true)
+		if (m_CurrentAnimationState == CORECLOSED)
 		{
-			if (self == m_CoreOpenTop || self == m_CoreOpenBottom)
+			if (self == m_CoreClosed)
 			{
-				m_ProjectileDestroyed = otherData;
+				projectileDestroyed = otherData;
 			}
 		}
-		else if (m_IsCoreOpen == false)
+		else if (m_CurrentAnimationState != CORECLOSED)
 		{
-			m_ProjectileDestroyed = otherData;
+			if (self == m_CoreOpenTop || self == m_CoreOpenBottom)
+			projectileDestroyed = otherData;
 		}
 	}
 }

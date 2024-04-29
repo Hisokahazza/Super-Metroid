@@ -60,9 +60,8 @@ private:
 	Direction m_BulletDirection;
 	void createFixture(b2Vec2 inititalPosition);
 
-	SheetlessAnimation* m_BulletDestruction;
-	SheetlessAnimation* m_Bullet;
-	SheetlessAnimation* m_CurrentSheetlessAnimation;
+	SheetlessAnimation* m_BulletDestructionAnim;
+	SheetlessAnimation* m_BulletAnim;
 
 public:
 	DefaultBullet(Direction bulletDirection);
@@ -70,6 +69,8 @@ public:
 
 	FixtureData fixtureData{};
 	b2Fixture* bulletFixture;
+
+	SheetlessAnimation* currentSheetlessAnimation;
 
 	void begin(b2Vec2 initialPosition);
 	void update(float deltaTime);
@@ -84,9 +85,13 @@ private:
 
 	float m_MaxSpeed;
 	void createFixture(b2Vec2 inititalPosition);
+
+	SheetlessAnimation* m_MissileDestructionAnim;
 public:
 	Missile(Direction missileDirection);
 	~Missile();
+
+	SheetlessAnimation* currentSheetlessAnimation;
 
 	FixtureData fixtureData{};
 

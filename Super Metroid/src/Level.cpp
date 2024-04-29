@@ -24,6 +24,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
@@ -55,6 +56,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
@@ -90,6 +92,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape polygonShape{};
 				polygonShape.SetAsBox(m_CellSize * 4.0f, m_CellSize * 1.5f);
@@ -239,6 +242,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
@@ -263,6 +267,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
@@ -287,6 +292,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
@@ -311,6 +317,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + (m_CellSize / 2.0f) - 0.5f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize * 1.5, m_CellSize);
@@ -351,6 +358,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize * 7, m_CellSize / 2);
@@ -375,6 +383,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize* x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
@@ -399,6 +408,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize* x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
@@ -423,6 +433,7 @@ std::vector<sf::Vector2f> StageSporeSpawn::createFromImg(const sf::Image& image)
 				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
 					m_CellSize * y + m_CellSize / 2.0f);
 				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
 
 				b2PolygonShape shape{};
 				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
@@ -544,5 +555,13 @@ void StageSporeSpawn::draw(Renderer& renderer)
 			y++;
 		}
 		x++;
+	}
+}
+
+void Level::clearLevel()
+{
+	for (auto& body : m_BodiesToDelete)
+	{
+		Physics::world.DestroyBody(body);
 	}
 }

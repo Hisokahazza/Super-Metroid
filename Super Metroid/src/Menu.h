@@ -42,3 +42,12 @@ public:
 	void update(float deltaTime);
 	void draw(Renderer& renderer);
 };
+
+class NoMenu : public Menu
+{
+private:
+public:
+	void begin();
+	void update(float deltaTime);
+	void draw(Renderer& renderer);
+};

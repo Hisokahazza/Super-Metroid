@@ -62,9 +62,13 @@ void Samus::updateBullet(float deltaTime)
 
 		if (bullet->destroyed == true)
 		{
-			m_Bullets.erase(std::find(m_Bullets.begin(), m_Bullets.end(), bullet));
 			bullet->~DefaultBullet();
-			delete(bullet);
+			bullet->currentSheetlessAnimation->update(deltaTime);
+			if (bullet->currentSheetlessAnimation->checkPlaying() == false)
+			{
+				m_Bullets.erase(std::find(m_Bullets.begin(), m_Bullets.end(), bullet));
+				delete(bullet);
+			}
 		}
 		else if (bullet)
 		{
@@ -84,9 +88,13 @@ void Samus::updateMissile(float deltaTime)
 
 		if (missile->destroyed == true)
 		{
-			m_Missiles.erase(std::find(m_Missiles.begin(), m_Missiles.end(), missile));
 			missile->~Missile();
-			delete(missile);
+			missile->currentSheetlessAnimation->update(deltaTime);
+			if (missile->currentSheetlessAnimation->checkPlaying() == false)
+			{
+				m_Missiles.erase(std::find(m_Missiles.begin(), m_Missiles.end(), missile));
+				delete(missile);
+			}
 		}
 		else if (missile)
 		{
@@ -150,38 +158,54 @@ void Samus::createFixture()
 
 void Samus::createActiveAnimations()
 {
-	// Define animation states
-	m_Animations[IDLE] = new Animation(Resources::textures["Idle_Samus.png"], "Idle_Samus.png", sf::Vector2u(1, 1), 1);
+	// Define Animation states
+	m_Animations[IDLE] = new SheetAnimation(Resources::textures["Idle_Samus.png"], "Idle_Samus.png", sf::Vector2u(1, 1), 1);
 
-	m_Animations[RUNRIGHT] = new Animation(Resources::textures["Run_Right.png"], "Run_Right.png", sf::Vector2u(10, 1), 10);
-	m_Animations[RUNLEFT] = new Animation(Resources::textures["Run_Left.png"], "Run_Left.png", sf::Vector2u(10, 1), 10);
+	m_Animations[RUNRIGHT] = new SheetAnimation(Resources::textures["Run_Right.png"], "Run_Right.png", sf::Vector2u(10, 1), 10);
+	m_Animations[RUNLEFT] = new SheetAnimation(Resources::textures["Run_Left.png"], "Run_Left.png", sf::Vector2u(10, 1), 10);
 
-	m_Animations[JUMPRIGHT] = new Animation(Resources::textures["Jump_Right.png"], "Jump_Right.png", sf::Vector2u(9, 1), 9);
-	m_Animations[JUMPLEFT] = new Animation(Resources::textures["Jump_Left.png"], "Jump_Left.png", sf::Vector2u(9, 1), 9);
-	m_Animations[JUMPRIGHTSTATIC] = new Animation(Resources::textures["Jump_Static_Right.png"], "Jump_Static_Right.png", sf::Vector2u(2, 1), 2, false, 1.0f);
-	m_Animations[JUMPLEFTSTATIC] = new Animation(Resources::textures["Jump_Static_Left.png"], "Jump_Static_Left.png", sf::Vector2u(2, 1), 2, false, 1.0f);
+	m_Animations[JUMPRIGHT] = new SheetAnimation(Resources::textures["Jump_Right.png"], "Jump_Right.png", sf::Vector2u(9, 1), 9);
+	m_Animations[JUMPLEFT] = new SheetAnimation(Resources::textures["Jump_Left.png"], "Jump_Left.png", sf::Vector2u(9, 1), 9);
+	m_Animations[JUMPRIGHTSTATIC] = new SheetAnimation(Resources::textures["Jump_Static_Right.png"], "Jump_Static_Right.png", sf::Vector2u(2, 1), 2, false, 1.0f);
+	m_Animations[JUMPLEFTSTATIC] = new SheetAnimation(Resources::textures["Jump_Static_Left.png"], "Jump_Static_Left.png", sf::Vector2u(2, 1), 2, false, 1.0f);
 
-	m_Animations[SHOOTRIGHT] = new Animation(Resources::textures["Shoot_Static_Right.png"], "Shoot_Static_Right.png", sf::Vector2u(4, 1), 4);
-	m_Animations[SHOOTLEFT] = new Animation(Resources::textures["Shoot_Static_Left.png"], "Shoot_Static_Left.png", sf::Vector2u(4, 1), 4);
-	m_Animations[SHOOTUPORIENTATIONRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Orientation_Right.png"], "Shoot_Static_Up_Orientation_Right.png", sf::Vector2u(2, 1), 2, false, 0.1, 1, false);
-	m_Animations[SHOOTUPORIENTATIONLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Orientation_Left.png"], "Shoot_Static_Up_Orientation_Left.png", sf::Vector2u(2, 1), 2, false, 0.1, 1, false);
-	m_Animations[SHOOTRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Right.png"], "Shoot_Static_Right.png", sf::Vector2u(4, 1), 4, true);
-	m_Animations[SHOOTLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Left.png"], "Shoot_Static_Left.png", sf::Vector2u(4, 1), 4, true);
-	m_Animations[SHOOTRIGHTMOVING] = new Animation(Resources::textures["Shoot_Moving_Right.png"], "Shoot_Moving_Right.png", sf::Vector2u(10, 1), 10, false, 0.07f);
-	m_Animations[SHOOTLEFTMOVING] = new Animation(Resources::textures["Shoot_Moving_Left.png"], "Shoot_Moving_Left.png", sf::Vector2u(10, 1), 10, false, 0.07f);
-	m_Animations[SHOOTUPRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Right.png"], "Shoot_Static_Up_Right.png", sf::Vector2u(1, 1));
-	m_Animations[SHOOTUPLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Up_Left.png"], "Shoot_Static_Up_Left.png", sf::Vector2u(1, 1));
-	m_Animations[SHOOTDOWNRIGHTSTATIC] = new Animation(Resources::textures["Shoot_Static_Down_Right.png"], "Shoot_Static_Down_Right.png", sf::Vector2u(1, 1));
-	m_Animations[SHOOTDOWNLEFTSTATIC] = new Animation(Resources::textures["Shoot_Static_Down_Left.png"], "Shoot_Static_Down_Left.png", sf::Vector2u(1, 1));
-	m_Animations[SHOOTUPRIGHTMOVING] = new Animation(Resources::textures["Shoot_Moving_Up_Right.png"], "Shoot_Moving_Up_Right.png", sf::Vector2u(10, 1), 10);
-	m_Animations[SHOOTUPLEFTMOVING] = new Animation(Resources::textures["Shoot_Moving_Up_Left.png"], "Shoot_Moving_Up_Left.png", sf::Vector2u(10, 1), 10);
-	m_Animations[SHOOTDOWNRIGHTMOVING] = new Animation(Resources::textures["Shoot_Moving_Down_Right.png"], "Shoot_Moving_Down_Right.png", sf::Vector2u(10, 1), 10);
-	m_Animations[SHOOTDOWNLEFTMOVING] = new Animation(Resources::textures["Shoot_Moving_Down_Left.png"], "Shoot_Moving_Down_Left.png", sf::Vector2u(10, 1), 10);
+	m_Animations[SHOOTRIGHT] = new SheetAnimation(Resources::textures["Shoot_Static_Right.png"], "Shoot_Static_Right.png", sf::Vector2u(4, 1), 4);
+	m_Animations[SHOOTLEFT] = new SheetAnimation(Resources::textures["Shoot_Static_Left.png"], "Shoot_Static_Left.png", sf::Vector2u(4, 1), 4);
+	m_Animations[SHOOTUPORIENTATIONRIGHTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Up_Orientation_Right.png"], "Shoot_Static_Up_Orientation_Right.png", sf::Vector2u(2, 1), 2, false, 0.1, 1, false);
+	m_Animations[SHOOTUPORIENTATIONLEFTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Up_Orientation_Left.png"], "Shoot_Static_Up_Orientation_Left.png", sf::Vector2u(2, 1), 2, false, 0.1, 1, false);
+	m_Animations[SHOOTRIGHTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Right.png"], "Shoot_Static_Right.png", sf::Vector2u(4, 1), 4, true);
+	m_Animations[SHOOTLEFTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Left.png"], "Shoot_Static_Left.png", sf::Vector2u(4, 1), 4, true);
+	m_Animations[SHOOTRIGHTMOVING] = new SheetAnimation(Resources::textures["Shoot_Moving_Right.png"], "Shoot_Moving_Right.png", sf::Vector2u(10, 1), 10, false, 0.07f);
+	m_Animations[SHOOTLEFTMOVING] = new SheetAnimation(Resources::textures["Shoot_Moving_Left.png"], "Shoot_Moving_Left.png", sf::Vector2u(10, 1), 10, false, 0.07f);
+	m_Animations[SHOOTUPRIGHTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Up_Right.png"], "Shoot_Static_Up_Right.png", sf::Vector2u(1, 1));
+	m_Animations[SHOOTUPLEFTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Up_Left.png"], "Shoot_Static_Up_Left.png", sf::Vector2u(1, 1));
+	m_Animations[SHOOTDOWNRIGHTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Down_Right.png"], "Shoot_Static_Down_Right.png", sf::Vector2u(1, 1));
+	m_Animations[SHOOTDOWNLEFTSTATIC] = new SheetAnimation(Resources::textures["Shoot_Static_Down_Left.png"], "Shoot_Static_Down_Left.png", sf::Vector2u(1, 1));
+	m_Animations[SHOOTUPRIGHTMOVING] = new SheetAnimation(Resources::textures["Shoot_Moving_Up_Right.png"], "Shoot_Moving_Up_Right.png", sf::Vector2u(10, 1), 10);
+	m_Animations[SHOOTUPLEFTMOVING] = new SheetAnimation(Resources::textures["Shoot_Moving_Up_Left.png"], "Shoot_Moving_Up_Left.png", sf::Vector2u(10, 1), 10);
+	m_Animations[SHOOTDOWNRIGHTMOVING] = new SheetAnimation(Resources::textures["Shoot_Moving_Down_Right.png"], "Shoot_Moving_Down_Right.png", sf::Vector2u(10, 1), 10);
+	m_Animations[SHOOTDOWNLEFTMOVING] = new SheetAnimation(Resources::textures["Shoot_Moving_Down_Left.png"], "Shoot_Moving_Down_Left.png", sf::Vector2u(10, 1), 10);
 
-	m_Animations[CROUCHRIGHT] = new Animation(Resources::textures["Crouch_Right.png"], "Crouch_Right.png", sf::Vector2u(4, 1), 4, true);
-	m_Animations[CROUCHLEFT] = new Animation(Resources::textures["Crouch_Left.png"], "Crouch_Left.png", sf::Vector2u(4, 1), 4, true);
-	m_Animations[MORPHBALLRIGHT] = new Animation(Resources::textures["Morph_Ball_Right.png"], "Morph_Ball_Right.png", sf::Vector2u(8, 1), 8);
-	m_Animations[MORPHBALLLEFT] = new Animation(Resources::textures["Morph_Ball_Left.png"], "Morph_Ball_Left.png", sf::Vector2u(8, 1), 8);
+	m_Animations[CROUCHRIGHT] = new SheetAnimation(Resources::textures["Crouch_Right.png"], "Crouch_Right.png", sf::Vector2u(4, 1), 4, true);
+	m_Animations[CROUCHLEFT] = new SheetAnimation(Resources::textures["Crouch_Left.png"], "Crouch_Left.png", sf::Vector2u(4, 1), 4, true);
+	m_Animations[MORPHBALLRIGHT] = new SheetAnimation(Resources::textures["Morph_Ball_Right.png"], "Morph_Ball_Right.png", sf::Vector2u(8, 1), 8);
+	m_Animations[MORPHBALLLEFT] = new SheetAnimation(Resources::textures["Morph_Ball_Left.png"], "Morph_Ball_Left.png", sf::Vector2u(8, 1), 8);
+
+	// Define sheetless Animation states
+	std::vector<sf::Texture> invulnerableRightTextures = {
+		Resources::textures["Knockback_R_01.png"],
+		Resources::textures["Knockback_Inbetween.png"],
+		Resources::textures["Knockback_R_02.png"]
+	};
+
+	std::vector<sf::Texture> invulnerableLeftTextures = {
+		Resources::textures["Knockback_L_01.png"],
+		Resources::textures["Knockback_Inbetween.png"],
+		Resources::textures["Knockback_L_02.png"]
+	};
+
+	m_Animations[INVULERABLEFACINGRIGHT] = new SheetlessAnimation(invulnerableRightTextures, 0.1f, false, 1);
+	m_Animations[INVULERABLEFACINGLEFT] = new SheetlessAnimation(invulnerableLeftTextures, 0.1f, false, 1);
 }
 
 Samus::Samus() : m_NumGroundContacts(0), m_JumpDelayCount(0)
@@ -195,8 +219,8 @@ void Samus::begin()
 
 	createActiveAnimations();
 
-	// Begin all active animations
-	for (auto state : m_ActiveStates)
+	// Begin all active Animations
+	for (auto& state : m_ActiveStates)
 	{
 		m_Animations[state]->begin();
 	}
@@ -211,7 +235,7 @@ void Samus::update(float deltaTime)
 	m_CanShoot = true;
 	currentHitbox = samusHitbox;
 
-	// Determine relevant idle animation state
+	// Determine relevant idle Animation state
 	if (m_Orientation == RIGHT)
 	{
 		setAnimationState(SHOOTRIGHTSTATIC);
@@ -420,7 +444,7 @@ void Samus::update(float deltaTime)
 		}
 	}
 
-	// Handle aiming animation
+	// Handle aiming Animation
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && m_Orientation == RIGHT)
 	{
 		setAnimationState(SHOOTUPORIENTATIONRIGHTSTATIC);
@@ -501,7 +525,7 @@ void Samus::update(float deltaTime)
 			}
 		}
 
-		// Handle idle animation
+		// Handle idle Animation
 		if (m_Orientation == RIGHT && m_CurrentAnimationState == SHOOTRIGHTSTATIC)
 		{
 			setAnimationState(SHOOTRIGHT);
@@ -510,10 +534,10 @@ void Samus::update(float deltaTime)
 		{
 			setAnimationState(SHOOTLEFT);
 		}
-
-		// Increments delay count
-		m_ProjectileDelayCount++;
 	}
+
+	// Increments delay count
+	m_ProjectileDelayCount++;
 
 	// Checks if a bullet has been shot or destroyed and updates all bullets
 	if (m_ProjectileShot)
@@ -548,24 +572,50 @@ void Samus::update(float deltaTime)
 		currentHitbox = jumpHitbox;
 	}
 
+	if (m_SamusHit == false)
+	{
+		m_SamusHit = sporeSpawn.getIsSamusHit();
+	}
+
 	// handle samus getting hit by bosses
 	if (m_SamusHit == true)
 	{
-		velocity = { 0, 0 };
+		m_IsInvulnerable = true;
 
-		b2Vec2 knockBackImpluse;
-		float m_KnockBackSpeed = 10.0f;
 		if (m_Orientation == RIGHT)
 		{
-			knockBackImpluse = b2Vec2(-m_KnockBackSpeed, -m_KnockBackSpeed / 10);
+			m_CurrentAnimationState = INVULERABLEFACINGRIGHT;
+		}
+		else if (m_Orientation == LEFT)
+		{
+			m_CurrentAnimationState = INVULERABLEFACINGLEFT;
+		}
+
+		b2Vec2 knockBackImpulse;
+		float m_KnockBackSpeed = 5.0f;
+		if (m_Orientation == RIGHT)
+		{
+			knockBackImpulse = b2Vec2(-m_KnockBackSpeed, -m_KnockBackSpeed / 10);
 		}
 		if (m_Orientation == LEFT)
 		{
-			knockBackImpluse = b2Vec2(m_KnockBackSpeed, -m_KnockBackSpeed / 10);
+			knockBackImpulse = b2Vec2(m_KnockBackSpeed, -m_KnockBackSpeed / 10);
 		}
 
-		m_Body->ApplyForceToCenter(knockBackImpluse, true);
-		m_SamusHit = false;
+		velocity = knockBackImpulse;
+
+		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
+		{
+			m_SamusHit = false;
+			sporeSpawn.setIsSamusHit(false);
+			m_IsInvulnerable = false;
+		}
+	}
+
+	if (m_SamusHit == false)
+	{
+		m_Animations[INVULERABLEFACINGRIGHT]->reset();
+		m_Animations[INVULERABLEFACINGLEFT]->reset();
 	}
 
 	/*if (m_CurrentAnimationState == SHOOTRIGHTSTATIC || m_CurrentAnimationState == SHOOTLEFTSTATIC)
@@ -583,6 +633,9 @@ void Samus::update(float deltaTime)
 
 	// Set the current samus hitbox from bosses
 	sporeSpawn.setPlayerHitbox(currentHitbox);
+
+	// Set player invulnerabillity status
+	sporeSpawn.setPlayerinvulnerabillity(m_IsInvulnerable);
 
 	// retrieve health offset from boss
 	m_CurrentHealthOffset = sporeSpawn.getPlayerHealthOffset();
@@ -640,7 +693,7 @@ void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		m_NumGroundContacts++;
 	}
-	if (self == currentHitbox && (otherData->type == BOSSCOMPONENT || otherData->type == BOSS))
+	if (self == currentHitbox && otherData->type == BOSSCOMPONENT)
 	{
 		std::cout << "COLLIDED" << std::endl;
 		m_SamusHit = true;

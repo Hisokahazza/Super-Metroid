@@ -2,18 +2,18 @@
 
 #include <iostream>
 
-Animation::Animation(const sf::Texture& spriteSheet, const std::string& sheetTag, const sf::Vector2u& rowsColumns, unsigned int keyFrames, bool isStatic, float switchTime, int timesPlayed, bool loop) :
+SheetAnimation::SheetAnimation(const sf::Texture& spriteSheet, const std::string& sheetTag, const sf::Vector2u& rowsColumns, unsigned int keyFrames, bool isStatic, float switchTime, int timesPlayed, bool loop) :
     m_SpriteSheet(spriteSheet), m_SheetTag(sheetTag), m_RowsColumns(rowsColumns), m_KeyFrames(keyFrames), m_IsStatic(isStatic), m_SwitchTime(switchTime), m_TimesPlayed(timesPlayed), m_Loop(loop)
 {
 }
 
-void Animation::begin()
+void SheetAnimation::begin()
 {
     m_SheetDimensions = { m_SpriteSheet.getSize().x, m_SpriteSheet.getSize().y };
     m_InitialRect = { 0, 0, (int)(m_SheetDimensions.x / m_RowsColumns.x), (int)(m_SheetDimensions.y / m_RowsColumns.y) };
 }
 
-void Animation::update(float deltaTime)
+void SheetAnimation::update(float deltaTime)
 {
     if (m_RowsColumns == sf::Vector2u(1, 1))
     {
@@ -64,7 +64,7 @@ void Animation::update(float deltaTime)
             m_CurrentRect = m_InitialRect;
             m_FrameCount++;
         }
-        else if (m_TotalTime >= m_SwitchTime && m_Playing == true)
+        else if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             // Subtract the switch time from total time
             m_TotalTime -= m_SwitchTime;
@@ -83,20 +83,20 @@ void Animation::update(float deltaTime)
 
         if (m_FrameCount == (m_TimesPlayed * m_RowsColumns.x * m_RowsColumns.y))
         {
-            m_Playing = false;
+            playing = false;
         }
     }
 }
 
-void Animation::reset()
+void SheetAnimation::reset()
 {
     m_FrameCount = 0;
     m_TotalTime = 0;
     m_CurrentRect = m_InitialRect;
-    m_Playing = true;
+    playing = true;
 }
 
-sf::Texture Animation::getCurrentFrame()
+sf::Texture SheetAnimation::getCurrentFrame()
 {
     if (m_IsStatic == true)
     {
@@ -108,7 +108,8 @@ sf::Texture Animation::getCurrentFrame()
     return m_CurrentFrame;
 }
 
-SheetlessAnimation::SheetlessAnimation(std::vector<sf::Texture> animationTextures, float switchTime, bool loop, int timesplayed, bool reverse) : m_SwitchTime(switchTime), m_AnimationTextures(animationTextures), m_Loop(loop), m_TimesPlayed(timesplayed), m_Reverse(reverse)
+SheetlessAnimation::SheetlessAnimation(std::vector<sf::Texture> AnimationTextures, float switchTime, bool loop, int timesplayed, bool reverse, std::vector<sf::Vector2f> frameSizes) : 
+    m_SwitchTime(switchTime), m_AnimationTextures(AnimationTextures), m_Loop(loop), m_TimesPlayed(timesplayed), m_Reverse(reverse), m_FrameSizes(frameSizes)
 {
 }
 
@@ -131,21 +132,33 @@ void SheetlessAnimation::begin()
 
 void SheetlessAnimation::update(float deltaTime)
 {
+    if (m_FrameSizes.size() > 0)
+    {
+        if (m_Reverse == true)
+        {
+            m_CurrentTextureSize = m_FrameSizes[m_NextTextureIndex - 1];
+        }
+        else if (m_Reverse == false)
+        {
+            m_CurrentTextureSize = m_FrameSizes[m_NextTextureIndex + 1];
+        }
+    }
+  
     if (m_FrameCount == 0)
     {
-        m_Playing = true;
+        playing = true;
     }
 
     if (m_Loop == false)
     {
         if (m_FrameCount == m_NumTextures * m_TimesPlayed)
         {
-            m_Playing = false;
+            playing = false;
         }
 
         m_TotalTime += deltaTime;
 
-        if (m_TotalTime >= m_SwitchTime && m_Playing == true)
+        if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             m_TotalTime -= m_SwitchTime;
 
@@ -196,14 +209,8 @@ void SheetlessAnimation::update(float deltaTime)
             }
 
             m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
-            std::cout << m_NextTextureIndex << std::endl;
         }
     }
-}
-
-sf::Texture SheetlessAnimation::getCurrentFrame()
-{
-    return m_CurrentTexture;
 }
 
 void SheetlessAnimation::reset()
@@ -221,5 +228,5 @@ void SheetlessAnimation::reset()
         m_CurrentTexture = m_AnimationTextures[0];
     }
 
-    m_Playing = true;
+    playing = true;
 }

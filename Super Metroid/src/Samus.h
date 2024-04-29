@@ -55,7 +55,10 @@ enum AnimationState
 	CROUCHRIGHT,
 	CROUCHLEFT,
 	MORPHBALLRIGHT,
-	MORPHBALLLEFT
+	MORPHBALLLEFT,
+
+	INVULERABLEFACINGRIGHT,
+	INVULERABLEFACINGLEFT
 };
 
 enum CrouchState
@@ -119,10 +122,12 @@ private:
 		CROUCHRIGHT,
 		CROUCHLEFT,
 		MORPHBALLRIGHT,
-		MORPHBALLLEFT
+		MORPHBALLLEFT,
+		INVULERABLEFACINGRIGHT,
+		INVULERABLEFACINGLEFT
 	};
 	AnimationState m_CurrentAnimationState;
-	void setAnimationState(AnimationState animationState);
+	void setAnimationState(AnimationState AnimationState);
 
 	bool m_Sprint = false;
 
@@ -135,6 +140,7 @@ private:
 	int m_CurrentHealthOffset;
 
 	bool m_SamusHit = false;
+	bool m_IsInvulnerable = false;
 public:
 	b2Fixture* currentHitbox;
 

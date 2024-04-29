@@ -20,8 +20,12 @@ private:
 	std::string m_CurrentStage = "res/Level_Spore_Spawn.png";
 	MenuState m_CurrentMenuState = NOMENU;
 
+	bool m_Menued = false;
+
 	void createStages();
 	void createMenus();
+
+	void setCurrentStage(std::string& currentStage);
 
 	std::unordered_map<std::string, Level*> m_Stages;
 	std::unordered_map<MenuState, Menu*> m_Menus;

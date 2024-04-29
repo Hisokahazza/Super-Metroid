@@ -42,3 +42,15 @@ void GameOver::update(float deltaTime)
 void GameOver::draw(Renderer& renderer)
 {
 }
+
+void NoMenu::begin()
+{
+}
+
+void NoMenu::update(float deltaTime)
+{
+}
+
+void NoMenu::draw(Renderer& renderer)
+{
+}
