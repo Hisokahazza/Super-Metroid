@@ -21,6 +21,7 @@ private:
 	MenuState m_CurrentMenuState = NOMENU;
 
 	bool m_Menued = false;
+	bool m_IsSamusAlive = true;
 
 	void createStages();
 	void createMenus();

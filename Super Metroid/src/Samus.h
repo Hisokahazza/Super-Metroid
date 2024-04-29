@@ -58,7 +58,10 @@ enum AnimationState
 	MORPHBALLLEFT,
 
 	INVULERABLEFACINGRIGHT,
-	INVULERABLEFACINGLEFT
+	INVULERABLEFACINGLEFT,
+
+	SAMUSDEATHINTRO,
+	SAMUSDEATH
 };
 
 enum CrouchState
@@ -124,7 +127,9 @@ private:
 		MORPHBALLRIGHT,
 		MORPHBALLLEFT,
 		INVULERABLEFACINGRIGHT,
-		INVULERABLEFACINGLEFT
+		INVULERABLEFACINGLEFT,
+		SAMUSDEATHINTRO,
+		SAMUSDEATH
 	};
 	AnimationState m_CurrentAnimationState;
 	void setAnimationState(AnimationState AnimationState);
@@ -138,9 +143,11 @@ private:
 	Direction currentDirection();
 
 	int m_CurrentHealthOffset;
+	int m_CurrentHealth;
 
 	bool m_SamusHit = false;
 	bool m_IsInvulnerable = false;
+	bool m_IsSamusAlive = true;
 public:
 	b2Fixture* currentHitbox;
 
@@ -168,4 +175,6 @@ public:
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
+
+	bool const checkSamusAlive() { return m_IsSamusAlive; }
 };

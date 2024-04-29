@@ -70,6 +70,11 @@ void Game::update(float deltaTime)
 {
 	m_Menued = false;
 
+	if (samus.checkSamusAlive() == true)
+	{
+		m_IsSamusAlive = false;
+	}
+
 	if (sporeSpawn.switchScreens == true)
 	{
 		m_Menued = true;

@@ -204,6 +204,15 @@ void Samus::createActiveAnimations()
 		Resources::textures["Knockback_L_02.png"]
 	};
 
+	std::vector<sf::Texture> samusDeathIntroTextures
+	{
+		Resources::textures["Samus_Death_Intro_01.png"],
+		Resources::textures["Samus_Death_Intro_02.png"],
+		Resources::textures["Samus_Death_Intro_03.png"],
+		Resources::textures["Samus_Death_Intro_04.png"],
+		Resources::textures["Samus_Death_Intro_05.png"]
+	};
+
 	m_Animations[INVULERABLEFACINGRIGHT] = new SheetlessAnimation(invulnerableRightTextures, 0.1f, false, 1);
 	m_Animations[INVULERABLEFACINGLEFT] = new SheetlessAnimation(invulnerableLeftTextures, 0.1f, false, 1);
 }
@@ -628,6 +637,11 @@ void Samus::update(float deltaTime)
 			}
 		}
 	}*/
+
+	if (m_CurrentHealth > 0)
+	{
+
+	}
 
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
