@@ -55,9 +55,6 @@ void Game::Begin(const sf::Window& window)
 	setCurrentStage(m_CurrentStage);
 	samus.begin();
 
-	playerHUD.begin();
-
-	
 	m_Menus[VICTORY]->begin();
 	m_Menus[GAMEOVER]->begin();
 
@@ -75,7 +72,13 @@ void Game::update(float deltaTime)
 		m_IsSamusAlive = false;
 	}
 
-	if (sporeSpawn.switchScreens == true)
+	if (sporeSpawn.checkSwitchScreens() == true)
+	{
+		m_Menued = true;
+		m_CurrentMenuState = VICTORY;
+	}
+
+	if (samus.checkSwitchScreens() == true)
 	{
 		m_Menued = true;
 		m_CurrentMenuState = VICTORY;
@@ -84,7 +87,7 @@ void Game::update(float deltaTime)
 	if (m_Menus[m_CurrentMenuState]->returnToHub == true)
 	{
 		m_CurrentMenuState = NOMENU;
-		sporeSpawn.switchScreens = false;
+		sporeSpawn.setSwitchScreens(false);
 
 		std::string hubStage = "res/Level_Hub.png";
 		setCurrentStage(hubStage);

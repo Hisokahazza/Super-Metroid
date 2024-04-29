@@ -37,6 +37,9 @@ public:
 class GameOver : public Menu
 {
 private:
+	sf::Text m_GameOvertext;
+	std::vector<sf::Texture> m_ReturnTextures;
+	SheetlessAnimation* m_ReturnTextAnim;
 public:
 	void begin();
 	void update(float deltaTime);

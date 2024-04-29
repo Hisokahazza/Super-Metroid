@@ -1,8 +1,8 @@
 #include "HUD.h"
 
-void HUD::begin()
+void HUD::begin(int initialEnergyTanks)
 {
-	m_EnergyBar.begin();
+	m_EnergyBar.begin(initialEnergyTanks);
 	m_AmmoHUD.begin();
 	m_Minimap.begin();
 }

@@ -41,6 +41,8 @@ protected:
 	std::unordered_map<BossAnimationState, Animation*> m_SheetlessAnimations;
 	std::vector<BossAnimationState> m_ActiveStates = {};
 	BossAnimationState m_CurrentAnimationState;
+
+	bool m_SwitchScreens = false;
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
@@ -60,11 +62,14 @@ public:
 	bool const getIsSamusHit() { return m_IsSamusHit; };
 	void const setIsSamusHit(bool isSamusHit) { m_IsSamusHit = isSamusHit; };
 
+	bool const checkSwitchScreens() { return m_SwitchScreens; }
+	void const setSwitchScreens(bool switchScreens) { m_SwitchScreens = switchScreens; }
+
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 
-	void setPlayerHitbox(b2Fixture* hitbox) { playerHitbox = hitbox; };
+	void setPlayerHitbox(b2Fixture* hitbox) { playerHitbox = hitbox; }
 
-	void setPlayerinvulnerabillity(bool isInvulnerable) { isPlayerInvulnerable = isInvulnerable; };
+	void setPlayerinvulnerabillity(bool isInvulnerable) { isPlayerInvulnerable = isInvulnerable; }
 };
 
 class BossComponent : public Collisionlistener
@@ -84,8 +89,8 @@ public:
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 
-	void setPlayerHitbox(b2Fixture* hitbox) { m_PlayerHitbox = hitbox; };
-	void setPlayerinvulnerabillity(bool isInvulnerable) { m_IsPlayerInvulnerable = isInvulnerable; };
+	void setPlayerHitbox(b2Fixture* hitbox) { m_PlayerHitbox = hitbox; }
+	void setPlayerinvulnerabillity(bool isInvulnerable) { m_IsPlayerInvulnerable = isInvulnerable; }
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 };
 
@@ -162,8 +167,6 @@ private:
 
 	bool m_BossComplete = false;
 public:
-	bool switchScreens = false;
-
 	void begin();
 	void update(float deltaTime);
 	void draw(Renderer& renderer);

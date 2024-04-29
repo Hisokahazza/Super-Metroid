@@ -145,9 +145,13 @@ private:
 	int m_CurrentHealthOffset;
 	int m_CurrentHealth;
 
+	int m_EnergyTanks = 2;
+
 	bool m_SamusHit = false;
 	bool m_IsInvulnerable = false;
-	bool m_IsSamusAlive = false;
+	bool m_IsSamusAlive = true;
+
+	bool m_SwitchScreens = false;
 public:
 	b2Fixture* currentHitbox;
 
@@ -177,4 +181,5 @@ public:
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
 
 	bool const checkSamusAlive() { return m_IsSamusAlive; }
+	bool const checkSwitchScreens() { return m_SwitchScreens; }
 };

@@ -16,7 +16,7 @@ private:
 	int m_TotalEnergyTanks;
 	int m_NumActiveEnergyTanks;
 public:
-	void begin();
+	void begin(int initialEnergyTanks);
 	void update(float deltaTime, int healthOffset);
 	void draw(Renderer& renderer);
 };

@@ -208,8 +208,18 @@ void Samus::createActiveAnimations()
 	{
 		Resources::textures["Samus_Death_Intro_01.png"],
 		Resources::textures["Samus_Death_Intro_02.png"],
+
 		Resources::textures["Samus_Death_Intro_03.png"],
 		Resources::textures["Samus_Death_Intro_04.png"],
+		Resources::textures["Samus_Death_Intro_03.png"],
+		Resources::textures["Samus_Death_Intro_04.png"],
+		Resources::textures["Samus_Death_Intro_03.png"],
+		Resources::textures["Samus_Death_Intro_04.png"],
+		Resources::textures["Samus_Death_Intro_03.png"],
+		Resources::textures["Samus_Death_Intro_04.png"],
+		Resources::textures["Samus_Death_Intro_03.png"],
+		Resources::textures["Samus_Death_Intro_04.png"],
+
 		Resources::textures["Samus_Death_Intro_05.png"]
 	};
 	
@@ -226,8 +236,8 @@ void Samus::createActiveAnimations()
 
 	m_Animations[INVULERABLEFACINGRIGHT] = new SheetlessAnimation(invulnerableRightTextures, 0.1f, false, 1);
 	m_Animations[INVULERABLEFACINGLEFT] = new SheetlessAnimation(invulnerableLeftTextures, 0.1f, false, 1);
-	m_Animations[SAMUSDEATHINTRO] = new SheetlessAnimation(samusDeathIntroTextures, 0.5f, false, 1);
-	m_Animations[SAMUSDEATH] = new SheetlessAnimation(samusDeathTextures, 0.5f, false, 1);
+	m_Animations[SAMUSDEATHINTRO] = new SheetlessAnimation(samusDeathIntroTextures, 0.2f, false, 1);
+	m_Animations[SAMUSDEATH] = new SheetlessAnimation(samusDeathTextures, 0.1f, false, 1);
 }
 
 Samus::Samus() : m_NumGroundContacts(0), m_JumpDelayCount(0)
@@ -241,6 +251,8 @@ void Samus::begin()
 
 	createActiveAnimations();
 
+	m_CurrentHealth = (m_EnergyTanks + 1) * 99;
+
 	// Begin all active Animations
 	for (auto& state : m_ActiveStates)
 	{
@@ -248,6 +260,7 @@ void Samus::begin()
 	}
 
 	m_ActiveProjectile = BULLETPROJ;
+	playerHUD.begin(m_EnergyTanks);
 }
 
 // Update every frame (passed into game update function)
@@ -564,27 +577,13 @@ void Samus::update(float deltaTime)
 	// Checks if a bullet has been shot or destroyed and updates all bullets
 	if (m_ProjectileShot)
 	{
-		if (m_ActiveProjectile == BULLETPROJ)
+		if (m_Missiles.size() != 0)
 		{
-			if (m_Missiles.size() != 0)
-			{
-				updateMissile(deltaTime);
-			}
-			else
-			{
-				updateBullet(deltaTime);
-			}
+			updateMissile(deltaTime);
 		}
-		else if (m_ActiveProjectile == MISSILEPROJ)
+		if (m_Bullets.size() != 0)
 		{
-			if (m_Bullets.size() != 0)
-			{
-				updateBullet(deltaTime);
-			}
-			else
-			{
-				updateMissile(deltaTime);
-			}
+			updateBullet(deltaTime);
 		}
 	}
 
@@ -597,10 +596,13 @@ void Samus::update(float deltaTime)
 	if (m_SamusHit == false)
 	{
 		m_SamusHit = sporeSpawn.getIsSamusHit();
+
+		m_Animations[INVULERABLEFACINGRIGHT]->reset();
+		m_Animations[INVULERABLEFACINGLEFT]->reset();
 	}
 
 	// handle samus getting hit by bosses
-	if (m_SamusHit == true)
+	if (m_SamusHit == true && m_IsSamusAlive == true)
 	{
 		m_IsInvulnerable = true;
 
@@ -634,20 +636,18 @@ void Samus::update(float deltaTime)
 		}
 	}
 
-	if (m_SamusHit == false)
-	{
-		m_Animations[INVULERABLEFACINGRIGHT]->reset();
-		m_Animations[INVULERABLEFACINGLEFT]->reset();
-	}
-
 	if (m_IsSamusAlive == false)
 	{
+		// Stop player from moving when death animation is playing
+		velocity = b2Vec2(0, 0);
+
 		m_CurrentAnimationState = SAMUSDEATHINTRO;
 		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 		{
 			m_CurrentAnimationState = SAMUSDEATH;
 			if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 			{
+				m_SwitchScreens = true;
 			}
 		}
 	}
@@ -663,9 +663,9 @@ void Samus::update(float deltaTime)
 		}
 	}*/
 
-	if (m_CurrentHealth > 0)
+	if (m_CurrentHealth <= 0)
 	{
-
+		m_IsSamusAlive = false;
 	}
 
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
@@ -678,6 +678,8 @@ void Samus::update(float deltaTime)
 
 	// retrieve health offset from boss
 	m_CurrentHealthOffset = sporeSpawn.getPlayerHealthOffset();
+
+	m_CurrentHealth += m_CurrentHealthOffset;
 
 	// Update HUD elements
 	playerHUD.update(deltaTime, m_CurrentHealthOffset, m_MissileOffset, m_ActiveProjectile);
@@ -734,7 +736,6 @@ void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 	}
 	if (self == currentHitbox && otherData->type == BOSSCOMPONENT)
 	{
-		std::cout << "COLLIDED" << std::endl;
 		m_SamusHit = true;
 	}
 }

@@ -33,6 +33,13 @@ void Victory::draw(Renderer& renderer)
 
 void GameOver::begin()
 {
+	m_ReturnTextures = {
+		Resources::textures["Return_Text_01.png"],
+		Resources::textures["Return_Text_02.png"]
+	};
+
+	m_ReturnTextAnim = new SheetlessAnimation(m_ReturnTextures, 0.3f);
+	m_ReturnTextAnim->begin();
 }
 
 void GameOver::update(float deltaTime)

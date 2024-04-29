@@ -1,10 +1,10 @@
 #include "HUDComponents.h"
 
-void EnergyBar::begin()
+void EnergyBar::begin(int initialEnergyTanks)
 {
 	// Init base values
-	m_TotalEnergyTanks = 3;
-	m_NumActiveEnergyTanks = 1;
+	m_TotalEnergyTanks = initialEnergyTanks;
+	m_NumActiveEnergyTanks = initialEnergyTanks;
 	m_EnergyValue = 99;
 }
 
@@ -12,6 +12,11 @@ void EnergyBar::update(float deltaTime, int healthOffset)
 {
 	// Update health based on response from samus class
 	m_EnergyValue += healthOffset;
+
+	if (m_EnergyValue <= 0 && m_NumActiveEnergyTanks <= 0)
+	{
+		m_EnergyValue = 0;
+	}
 
 	// Reset health when energy tank runs out
 	if (m_EnergyValue <= 0 && m_NumActiveEnergyTanks > 0)

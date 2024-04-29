@@ -127,6 +127,7 @@ void SporeSpawn::createFixture()
 	circleShape.m_p.Set(0, 0);
 	b2FixtureDef fixtureDef{};
 	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
+	fixtureDef.isSensor = true;
 	fixtureDef.shape = &circleShape;
 	fixtureDef.friction = 0.0f;
 	m_CoreClosed = body->CreateFixture(&fixtureDef);
@@ -134,7 +135,6 @@ void SporeSpawn::createFixture()
 	b2PolygonShape polygonShape{};
 	polygonShape.SetAsBox(0.4f, 1.3f);
 	fixtureDef.shape = &polygonShape;
-	fixtureDef.isSensor = true;
 	m_CoreFixture = body->CreateFixture(&fixtureDef);
 
 	// Create bottom and top fixtures for when core is open
@@ -143,6 +143,14 @@ void SporeSpawn::createFixture()
 
 	polygonShape.SetAsBox(1.7f, 0.65f, b2Vec2(0.0f, 2.2f), 0.0f);
 	m_CoreOpenBottom = body->CreateFixture(&fixtureDef);
+
+	// create collidable body so player doesn't overlap with the boss
+	circleShape.m_radius = 1.5f;
+	circleShape.m_p.Set(0, 0);
+	fixtureDef.isSensor = false;
+	fixtureDef.shape = &circleShape;
+	fixtureDef.friction = 0.0f;
+	body->CreateFixture(&fixtureDef);
 }
 
 void SporeSpawn::closeCore(float deltaTime)
@@ -420,14 +428,14 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 
-	if (switchScreens == false)
+	if (m_SwitchScreens == false)
 	{
 		m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 	}
 	
 	if (m_BossComplete == true && m_CurrentAnimationState == CORECLOSED)
 	{
-		switchScreens = true;
+		m_SwitchScreens = true;
 		m_BossComplete = false;
 	}
 }
@@ -471,6 +479,7 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		if (m_CurrentAnimationState == CORECLOSED && self == m_CoreClosed)
 		{
+			std::cout << "COLLIDED" << std::endl;
 			playerHealthOffset -= 20;
 			m_IsSamusHit = true;
 		}

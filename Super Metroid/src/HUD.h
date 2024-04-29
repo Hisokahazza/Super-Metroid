@@ -11,7 +11,7 @@ private:
 	Ammo m_AmmoHUD;
 	MiniMap m_Minimap;
 public:
-	void begin();
+	void begin(int initialEnergyTanks);
 	void update(float deltaTime, int healthOffset, int ammoOffset, ProjectileType activeProjectile);
 	void draw(Renderer& renderer);
 };
