@@ -562,6 +562,10 @@ void Level::clearLevel()
 {
 	for (auto& body : m_BodiesToDelete)
 	{
-		Physics::world.DestroyBody(body);
+		if (body)
+		{
+			Physics::world.DestroyBody(body);
+		}
+		m_BodiesToDelete.erase(std::find(m_BodiesToDelete.begin(), m_BodiesToDelete.end(), body));
 	}
 }

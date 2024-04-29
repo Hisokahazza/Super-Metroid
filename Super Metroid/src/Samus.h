@@ -19,9 +19,11 @@
 
 #include "HUD.h"
 #include "Boss.h"
+#include "MenuManager.h"
 
 extern HUD playerHUD;
 extern SporeSpawn sporeSpawn;
+extern MenuManager menuManager;
 
 enum AnimationState
 {
@@ -150,8 +152,6 @@ private:
 	bool m_SamusHit = false;
 	bool m_IsInvulnerable = false;
 	bool m_IsSamusAlive = true;
-
-	bool m_SwitchScreens = false;
 public:
 	b2Fixture* currentHitbox;
 
@@ -181,5 +181,4 @@ public:
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
 
 	bool const checkSamusAlive() { return m_IsSamusAlive; }
-	bool const checkSwitchScreens() { return m_SwitchScreens; }
 };

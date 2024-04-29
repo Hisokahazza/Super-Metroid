@@ -6,7 +6,7 @@ void Renderer::loadTex()
 	for (auto& file : std::filesystem::directory_iterator("./res/textures/"))
 	{
 		if (file.is_regular_file() && (file.path().extension() == ".png" ||
-			file.path().extension() == ".jpg" || file.path().extension() == ".gif"))
+			file.path().extension() == ".jpg" || file.path().extension() == ".gif" || file.path().extension() == ".jpeg"))
 		{
 			Resources::textures[file.path().filename().string()].loadFromFile(
 				file.path().string());

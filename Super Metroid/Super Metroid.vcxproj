@@ -134,6 +134,7 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Menu.h" />
+    <ClInclude Include="src\MenuManager.h" />
     <ClInclude Include="src\Samus.h" />
     <ClInclude Include="src\HUD.h" />
     <ClInclude Include="src\HUDComponents.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\Menu.cpp" />
+    <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Renderer.cpp" />

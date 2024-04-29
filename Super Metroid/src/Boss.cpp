@@ -428,14 +428,14 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 
-	if (m_SwitchScreens == false)
+	if (menuManager.getSwitchScreen() == NOMENU)
 	{
 		m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 	}
 	
 	if (m_BossComplete == true && m_CurrentAnimationState == CORECLOSED)
 	{
-		m_SwitchScreens = true;
+		menuManager.setSwitchScreen(VICTORY);
 		m_BossComplete = false;
 	}
 }

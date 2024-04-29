@@ -9,10 +9,13 @@
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_circle_shape.h>
 
-
 #include "Renderer.h"
 #include "Animation.h"
 #include "Physics.h"
+
+#include "MenuManager.h"
+
+extern MenuManager menuManager;
 
 struct BossAttributes
 {
@@ -42,7 +45,6 @@ protected:
 	std::vector<BossAnimationState> m_ActiveStates = {};
 	BossAnimationState m_CurrentAnimationState;
 
-	bool m_SwitchScreens = false;
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
@@ -61,9 +63,6 @@ public:
 
 	bool const getIsSamusHit() { return m_IsSamusHit; };
 	void const setIsSamusHit(bool isSamusHit) { m_IsSamusHit = isSamusHit; };
-
-	bool const checkSwitchScreens() { return m_SwitchScreens; }
-	void const setSwitchScreens(bool switchScreens) { m_SwitchScreens = switchScreens; }
 
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 

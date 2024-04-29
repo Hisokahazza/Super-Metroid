@@ -11,6 +11,7 @@
 #include "Boss.h"
 #include "HUD.h"
 #include "Menu.h"
+#include "MenuManager.h"
 
 extern Camera camera;
 
@@ -18,21 +19,19 @@ class Game
 {
 private:
 	std::string m_CurrentStage = "res/Level_Spore_Spawn.png";
-	MenuState m_CurrentMenuState = NOMENU;
 
-	bool m_Menued = false;
 	bool m_IsSamusAlive = true;
 
 	void createStages();
-	void createMenus();
 
 	void setCurrentStage(std::string& currentStage);
 
 	std::unordered_map<std::string, Level*> m_Stages;
-	std::unordered_map<MenuState, Menu*> m_Menus;
 
 	sf::Image m_MapImage;
 	std::vector<sf::Vector2f> m_MapPositions;
+
+	std::string m_HubStage = "res/Level_Hub.png";
 public:
 	Game();
 	~Game();

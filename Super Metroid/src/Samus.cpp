@@ -606,6 +606,8 @@ void Samus::update(float deltaTime)
 	{
 		m_IsInvulnerable = true;
 
+		m_CrouchState = NONE;
+
 		if (m_Orientation == RIGHT)
 		{
 			m_CurrentAnimationState = INVULERABLEFACINGRIGHT;
@@ -647,7 +649,7 @@ void Samus::update(float deltaTime)
 			m_CurrentAnimationState = SAMUSDEATH;
 			if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 			{
-				m_SwitchScreens = true;
+				menuManager.setSwitchScreen(GAMEOVER);
 			}
 		}
 	}
@@ -668,6 +670,7 @@ void Samus::update(float deltaTime)
 		m_IsSamusAlive = false;
 	}
 
+	// Update current animation
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
 	// Set the current samus hitbox from bosses
@@ -684,6 +687,7 @@ void Samus::update(float deltaTime)
 	// Update HUD elements
 	playerHUD.update(deltaTime, m_CurrentHealthOffset, m_MissileOffset, m_ActiveProjectile);
 	
+	// Reset offsets
 	m_MissileOffset = 0;
 	sporeSpawn.setPlayerHealthOffset(0);
 	
