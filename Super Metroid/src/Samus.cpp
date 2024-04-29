@@ -212,9 +212,22 @@ void Samus::createActiveAnimations()
 		Resources::textures["Samus_Death_Intro_04.png"],
 		Resources::textures["Samus_Death_Intro_05.png"]
 	};
+	
+	std::vector<sf::Texture> samusDeathTextures
+	{
+		Resources::textures["Samus_Death_01.png"],
+		Resources::textures["Samus_Death_02.png"],
+		Resources::textures["Samus_Death_03.png"],
+		Resources::textures["Samus_Death_04.png"],
+		Resources::textures["Samus_Death_05.png"],
+		Resources::textures["Samus_Death_06.png"],
+		Resources::textures["Samus_Death_07.png"]
+	};
 
 	m_Animations[INVULERABLEFACINGRIGHT] = new SheetlessAnimation(invulnerableRightTextures, 0.1f, false, 1);
 	m_Animations[INVULERABLEFACINGLEFT] = new SheetlessAnimation(invulnerableLeftTextures, 0.1f, false, 1);
+	m_Animations[SAMUSDEATHINTRO] = new SheetlessAnimation(samusDeathIntroTextures, 0.5f, false, 1);
+	m_Animations[SAMUSDEATH] = new SheetlessAnimation(samusDeathTextures, 0.5f, false, 1);
 }
 
 Samus::Samus() : m_NumGroundContacts(0), m_JumpDelayCount(0)
@@ -627,6 +640,18 @@ void Samus::update(float deltaTime)
 		m_Animations[INVULERABLEFACINGLEFT]->reset();
 	}
 
+	if (m_IsSamusAlive == false)
+	{
+		m_CurrentAnimationState = SAMUSDEATHINTRO;
+		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
+		{
+			m_CurrentAnimationState = SAMUSDEATH;
+			if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
+			{
+			}
+		}
+	}
+
 	/*if (m_CurrentAnimationState == SHOOTRIGHTSTATIC || m_CurrentAnimationState == SHOOTLEFTSTATIC)
 	{
 		for (auto state : m_ActiveStates)
@@ -677,14 +702,14 @@ void Samus::draw(Renderer& renderer)
 
 	if (m_Bullets.size() != 0)
 	{
-		for (auto bullet : m_Bullets)
+		for (auto& bullet : m_Bullets)
 		{
 			bullet->draw(renderer);
 		}
 	}
 	if (m_Missiles.size() != 0)
 	{
-		for (auto missile : m_Missiles)
+		for (auto& missile : m_Missiles)
 		{
 			missile->draw(renderer);
 		}

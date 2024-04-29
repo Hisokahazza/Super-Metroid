@@ -147,7 +147,7 @@ private:
 
 	bool m_SamusHit = false;
 	bool m_IsInvulnerable = false;
-	bool m_IsSamusAlive = true;
+	bool m_IsSamusAlive = false;
 public:
 	b2Fixture* currentHitbox;
 
