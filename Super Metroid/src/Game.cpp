@@ -19,8 +19,6 @@ void Game::createStages()
 void Game::setCurrentStage(std::string& currentStage)
 {
 	m_Stages[m_CurrentStage]->clearLevel();
-
-	std::cout << "CLEARED" << std::endl;
 	
 	m_CurrentStage = currentStage;
 
@@ -58,8 +56,6 @@ void Game::Begin(const sf::Window& window)
 // update function(called every frame)
 void Game::update(float deltaTime)
 {
-	menuManager.setMenued(false);
-
 	if (menuManager.getSwitchScreen() != NOMENU)
 	{
 		menuManager.setMenued(true);
@@ -77,6 +73,7 @@ void Game::update(float deltaTime)
 
 		if (menuManager.checkMenued() == true)
 		{
+			std::cout << "CLEARED" << std::endl;
 			setCurrentStage(m_HubStage);
 		}
 	}

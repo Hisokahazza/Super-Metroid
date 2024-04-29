@@ -562,10 +562,20 @@ void Level::clearLevel()
 {
 	for (auto& body : m_BodiesToDelete)
 	{
+		/*if (m_BodiesToDelete.size() > 0)
+		{
+			m_BodiesToDelete.erase(std::find(m_BodiesToDelete.begin(), m_BodiesToDelete.end(), body));
+		}*/
+
 		if (body)
 		{
+			m_CurrentFixtureToDelete = body->GetFixtureList();
+
+			body->DestroyFixture(m_CurrentFixtureToDelete);
+
 			Physics::world.DestroyBody(body);
+
+			body = nullptr;
 		}
-		m_BodiesToDelete.erase(std::find(m_BodiesToDelete.begin(), m_BodiesToDelete.end(), body));
 	}
 }

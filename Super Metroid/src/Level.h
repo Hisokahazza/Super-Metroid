@@ -38,6 +38,7 @@ private:
 protected:
 	std::vector<std::vector<int>> m_Grid;
 	std::vector<b2Body*> m_BodiesToDelete;
+	b2Fixture* m_CurrentFixtureToDelete;
 
 	std::unordered_map<Colour, sf::Color> colours = { 
 		{RED, sf::Color(255, 0, 0)},
