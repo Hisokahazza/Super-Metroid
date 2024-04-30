@@ -28,12 +28,11 @@ void Game::setCurrentStage(std::string& currentStage)
 	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
 	camera.position = sf::Vector2f(m_MapImage.getSize().x / 2.0f, m_MapImage.getSize().y / 2.0f);
 	samus.position = m_MapPositions[0];
+
 	samus.reset();
 	samus.begin();
 
 	std::cout << m_MapPositions[0].x << m_MapPositions[0].y << std::endl;
-
-	//menuManager.setMenued(false);
 }
 
 Game::Game()

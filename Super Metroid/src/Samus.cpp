@@ -732,13 +732,7 @@ void Samus::reset()
 	m_IsSamusAlive = true;
 	m_SamusHit = false;
 
-	if (m_Body)
-	{
-		std::cout << "VEL" << std::endl;
-		m_Body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-	}
-
-	m_CurrentAnimationState = IDLE;
+	setAnimationState(IDLE);
 	
 	m_ActiveProjectile = BULLETPROJ;
 
