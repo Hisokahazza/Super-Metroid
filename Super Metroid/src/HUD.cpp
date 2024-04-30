@@ -23,3 +23,10 @@ void HUD::draw(Renderer& renderer)
 	m_AmmoHUD.draw(renderer);
 	m_Minimap.draw(renderer);
 }
+
+void HUD::reset()
+{
+	m_EnergyBar.reset();
+	m_AmmoHUD.reset();
+	m_Minimap.reset();
+}

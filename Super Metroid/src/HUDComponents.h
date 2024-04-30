@@ -19,6 +19,7 @@ public:
 	void begin(int initialEnergyTanks);
 	void update(float deltaTime, int healthOffset);
 	void draw(Renderer& renderer);
+	void reset();
 };
 
 class Ammo
@@ -32,6 +33,7 @@ public:
 	void begin();
 	void update(float deltaTime, int ammoOffset, ProjectileType activeProjectile);
 	void draw(Renderer& renderer);
+	void reset();
 };
 
 class MiniMap
@@ -47,4 +49,5 @@ public:
 	void begin();
 	void update(float deltaTime);
 	void draw(Renderer& renderer);
+	void reset();
 };

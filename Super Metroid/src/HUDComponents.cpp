@@ -49,6 +49,12 @@ void EnergyBar::draw(Renderer& renderer)
 	}
 }
 
+void EnergyBar::reset()
+{
+	m_NumActiveEnergyTanks = m_TotalEnergyTanks;
+	m_EnergyValue = 99;
+}
+
 void Ammo::begin()
 {
 	// Init base value
@@ -81,6 +87,11 @@ void Ammo::draw(Renderer& renderer)
 
 }
 
+void Ammo::reset()
+{
+	m_AmmoValue = 15;
+}
+
 void MiniMap::begin()
 {
 	m_FlashTextures = { Resources::textures["Mini_Map_S_WP.png"], Resources::textures["Mini_Map_S_RO.png"] };
@@ -108,4 +119,8 @@ void MiniMap::draw(Renderer& renderer)
 			}
 		}
 	}
+}
+
+void MiniMap::reset()
+{
 }

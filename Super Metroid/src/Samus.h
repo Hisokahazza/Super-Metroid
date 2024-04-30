@@ -152,6 +152,8 @@ private:
 	bool m_SamusHit = false;
 	bool m_IsInvulnerable = false;
 	bool m_IsSamusAlive = true;
+
+	b2Vec2 m_Velocity;
 public:
 	b2Fixture* currentHitbox;
 
@@ -165,6 +167,7 @@ public:
 	void begin();
 	void update(float deltaTime);
 	void draw(Renderer& renderer);
+	void reset();
 
 	sf::Vector2f position{};
 

@@ -125,7 +125,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 			}
 		}
 	}
-	return {samusPosition};
+	return {samusPosition, sf::Vector2f()};
 }
 
 void StageHub::draw(Renderer& renderer)

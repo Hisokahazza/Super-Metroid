@@ -18,14 +18,22 @@ void Game::createStages()
 
 void Game::setCurrentStage(std::string& currentStage)
 {
+	sporeSpawn.resetFixture();
+
 	m_Stages[m_CurrentStage]->clearLevel();
 	
 	m_CurrentStage = currentStage;
 
-	m_MapImage.loadFromFile(m_CurrentStage);
-	m_MapPositions = m_Stages[m_CurrentStage]->createFromImg(m_MapImage);
+	m_MapImage.loadFromFile(currentStage);
+	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
 	camera.position = sf::Vector2f(m_MapImage.getSize().x / 2.0f, m_MapImage.getSize().y / 2.0f);
 	samus.position = m_MapPositions[0];
+	samus.reset();
+	samus.begin();
+
+	std::cout << m_MapPositions[0].x << m_MapPositions[0].y << std::endl;
+
+	//menuManager.setMenued(false);
 }
 
 Game::Game()
@@ -56,11 +64,6 @@ void Game::Begin(const sf::Window& window)
 // update function(called every frame)
 void Game::update(float deltaTime)
 {
-	if (menuManager.getSwitchScreen() != NOMENU)
-	{
-		menuManager.setMenued(true);
-	}
-
 	if (samus.checkSamusAlive() == true)
 	{
 		m_IsSamusAlive = false;
@@ -71,19 +74,10 @@ void Game::update(float deltaTime)
 	{
 		menuManager.setSwitchScreen(NOMENU);
 
-		if (menuManager.checkMenued() == true)
-		{
-			std::cout << "CLEARED" << std::endl;
-			setCurrentStage(m_HubStage);
-		}
+		setCurrentStage(m_HubStage);
 	}
-	
-	menuManager.menus[menuManager.getSwitchScreen()]->update(deltaTime);
 
-	if (menuManager.checkMenued() == true)
-	{
-		return;
-	}
+	menuManager.menus[menuManager.getSwitchScreen()]->update(deltaTime);
 	
 	Physics::update(deltaTime);
 	samus.update(deltaTime);
@@ -98,11 +92,6 @@ void Game::update(float deltaTime)
 // Final rendering step
 void Game::draw(Renderer& renderer)
 {
-	if (menuManager.checkMenued() == true)
-	{
-		return;
-	}
-
 	m_Stages[m_CurrentStage]->draw(renderer);
 	samus.draw(renderer);
 
@@ -116,11 +105,6 @@ void Game::draw(Renderer& renderer)
 
 void Game::drawUI(Renderer& renderer)
 {
-	if (menuManager.checkMenued() == true)
-	{
-		return;
-	}
-
 	playerHUD.draw(renderer);
 }
 

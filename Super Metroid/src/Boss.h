@@ -53,6 +53,7 @@ public:
 	sf::Vector2f position;
 
 	virtual void createFixture() = 0;
+	virtual void resetFixture() = 0;
 
 	virtual void begin() = 0;
 	virtual void update(float deltaTime) = 0;
@@ -169,6 +170,8 @@ public:
 	void begin();
 	void update(float deltaTime);
 	void draw(Renderer& renderer);
+
+	void resetFixture();
 
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;

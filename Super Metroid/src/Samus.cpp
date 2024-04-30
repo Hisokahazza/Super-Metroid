@@ -293,8 +293,8 @@ void Samus::update(float deltaTime)
 	}
 
 	// Get current velocity of body
-	b2Vec2 velocity = m_Body->GetLinearVelocity();
-	velocity.x = 0.0f;
+	m_Velocity = m_Body->GetLinearVelocity();
+	m_Velocity.x = 0.0f;
 
 	// Handle sprint
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::LShift) && m_NumGroundContacts >= 1)
@@ -307,24 +307,22 @@ void Samus::update(float deltaTime)
 	// Handle left right movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right))
 	{
-		if (m_CrouchState == CROUCH)
-		{
-			m_CrouchState = NONE;
-		}
+		m_CrouchState = NONE;
 
 		if (m_NumGroundContacts >= 1)
 		{
-			velocity.x += move;
+			m_Velocity.x += move;
 		}
 		// movement is restricted when in the air
 		else
 		{
-			velocity.x += move / 1.3;
+			m_Velocity.x += move / 1.3;
 		}
 
 		if (m_NumGroundContacts < 1)
 		{
 			setAnimationState(JUMPRIGHT);
+			m_CanShoot = false;
 		}
 		else if (m_Sprint == true)
 		{
@@ -350,24 +348,22 @@ void Samus::update(float deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
 	{
-		if (m_CrouchState == CROUCH)
-		{
-			m_CrouchState = NONE;
-		}
+		m_CrouchState = NONE;
 
 		if (m_NumGroundContacts >= 1)
 		{
-			velocity.x -= move;
+			m_Velocity.x -= move;
 		}
 		// movement is restricted when in the air
 		else
 		{
-			velocity.x -= move / 1.3;
+			m_Velocity.x -= move / 1.3;
 		}
 
 		if (m_NumGroundContacts < 1)
 		{
 			setAnimationState(JUMPLEFT);
+			m_CanShoot = false;
 		}
 		else if (m_Sprint == true)
 		{
@@ -395,7 +391,7 @@ void Samus::update(float deltaTime)
 	// Handle jumping
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Up) && m_NumGroundContacts >= 1 && m_CrouchState != MORPHBALL)
 	{
-		velocity.y = -jumpVelocity;
+		m_Velocity.y = -jumpVelocity;
 	}
 
 	// allow player to jump higher when holding the key
@@ -456,10 +452,12 @@ void Samus::update(float deltaTime)
 		if (m_Orientation == RIGHT)
 		{
 			setAnimationState(CROUCHRIGHT);
+			m_ProjectileInitialPos = b2Vec2(position.x + 0.3f, position.y + 0.6f);
 		}
 		else if (m_Orientation == LEFT)
 		{
 			setAnimationState(CROUCHLEFT);
+			m_ProjectileInitialPos = b2Vec2(position.x - 0.3f, position.y + 0.6f);
 		}
 	}
 
@@ -574,7 +572,7 @@ void Samus::update(float deltaTime)
 	// Increments delay count
 	m_ProjectileDelayCount++;
 
-	// Checks if a bullet has been shot or destroyed and updates all bullets
+	// Checks if a bullet has been shot and destroys and updates all bullets
 	if (m_ProjectileShot)
 	{
 		if (m_Missiles.size() != 0)
@@ -628,7 +626,7 @@ void Samus::update(float deltaTime)
 			knockBackImpulse = b2Vec2(m_KnockBackSpeed, -m_KnockBackSpeed / 10);
 		}
 
-		velocity = knockBackImpulse;
+		m_Velocity = knockBackImpulse;
 
 		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 		{
@@ -641,7 +639,7 @@ void Samus::update(float deltaTime)
 	if (m_IsSamusAlive == false)
 	{
 		// Stop player from moving when death animation is playing
-		velocity = b2Vec2(0, 0);
+		m_Velocity = b2Vec2(0, 0);
 
 		m_CurrentAnimationState = SAMUSDEATHINTRO;
 		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
@@ -649,7 +647,11 @@ void Samus::update(float deltaTime)
 			m_CurrentAnimationState = SAMUSDEATH;
 			if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 			{
-				menuManager.setSwitchScreen(GAMEOVER);
+				if (menuManager.checkMenued() == false)
+				{
+					menuManager.setMenued(true);
+					menuManager.setSwitchScreen(GAMEOVER);
+				}
 			}
 		}
 	}
@@ -694,7 +696,7 @@ void Samus::update(float deltaTime)
 	m_Sprint = false;
 
 	// Set velocity to new value
-	m_Body->SetLinearVelocity(velocity);
+	m_Body->SetLinearVelocity(m_Velocity);
 
 	// Assign new character position
 	position = sf::Vector2f(m_Body->GetPosition().x, m_Body->GetPosition().y);
@@ -721,6 +723,26 @@ void Samus::draw(Renderer& renderer)
 		}
 	}
 		
+}
+
+void Samus::reset()
+{
+	m_CurrentHealth = (m_EnergyTanks + 1) * 99;
+
+	m_IsSamusAlive = true;
+	m_SamusHit = false;
+
+	if (m_Body)
+	{
+		std::cout << "VEL" << std::endl;
+		m_Body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+	}
+
+	m_CurrentAnimationState = IDLE;
+	
+	m_ActiveProjectile = BULLETPROJ;
+
+	playerHUD.reset();
 }
 
 // Implement collision listener in physics module

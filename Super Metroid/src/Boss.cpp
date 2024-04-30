@@ -341,6 +341,15 @@ void SporeSpawn::update(float deltaTime)
 		}
 	}
 
+	if (menuManager.menus[menuManager.getSwitchScreen()]->returnToHub == true)
+	{
+		std::cout << "SPORE" << std::endl;
+		for (auto& spore : m_Spores)
+		{
+			spore->~Spore();
+		}
+	}
+
 	// Handle Spore Spawning
 	m_SporeTotalTime += deltaTime;
 
@@ -452,6 +461,17 @@ void SporeSpawn::draw(Renderer& renderer)
 	for (auto spore : m_Spores)
 	{
 		spore->draw(renderer);
+	}
+}
+
+void SporeSpawn::resetFixture()
+{
+	if (body)
+	{
+		b2Fixture* fixturesToDelete = body->GetFixtureList();
+		body->DestroyFixture(fixturesToDelete);
+
+		Physics::world.DestroyBody(body);
 	}
 }
 
