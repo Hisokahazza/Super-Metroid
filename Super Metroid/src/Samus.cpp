@@ -768,6 +768,11 @@ void Samus::reset()
 		m_Body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 	}
 	
+	setAnimationState(IDLE);
+	
+
+	m_CurrentAnimationState = IDLE;
+	
 	m_ActiveProjectile = BULLETPROJ;
 
 	playerHUD.reset();
