@@ -6,7 +6,7 @@ Samus samus;
 HUD playerHUD;
 MenuManager menuManager;
 
-SporeSpawn sporeSpawn;
+//SporeSpawn sporeSpawn;
 
 float movementSpeed = 0.5f;
 
@@ -14,11 +14,19 @@ void Game::createStages()
 {
 	m_Stages["res/Level_Hub.png"] = new StageHub();
 	m_Stages["res/Level_Spore_Spawn.png"] = new StageSporeSpawn();
+	m_Stages["res/Level_Gold_Torizo.png"] = new StageGoldTorizo();
+}
+
+void Game::createBosses()
+{
+	m_Bosses[SPORESPAWN] = new SporeSpawn();
+	m_Bosses[GOLDTORIZO] = new GoldTorizo();
 }
 
 void Game::setCurrentStage(std::string& currentStage)
 {
-	sporeSpawn.resetFixture();
+	//sporeSpawn.resetFixture();
+	m_Bosses[m_CurrentBoss]->resetFixture();
 
 	m_Stages[m_CurrentStage]->clearLevel();
 	
@@ -26,13 +34,9 @@ void Game::setCurrentStage(std::string& currentStage)
 
 	m_MapImage.loadFromFile(currentStage);
 	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
-	camera.position = sf::Vector2f(m_MapImage.getSize().x / 2.0f, m_MapImage.getSize().y / 2.0f);
 	samus.position = m_MapPositions[0];
 
 	samus.reset();
-	samus.begin();
-
-	std::cout << m_MapPositions[0].x << m_MapPositions[0].y << std::endl;
 }
 
 Game::Game()
@@ -49,25 +53,34 @@ void Game::Begin(const sf::Window& window)
 	menuManager.begin();
 
 	createStages();
+	createBosses();
 
 	Physics::init();
 
 	//load map image
 	setCurrentStage(m_CurrentStage);
+
+	samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
 	samus.begin();
 
-	sporeSpawn.position = m_MapPositions[1];
-	sporeSpawn.begin();
+	camera.position = samus.position;
+
+	m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
+	m_Bosses[m_CurrentBoss]->begin();
+
+	//sporeSpawn.position = m_MapPositions[1]
+	//sporeSpawn.begin();
 }
 
 // update function(called every frame)
 void Game::update(float deltaTime)
 {
+	camera.position = samus.position;
+
 	if (samus.checkSamusAlive() == true)
 	{
 		m_IsSamusAlive = false;
 	}
-
 
 	if (menuManager.menus[menuManager.getSwitchScreen()]->returnToHub == true)
 	{
@@ -84,7 +97,8 @@ void Game::update(float deltaTime)
 	if (m_CurrentStage != "res/Level_Hub.png")
 	{
 		// determine which boss to play
-		sporeSpawn.update(deltaTime);
+		m_Bosses[m_CurrentBoss]->update(deltaTime);
+		//sporeSpawn.update(deltaTime);
 	}
 }
 
@@ -96,7 +110,8 @@ void Game::draw(Renderer& renderer)
 
 	if (m_CurrentStage != "res/Level_Hub.png")
 	{
-		sporeSpawn.draw(renderer);
+		m_Bosses[m_CurrentBoss]->draw(renderer);
+		//sporeSpawn.draw(renderer);
 	}
 	
 	Physics::debugDraw(renderer);

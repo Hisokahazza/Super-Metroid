@@ -57,7 +57,7 @@ void Samus::updateBullet(float deltaTime)
 	for (auto bullet : m_Bullets)
 	{
 		// Check if bullet collides with spore objects
-		if (&(bullet->fixtureData) == sporeSpawn.getProjectileDestroyed())
+		if (&(bullet->fixtureData) == m_CurrentBoss->getProjectileDestroyed())
 		{
 			bullet->destroyed = true;
 		}
@@ -87,7 +87,7 @@ void Samus::updateMissile(float deltaTime)
 	for (auto missile : m_Missiles)
 	{
 		// Check if bullet collides with spore objects
-		if ( missile && &(missile->fixtureData) == sporeSpawn.getProjectileDestroyed())
+		if ( missile && &(missile->fixtureData) == m_CurrentBoss->getProjectileDestroyed())
 		{
 			missile->destroyed = true;
 		}
@@ -275,6 +275,8 @@ void Samus::begin()
 // Update every frame (passed into game update function)
 void Samus::update(float deltaTime)
 {
+	std::cout << m_CurrentBoss << std::endl;
+
 	float move = movementSpeed;
 	m_CanShoot = true;
 	currentHitbox = samusHitbox;
@@ -613,7 +615,7 @@ void Samus::update(float deltaTime)
 
 	if (m_SamusHit == false)
 	{
-		m_SamusHit = sporeSpawn.getIsSamusHit();
+		m_SamusHit = m_CurrentBoss->getIsSamusHit();
 		
 		m_Animations[INVULERABLEFACINGRIGHT]->reset();
 		m_Animations[INVULERABLEFACINGLEFT]->reset();
@@ -654,7 +656,7 @@ void Samus::update(float deltaTime)
 		{
 			// When animation ends set hit to false
 			m_SamusHit = false;
-			sporeSpawn.setIsSamusHit(false);
+			m_CurrentBoss->setIsSamusHit(false);
 			m_IsInvulnerable = false;
 		}
 	}
@@ -702,13 +704,13 @@ void Samus::update(float deltaTime)
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
 	// Set the current samus hitbox from bosses
-	sporeSpawn.setPlayerHitbox(currentHitbox);
+	m_CurrentBoss->setPlayerHitbox(currentHitbox);
 
 	// Set player invulnerabillity status
-	sporeSpawn.setPlayerinvulnerabillity(m_IsInvulnerable);
+	m_CurrentBoss->setPlayerinvulnerabillity(m_IsInvulnerable);
 
 	// retrieve health offset from boss
-	m_CurrentHealthOffset = sporeSpawn.getPlayerHealthOffset();
+	m_CurrentHealthOffset = m_CurrentBoss->getPlayerHealthOffset();
 
 	m_CurrentHealth += m_CurrentHealthOffset;
 
@@ -717,7 +719,7 @@ void Samus::update(float deltaTime)
 	
 	// Reset offsets
 	m_MissileOffset = 0;
-	sporeSpawn.setPlayerHealthOffset(0);
+	m_CurrentBoss->setPlayerHealthOffset(0);
 	
 	m_Sprint = false;
 
@@ -761,7 +763,7 @@ void Samus::reset()
 
 	m_IsSamusAlive = true;
 	m_SamusHit = false;
-	sporeSpawn.setIsSamusHit(false);
+	m_CurrentBoss->setIsSamusHit(false);
 
 	if (m_Body)
 	{

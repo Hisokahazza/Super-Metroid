@@ -41,7 +41,7 @@ int main()
 		game.update(deltaTime);
 
 		// Clears screen before next render
-		window.clear(sf::Color(20, 20, 20));
+		window.clear(sf::Color(0, 0, 0));
 
 		game.draw(renderer);
 

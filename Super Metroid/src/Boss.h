@@ -24,6 +24,12 @@ struct BossAttributes
 	float defenceMultiplier;
 };
 
+enum BossName
+{
+	SPORESPAWN,
+	GOLDTORIZO
+};
+
 enum BossAnimationState
 {
 	// SporeSpawn animation states
@@ -48,7 +54,6 @@ protected:
 	std::unordered_map<BossAnimationState, Animation*> m_SheetlessAnimations;
 	std::vector<BossAnimationState> m_ActiveStates = {};
 	BossAnimationState m_CurrentAnimationState;
-
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;

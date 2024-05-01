@@ -3,7 +3,7 @@
 #pragma once
 
 #include <unordered_map>
-#include <Queue>
+#include <Memory>
 
 #include <box2d/b2_body.h>
 #include <box2d/b2_polygon_shape.h>
@@ -22,7 +22,7 @@
 #include "MenuManager.h"
 
 extern HUD playerHUD;
-extern SporeSpawn sporeSpawn;
+//extern SporeSpawn sporeSpawn;
 extern MenuManager menuManager;
 
 enum AnimationState
@@ -76,6 +76,8 @@ enum CrouchState
 class Samus : public Collisionlistener
 {
 private:
+	Boss* m_CurrentBoss = new SporeSpawn();
+
 	void createFixture();
 	void createActiveAnimations();
 
@@ -183,5 +185,7 @@ public:
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
 
+	// Getters and Setters
 	bool const checkSamusAlive() { return m_IsSamusAlive; }
+	void const setCurrentBoss(Boss* boss) { m_CurrentBoss = boss; }
 };

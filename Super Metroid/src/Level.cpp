@@ -1,6 +1,28 @@
 #include "Level.h"
 #include <iostream>
 
+void Level::clearLevel()
+{
+	for (auto& body : m_BodiesToDelete)
+	{
+		/*if (m_BodiesToDelete.size() > 0)
+		{
+			m_BodiesToDelete.erase(std::find(m_BodiesToDelete.begin(), m_BodiesToDelete.end(), body));
+		}*/
+
+		if (body)
+		{
+			m_CurrentFixtureToDelete = body->GetFixtureList();
+
+			body->DestroyFixture(m_CurrentFixtureToDelete);
+
+			Physics::world.DestroyBody(body);
+
+			body = nullptr;
+		}
+	}
+}
+
 StageHub::StageHub(float cellSize) : m_CellSize(cellSize)
 {
 }
@@ -558,37 +580,262 @@ void StageSporeSpawn::draw(Renderer& renderer)
 	}
 }
 
-void Level::clearLevel()
-{
-	for (auto& body : m_BodiesToDelete)
-	{
-		/*if (m_BodiesToDelete.size() > 0)
-		{
-			m_BodiesToDelete.erase(std::find(m_BodiesToDelete.begin(), m_BodiesToDelete.end(), body));
-		}*/
-
-		if (body)
-		{
-			m_CurrentFixtureToDelete = body->GetFixtureList();
-
-			body->DestroyFixture(m_CurrentFixtureToDelete);
-
-			Physics::world.DestroyBody(body);
-
-			body = nullptr;
-		}
-	}
-}
-
-StageGoldTorizo::StageGoldTorizo(float cellSize)
+StageGoldTorizo::StageGoldTorizo(float cellSize) : m_CellSize(cellSize)
 {
 }
 
 std::vector<sf::Vector2f> StageGoldTorizo::createFromImg(const sf::Image& image)
 {
-	return std::vector<sf::Vector2f>();
+	m_Grid.clear();
+	m_Grid = std::vector(image.getSize().x, std::vector(image.getSize().y, 0));
+
+	for (size_t x = 0; x < m_Grid.size(); x++)
+	{
+		for (size_t y = 0; y < m_Grid[x].size(); y++)
+		{
+			sf::Color colour = image.getPixel(x, y);
+			if (colour == colours[GREEN])
+			{
+				m_Grid[x][y] = 1;
+
+				b2BodyDef bodyDef{};
+				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
+
+				FixtureData* fixtureData = new FixtureData();
+				fixtureData->type = MAPTILE;
+				fixtureData->mapPosx = x;
+				fixtureData->mapPosY = y;
+
+				b2FixtureDef fixtureDef{};
+				fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = 0.0f;
+				fixtureDef.friction = 0.0f;
+				body->CreateFixture(&fixtureDef);
+			}
+			else if (colour == colours[PURPLE])
+			{
+				m_Grid[x][y] = 2;
+
+				b2BodyDef bodyDef{};
+				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(m_CellSize, m_CellSize / 2.0f);
+
+				FixtureData* fixtureData = new FixtureData();
+				fixtureData->type = MAPTILE;
+				fixtureData->mapPosx = x;
+				fixtureData->mapPosY = y;
+
+				b2FixtureDef fixtureDef{};
+				fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = 0.0f;
+				fixtureDef.friction = 0.0f;
+				body->CreateFixture(&fixtureDef);
+			}
+			else if (colour == colours[TURQUOISE])
+			{
+				m_Grid[x][y] = 3;
+
+				b2BodyDef bodyDef{};
+				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(m_CellSize / 2.0f, m_CellSize / 2.0f);
+
+				FixtureData* fixtureData = new FixtureData();
+				fixtureData->type = MAPTILE;
+				fixtureData->mapPosx = x;
+				fixtureData->mapPosY = y;
+
+				b2FixtureDef fixtureDef{};
+				fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = 0.0f;
+				fixtureDef.friction = 0.0f;
+				body->CreateFixture(&fixtureDef);
+			}
+			else if (colour == colours[MAGENTA])
+			{
+				m_Grid[x][y] = 4;
+
+				b2BodyDef bodyDef{};
+				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(m_CellSize, m_CellSize * 1.5);
+
+				FixtureData* fixtureData = new FixtureData();
+				fixtureData->type = MAPTILE;
+				fixtureData->mapPosx = x;
+				fixtureData->mapPosY = y;
+
+				b2FixtureDef fixtureDef{};
+				fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = 0.0f;
+				fixtureDef.friction = 0.0f;
+				body->CreateFixture(&fixtureDef);
+			}
+			else if (colour == colours[ORANGE])
+			{
+				m_Grid[x][y] = 5;
+			}
+			else if (colour == colours[BLUE])
+			{
+				m_Grid[x][y] = 6;
+			}
+			else if (colour == colours[YELLOW])
+			{
+				m_Grid[x][y] = 7;
+			}
+			else if (colour == colours[ROUGE])
+			{
+				m_Grid[x][y] = 8;
+			}
+			else if (colour == colours[DARKGREEN])
+			{
+				m_Grid[x][y] = 9;
+			}
+			else if (colour == colours[PINK])
+			{
+				m_Grid[x][y] = 10;
+			}
+			else if (colour == colours[LIGHTBLUE])
+			{
+				m_Grid[x][y] = 11;
+			}
+			else if (colour == colours[RED])
+			{
+				//m_Grid[x][y] = 6;
+
+				samusPosition = sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+			}
+			else if (colour == colours[BROWN])
+			{
+				//m_Grid[x][y] = 6;
+
+				bossPosition = sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+			}
+		}
+	}
+	
+	return { samusPosition, bossPosition };
 }
 
 void StageGoldTorizo::draw(Renderer& renderer)
 {
+	int x = 0;
+	for (const auto& column : m_Grid)
+	{
+		int y = 0;
+		for (const auto& cell : column)
+		{
+			if (cell)
+			{
+				if (m_Grid[x][y] == 1)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_01.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 3)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_01.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 4)
+				{
+					renderer.draw(Resources::textures["GT_Blue_Door.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize * 2, m_CellSize * 3));
+				}
+				else if (m_Grid[x][y] == 5)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_03.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 6)
+				{
+
+					renderer.draw(Resources::textures["GT_Background_Tile_02.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 7)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_04.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 8)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_05.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 9)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_06.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 10)
+				{
+					renderer.draw(Resources::textures["GT_Background_Tile_07.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
+				}
+				else if (m_Grid[x][y] == 11)
+				{
+					renderer.draw(Resources::textures["GT_Stalactites.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize * 3, m_CellSize * 3));
+				}
+			}
+			y++;
+		}
+		x++;
+	}
+
+	x = 0;
+	for (const auto& column : m_Grid)
+	{
+		int y = 0;
+		for (const auto& cell : column)
+		{
+			if (cell)
+			{
+				if (m_Grid[x][y] == 2)
+				{
+					renderer.draw(Resources::textures["GT_Pillar_01.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize * 2, m_CellSize));
+				}
+			}
+			y++;
+		}
+		x++;
+	}
 }

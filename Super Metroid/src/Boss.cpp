@@ -1,5 +1,6 @@
 #include "Boss.h"
 
+
 void Spore::createFixture()
 {
 	m_SporeFixtureData.type = BOSSCOMPONENT;

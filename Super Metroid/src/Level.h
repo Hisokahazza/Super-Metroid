@@ -29,7 +29,8 @@ enum Colour
 	ORANGE,
 	PURPLE,
 	PINK,
-	TURQUOISE
+	TURQUOISE,
+	ROUGE
 };
 
 class Level
@@ -55,7 +56,8 @@ protected:
 		{ORANGE, sf::Color(255, 99, 0)},
 		{PURPLE, sf::Color(120, 0, 255)},
 		{PINK, sf::Color(255, 0, 255)},
-		{TURQUOISE, sf::Color(0, 255, 130)}
+		{TURQUOISE, sf::Color(0, 255, 130)},
+		{ROUGE, sf::Color(171, 18, 57)}
 	};
 
 	sf::Vector2f samusPosition;
@@ -93,6 +95,7 @@ public:
 class StageGoldTorizo : public Level
 {
 private:
+	float m_CellSize;
 public:
 	StageGoldTorizo(float cellSize = 1.0f);
 
