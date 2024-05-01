@@ -579,3 +579,16 @@ void Level::clearLevel()
 		}
 	}
 }
+
+StageGoldTorizo::StageGoldTorizo(float cellSize)
+{
+}
+
+std::vector<sf::Vector2f> StageGoldTorizo::createFromImg(const sf::Image& image)
+{
+	return std::vector<sf::Vector2f>();
+}
+
+void StageGoldTorizo::draw(Renderer& renderer)
+{
+}

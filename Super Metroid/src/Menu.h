@@ -29,9 +29,9 @@ private:
 	std::vector<sf::Texture> m_ReturnTextures;
 	SheetlessAnimation* m_ReturnTextAnim;
 public:
-	void begin();
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void begin() override;
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 };
 
 class GameOver : public Menu
@@ -41,16 +41,16 @@ private:
 	std::vector<sf::Texture> m_ReturnTextures;
 	SheetlessAnimation* m_ReturnTextAnim;
 public:
-	void begin();
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void begin() override;
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 };
 
 class NoMenu : public Menu
 {
 private:
 public:
-	void begin();
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void begin() override;
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 };

@@ -75,8 +75,8 @@ private:
 public:
 	StageHub(float cellSize = 1.0f);
 
-	std::vector<sf::Vector2f> createFromImg(const sf::Image& image);
-	void draw(Renderer& renderer);
+	std::vector<sf::Vector2f> createFromImg(const sf::Image& image) override;
+	void draw(Renderer& renderer) override;
 };
 
 class StageSporeSpawn : public Level
@@ -86,7 +86,17 @@ private:
 public:
 	StageSporeSpawn(float cellSize = 1.0f);
 
-	std::vector<sf::Vector2f> createFromImg(const sf::Image& image);
-	void draw(Renderer& renderer);
+	std::vector<sf::Vector2f> createFromImg(const sf::Image& image) override;
+	void draw(Renderer& renderer) override;
+};
+
+class StageGoldTorizo : public Level
+{
+private:
+public:
+	StageGoldTorizo(float cellSize = 1.0f);
+
+	std::vector<sf::Vector2f> createFromImg(const sf::Image& image) override;
+	void draw(Renderer& renderer) override;
 };
 

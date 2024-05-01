@@ -534,3 +534,34 @@ void SporeSpawn::onEndContact(b2Fixture* self, b2Fixture* other)
 	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
 }
 
+void GoldTorizo::createFixture()
+{
+}
+
+void GoldTorizo::createActiveAnimations()
+{
+}
+
+void GoldTorizo::begin()
+{
+}
+
+void GoldTorizo::update(float deltaTime)
+{
+}
+
+void GoldTorizo::draw(Renderer& renderer)
+{
+}
+
+void GoldTorizo::resetFixture()
+{
+}
+
+void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
+{
+}
+
+void GoldTorizo::onEndContact(b2Fixture* self, b2Fixture* other)
+{
+}

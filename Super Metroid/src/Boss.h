@@ -17,6 +17,7 @@
 
 extern MenuManager menuManager;
 
+// bundle attributes in a struct
 struct BossAttributes
 {
 	unsigned int health;
@@ -25,11 +26,14 @@ struct BossAttributes
 
 enum BossAnimationState
 {
+	// SporeSpawn animation states
 	COREOPENING,
 	COREOPENED,
 	CORECLOSING,
 	CORECLOSED,
-	COREFLASHING
+	COREFLASHING,
+
+	// Gold Torizo animation states
 };
 
 class Boss : public Collisionlistener
@@ -59,6 +63,7 @@ public:
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 
+	// Getters and setters
 	int const getPlayerHealthOffset() { return playerHealthOffset; };
 	void setPlayerHealthOffset(int newOffset) { playerHealthOffset = newOffset; };
 
@@ -89,6 +94,7 @@ public:
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 
+	// Getters and setters
 	void setPlayerHitbox(b2Fixture* hitbox) { m_PlayerHitbox = hitbox; }
 	void setPlayerinvulnerabillity(bool isInvulnerable) { m_IsPlayerInvulnerable = isInvulnerable; }
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
@@ -107,7 +113,7 @@ private:
 
 	std::vector<sf::Vector2f> m_SporeInitialPositions = {sf::Vector2f(3.0f, 2.3f), sf::Vector2f(6.0f, 2.3f) , sf::Vector2f(9.0f, 2.3f) , sf::Vector2f(12.0f, 2.3f) };
 	
-	void createFixture();
+	void createFixture() override;
 
 	std::vector<sf::Texture> m_SporeFrames;
 	SheetlessAnimation* m_SporeAnimation;
@@ -118,8 +124,8 @@ public:
 	~Spore();
 
 	void begin(unsigned int positionIndex);
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 
 	int const getPlayerHealthOffset() { return m_PlayerHealthOffset; };
 
@@ -132,10 +138,14 @@ class SporeSpawn : public Boss
 {
 private:
 	FixtureData m_FixtureData{};
-	void createFixture();
+
+	void createFixture() override;
+
 	void closeCore(float deltaTime);
 	void openCore(float deltaTime);
+
 	void createActiveAnimations();
+
 	sf::Vector2f determineSegmentPos(float positionOnLine);
 
 	sf::Vector2f m_TetherPoint = {7.5f, 5.0f};
@@ -167,7 +177,27 @@ private:
 
 	bool m_BossComplete = false;
 public:
-	void begin();
+	void begin() override;
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
+
+	void resetFixture() override;
+
+	// Inherited via Collisionlistener
+	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
+	void onEndContact(b2Fixture* self, b2Fixture* other) override;
+};
+
+class GoldTorizo : public Boss
+{
+private:
+	FixtureData m_FixtureData{};
+
+	void createFixture() override;
+	void createActiveAnimations();
+
+public:
+	void begin() override;
 	void update(float deltaTime);
 	void draw(Renderer& renderer);
 

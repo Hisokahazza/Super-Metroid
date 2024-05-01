@@ -53,13 +53,16 @@ Direction Samus::currentDirection()
 
 void Samus::updateBullet(float deltaTime)
 {
+	// Parse through all bullet objects
 	for (auto bullet : m_Bullets)
 	{
+		// Check if bullet collides with spore objects
 		if (&(bullet->fixtureData) == sporeSpawn.getProjectileDestroyed())
 		{
 			bullet->destroyed = true;
 		}
 
+		// Check if bullet is destroyed and calls relevant destruction methods
 		if (bullet->destroyed == true)
 		{
 			bullet->~DefaultBullet();
@@ -70,6 +73,7 @@ void Samus::updateBullet(float deltaTime)
 				delete(bullet);
 			}
 		}
+		// update active bullets
 		else if (bullet)
 		{
 			bullet->update(deltaTime);
@@ -79,13 +83,16 @@ void Samus::updateBullet(float deltaTime)
 
 void Samus::updateMissile(float deltaTime)
 {
+	// Parse through all bullet objects
 	for (auto missile : m_Missiles)
 	{
+		// Check if bullet collides with spore objects
 		if ( missile && &(missile->fixtureData) == sporeSpawn.getProjectileDestroyed())
 		{
 			missile->destroyed = true;
 		}
 
+		// Check if bullet is destroyed and calls relevant destruction methods
 		if (missile->destroyed == true)
 		{
 			missile->~Missile();
@@ -96,6 +103,7 @@ void Samus::updateMissile(float deltaTime)
 				delete(missile);
 			}
 		}
+		// update active bullets
 		else if (missile)
 		{
 			missile->update(deltaTime);
@@ -105,6 +113,7 @@ void Samus::updateMissile(float deltaTime)
 
 void Samus::createFixture()
 {	
+	// set fixtureData members
 	fixtureData.listener = this;
 	fixtureData.type = SAMUS;
 	fixtureData.samus = this;
@@ -125,8 +134,8 @@ void Samus::createFixture()
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
 	fixtureDef.restitution = 0.0f;
-	m_Body->CreateFixture(&fixtureDef);
 
+	m_Body->CreateFixture(&fixtureDef);
 	polygonShape.SetAsBox(0.5f, 0.3f, b2Vec2(0.0f, 1.2f), 0.0f);
 	fixtureDef.isSensor = true;
 	samusGroundFixture = m_Body->CreateFixture(&fixtureDef);
@@ -283,6 +292,7 @@ void Samus::update(float deltaTime)
 		m_ProjectileInitialPos = b2Vec2(position.x - 0.5f, position.y);
 	}
 
+	// Determine relevant jump animation state
 	if (m_Orientation == RIGHT && m_NumGroundContacts < 1)
 	{
 		setAnimationState(JUMPRIGHTSTATIC);
@@ -313,12 +323,12 @@ void Samus::update(float deltaTime)
 		{
 			m_Velocity.x += move;
 		}
-		// movement is restricted when in the air
+		// Movement is restricted when in the air
 		else
 		{
 			m_Velocity.x += move / 1.3;
 		}
-
+		// Determine relevant right facing animation state
 		if (m_NumGroundContacts < 1)
 		{
 			setAnimationState(JUMPRIGHT);
@@ -354,12 +364,12 @@ void Samus::update(float deltaTime)
 		{
 			m_Velocity.x -= move;
 		}
-		// movement is restricted when in the air
+		// Movement is restricted when in the air
 		else
 		{
 			m_Velocity.x -= move / 1.3;
 		}
-
+		// Determine relevant left facing animation state
 		if (m_NumGroundContacts < 1)
 		{
 			setAnimationState(JUMPLEFT);
@@ -412,6 +422,7 @@ void Samus::update(float deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && m_NumGroundContacts >= 1)
 	{
+		// Determine crouch state
 		if (m_CrouchState == NONE)
 		{
 			m_CrouchState = CROUCH;
@@ -447,8 +458,10 @@ void Samus::update(float deltaTime)
 
 	if (m_CrouchState == CROUCH && (!sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::D)))
 	{
+		// Set current hitbox
 		currentHitbox = crouchHitbox;
 
+		// Determine relevant crouch animation state
 		if (m_Orientation == RIGHT)
 		{
 			setAnimationState(CROUCHRIGHT);
@@ -463,10 +476,13 @@ void Samus::update(float deltaTime)
 
 	if (m_CrouchState == MORPHBALL)
 	{
+		// Restrict shooting
 		m_CanShoot = false;
-
+		
+		// Set current hitbox
 		currentHitbox = morphballHitbox;
 
+		// Determine relevant crouch animation state
 		if (m_Orientation == RIGHT)
 		{
 			setAnimationState(MORPHBALLRIGHT);
@@ -477,39 +493,43 @@ void Samus::update(float deltaTime)
 		}
 	}
 
-	// Handle aiming Animation
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && m_Orientation == RIGHT)
+	// Handle aiming animation
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && m_Orientation == RIGHT && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		setAnimationState(SHOOTUPORIENTATIONRIGHTSTATIC);
 		m_ProjectileInitialPos = b2Vec2(position.x + 0.1f, position.y - 0.8f);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && m_Orientation == LEFT)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && m_Orientation == LEFT && !sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		setAnimationState(SHOOTUPORIENTATIONLEFTSTATIC);
 		m_ProjectileInitialPos = b2Vec2(position.x, position.y - 0.8f);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && m_Orientation == RIGHT && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		setAnimationState(SHOOTUPRIGHTSTATIC);
+		m_Orientation = RIGHT;
 		m_ProjectileInitialPos = b2Vec2(position.x + 0.3f, position.y - 0.4f);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && m_Orientation == LEFT && !sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		setAnimationState(SHOOTUPLEFTSTATIC);
+		m_Orientation = LEFT;
 		m_ProjectileInitialPos = b2Vec2(position.x - 0.3f, position.y - 0.4f);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && m_Orientation == RIGHT && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		setAnimationState(SHOOTDOWNRIGHTSTATIC);
+		m_Orientation = RIGHT;
 		m_ProjectileInitialPos = b2Vec2(position.x + 0.3f, position.y);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && m_Orientation == LEFT && !sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		setAnimationState(SHOOTDOWNLEFTSTATIC);
+		m_Orientation = LEFT;
 		m_ProjectileInitialPos = b2Vec2(position.x - 0.3f, position.y);
 	}
 
@@ -594,7 +614,7 @@ void Samus::update(float deltaTime)
 	if (m_SamusHit == false)
 	{
 		m_SamusHit = sporeSpawn.getIsSamusHit();
-
+		
 		m_Animations[INVULERABLEFACINGRIGHT]->reset();
 		m_Animations[INVULERABLEFACINGLEFT]->reset();
 	}
@@ -606,6 +626,7 @@ void Samus::update(float deltaTime)
 
 		m_CrouchState = NONE;
 
+		// Determine relevant invulnerable animation
 		if (m_Orientation == RIGHT)
 		{
 			m_CurrentAnimationState = INVULERABLEFACINGRIGHT;
@@ -626,10 +647,12 @@ void Samus::update(float deltaTime)
 			knockBackImpulse = b2Vec2(m_KnockBackSpeed, -m_KnockBackSpeed / 10);
 		}
 
+		// Adjust velocity based on orientation and knockback speed
 		m_Velocity = knockBackImpulse;
 
 		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 		{
+			// When animation ends set hit to false
 			m_SamusHit = false;
 			sporeSpawn.setIsSamusHit(false);
 			m_IsInvulnerable = false;
@@ -641,6 +664,7 @@ void Samus::update(float deltaTime)
 		// Stop player from moving when death animation is playing
 		m_Velocity = b2Vec2(0, 0);
 
+		// Play death animation
 		m_CurrentAnimationState = SAMUSDEATHINTRO;
 		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
 		{
@@ -649,6 +673,7 @@ void Samus::update(float deltaTime)
 			{
 				if (menuManager.checkMenued() == false)
 				{
+					// Switch to game over menu
 					menuManager.setMenued(true);
 					menuManager.setSwitchScreen(GAMEOVER);
 				}
@@ -667,6 +692,7 @@ void Samus::update(float deltaTime)
 		}
 	}*/
 
+	// Determine whether samus has died
 	if (m_CurrentHealth <= 0)
 	{
 		m_IsSamusAlive = false;
@@ -708,6 +734,7 @@ void Samus::draw(Renderer& renderer)
 	renderer.draw(m_Animations[m_CurrentAnimationState]->getCurrentFrame(), position,
 		sf::Vector2f(4.0f, 3.7f));
 
+	// Draw all active bullets
 	if (m_Bullets.size() != 0)
 	{
 		for (auto& bullet : m_Bullets)
@@ -715,6 +742,7 @@ void Samus::draw(Renderer& renderer)
 			bullet->draw(renderer);
 		}
 	}
+	// Draw all active missiles
 	if (m_Missiles.size() != 0)
 	{
 		for (auto& missile : m_Missiles)
@@ -727,18 +755,18 @@ void Samus::draw(Renderer& renderer)
 
 void Samus::reset()
 {
+	setAnimationState(IDLE);
+
 	m_CurrentHealth = (m_EnergyTanks + 1) * 99;
 
 	m_IsSamusAlive = true;
 	m_SamusHit = false;
+	sporeSpawn.setIsSamusHit(false);
 
 	if (m_Body)
 	{
-		std::cout << "VEL" << std::endl;
 		m_Body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 	}
-
-	m_CurrentAnimationState = IDLE;
 	
 	m_ActiveProjectile = BULLETPROJ;
 

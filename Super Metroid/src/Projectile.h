@@ -72,9 +72,9 @@ public:
 
 	SheetlessAnimation* currentSheetlessAnimation;
 
-	void begin(b2Vec2 initialPosition);
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void begin(b2Vec2 initialPosition) override;
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 };
 
 class Missile : public Projectile
@@ -95,7 +95,7 @@ public:
 
 	FixtureData fixtureData{};
 
-	void begin(b2Vec2 initialPosition);
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void begin(b2Vec2 initialPosition) override;
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 };
