@@ -40,6 +40,9 @@ enum BossAnimationState
 	COREFLASHING,
 
 	// Gold Torizo animation states
+	GOLDTORIZOBLINK,
+	GOLDTORIZOSTAND,
+	
 };
 
 class Boss : public Collisionlistener

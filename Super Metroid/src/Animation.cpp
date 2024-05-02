@@ -124,7 +124,15 @@ void SheetlessAnimation::begin()
     }
     else
     {
-        m_NextTextureIndex = -1;
+        if (m_Loop == true)
+        {
+            m_NextTextureIndex = 0;
+        }
+        else
+        {
+            m_NextTextureIndex = -1;
+        }
+        
         m_CurrentTexture = m_AnimationTextures[0];
 
     }
@@ -149,13 +157,13 @@ void SheetlessAnimation::update(float deltaTime)
         playing = true;
     }
 
+    if (m_FrameCount == m_NumTextures * m_TimesPlayed)
+    {
+        playing = false;
+    }
+
     if (m_Loop == false)
     {
-        if (m_FrameCount == m_NumTextures * m_TimesPlayed)
-        {
-            playing = false;
-        }
-
         m_TotalTime += deltaTime;
 
         if (m_TotalTime >= m_SwitchTime && playing == true)
@@ -190,7 +198,7 @@ void SheetlessAnimation::update(float deltaTime)
     {
         m_TotalTime += deltaTime;
 
-        if (m_TotalTime >= m_SwitchTime)
+        if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             m_TotalTime -= m_SwitchTime;
 
@@ -203,11 +211,14 @@ void SheetlessAnimation::update(float deltaTime)
                 m_NextTextureIndex--;
             }
 
-            if (m_NextTextureIndex == m_NumTextures - 1 || m_NextTextureIndex <= 0)
+            if (m_NextTextureIndex == m_NumTextures || m_NextTextureIndex <= 0)
             {
                 m_AnimDirection = !m_AnimDirection;
             }
 
+            m_FrameCount++;
+
+            std::cout << m_NextTextureIndex << std::endl;
             m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
         }
     }

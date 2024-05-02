@@ -209,7 +209,7 @@ void SporeSpawn::createActiveAnimations()
 		Resources::textures["SSP_Open_Flash_02.png"]
 	};
 
-	// Initialise sheetless Animations
+	// Initialise sheetless animations
 	m_SheetlessAnimations[COREOPENING] = new SheetlessAnimation(coreOpeningTextures, 0.2f, false, 1);
 	m_SheetlessAnimations[COREOPENED] = new SheetlessAnimation(coreOpenedTextures, 0.2f, false);
 	m_SheetlessAnimations[CORECLOSING] = new SheetlessAnimation(coreOpeningTextures, 0.1f, false, 1, true);
@@ -558,25 +558,61 @@ void GoldTorizo::createFixture()
 	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
 	fixtureDef.shape = &circleShape;
 	body->CreateFixture(&fixtureDef);
-
-
 }
 
 void GoldTorizo::createActiveAnimations()
 {
+	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND };
+
+	// Initialise textures for sheetless Animations
+	std::vector<sf::Texture> blinkTextures
+	{
+		Resources::textures["GT_Intro_01.png"],
+		Resources::textures["GT_Intro_02.png"],
+		Resources::textures["GT_Intro_03.png"],
+		Resources::textures["GT_Intro_04.png"],
+	};
+	std::vector<sf::Texture> standTextures
+	{
+		Resources::textures["GT_Intro_05.png"],
+		Resources::textures["GT_Intro_06.png"],
+		Resources::textures["GT_Intro_07.png"],
+		Resources::textures["GT_Intro_08.png"],
+		Resources::textures["GT_Intro_09.png"],
+		Resources::textures["GT_Intro_10.png"]
+	};
+
+	// Initialise sheetless animations
+	m_SheetlessAnimations[GOLDTORIZOBLINK] = new SheetlessAnimation(blinkTextures, 0.2f, true, 5);
+	m_SheetlessAnimations[GOLDTORIZOSTAND] = new SheetlessAnimation(standTextures, 0.1f, false, 1);
 }
 
 void GoldTorizo::begin()
 {
 	createFixture();
+	createActiveAnimations();
+
+	for (auto state : m_ActiveStates)
+	{
+		m_SheetlessAnimations[state]->begin();
+	}
+
+	m_CurrentAnimationState = GOLDTORIZOBLINK;
 }
 
 void GoldTorizo::update(float deltaTime)
 {
+	if (m_SheetlessAnimations[m_CurrentAnimationState]->checkPlaying() == false)
+	{
+		m_CurrentAnimationState = GOLDTORIZOSTAND;
+	}
+
+	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 }
 
 void GoldTorizo::draw(Renderer& renderer)
 {
+	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), position, sf::Vector2f(3.0f, 3.5f));
 }
 
 void GoldTorizo::resetFixture()

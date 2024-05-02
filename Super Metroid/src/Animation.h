@@ -64,7 +64,7 @@ private:
 	bool m_Loop;
 
 	unsigned int m_NumTextures;
-	unsigned int m_NextTextureIndex;
+	int m_NextTextureIndex;
 
 	sf::Texture m_CurrentTexture;
 
