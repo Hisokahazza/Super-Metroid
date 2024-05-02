@@ -23,7 +23,7 @@ void Game::createBosses()
 	m_Bosses[GOLDTORIZO] = new GoldTorizo();
 }
 
-void Game::setCurrentStage(std::string& currentStage)
+void Game::setCurrentStage(std::string& currentStage, bool initStage)
 {
 	//sporeSpawn.resetFixture();
 	m_Bosses[m_CurrentBoss]->resetFixture();
@@ -36,7 +36,10 @@ void Game::setCurrentStage(std::string& currentStage)
 	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
 	samus.position = m_MapPositions[0];
 
-	samus.reset();
+	if (initStage == false)
+	{
+		samus.reset();
+	}
 }
 
 Game::Game()
@@ -58,7 +61,7 @@ void Game::Begin(const sf::Window& window)
 	Physics::init();
 
 	//load map image
-	setCurrentStage(m_CurrentStage);
+	setCurrentStage(m_CurrentStage, true);
 
 	samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
 	samus.begin();
@@ -86,7 +89,7 @@ void Game::update(float deltaTime)
 	{
 		menuManager.setSwitchScreen(NOMENU);
 
-		setCurrentStage(m_HubStage);
+		setCurrentStage(m_HubStage, false);
 	}
 
 	menuManager.menus[menuManager.getSwitchScreen()]->update(deltaTime);

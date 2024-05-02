@@ -34,7 +34,8 @@ Spore::~Spore()
 		// Destroy the body
 		Physics::world.DestroyBody(body);
 
-		body = nullptr;  // Set the pointer to nullptr to avoid using it accidentally later
+		// Set the pointer to nullptr to avoid using it accidentally later
+		body = nullptr;
 	}
 }
 
@@ -314,6 +315,8 @@ void SporeSpawn::update(float deltaTime)
 		openCore(deltaTime);
 	}
 
+
+
 	// Update and check for collisions of spore objects
 	for (auto spore : m_Spores)
 	{
@@ -537,6 +540,26 @@ void SporeSpawn::onEndContact(b2Fixture* self, b2Fixture* other)
 
 void GoldTorizo::createFixture()
 {
+	m_FixtureData.listener = this;
+	m_FixtureData.type = BOSS;
+	m_FixtureData.boss = this;
+
+	// Create boss body
+	b2BodyDef bodyDef{};
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(position.x, position.y);
+	bodyDef.fixedRotation = true;
+	body = Physics::world.CreateBody(&bodyDef);
+
+	b2CircleShape circleShape{};
+	circleShape.m_radius = 2.0f;
+	circleShape.m_p.Set(0, 0);
+	b2FixtureDef fixtureDef{};
+	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
+	fixtureDef.shape = &circleShape;
+	body->CreateFixture(&fixtureDef);
+
+
 }
 
 void GoldTorizo::createActiveAnimations()
@@ -545,6 +568,7 @@ void GoldTorizo::createActiveAnimations()
 
 void GoldTorizo::begin()
 {
+	createFixture();
 }
 
 void GoldTorizo::update(float deltaTime)

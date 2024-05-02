@@ -275,8 +275,6 @@ void Samus::begin()
 // Update every frame (passed into game update function)
 void Samus::update(float deltaTime)
 {
-	std::cout << m_CurrentBoss << std::endl;
-
 	float move = movementSpeed;
 	m_CanShoot = true;
 	currentHitbox = samusHitbox;
@@ -757,6 +755,8 @@ void Samus::draw(Renderer& renderer)
 
 void Samus::reset()
 {
+	createFixture();
+
 	setAnimationState(IDLE);
 
 	m_CurrentHealth = (m_EnergyTanks + 1) * 99;

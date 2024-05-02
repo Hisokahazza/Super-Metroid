@@ -18,15 +18,15 @@ extern Camera camera;
 class Game
 {
 private:
-	std::string m_CurrentStage = "res/Level_Spore_Spawn.png";
-	BossName m_CurrentBoss = SPORESPAWN;
+	std::string m_CurrentStage = "res/Level_Gold_Torizo.png";
+	BossName m_CurrentBoss = GOLDTORIZO;
 
 	bool m_IsSamusAlive = true;
 
 	void createStages();
 	void createBosses();
 
-	void setCurrentStage(std::string& currentStage);
+	void setCurrentStage(std::string& currentStage, bool initStage);
 
 	std::unordered_map<std::string, Level*> m_Stages;
 	std::unordered_map<BossName, Boss*> m_Bosses;
