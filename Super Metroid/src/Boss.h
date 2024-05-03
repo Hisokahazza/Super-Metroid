@@ -42,6 +42,7 @@ enum BossAnimationState
 	// Gold Torizo animation states
 	GOLDTORIZOBLINK,
 	GOLDTORIZOSTAND,
+	GOLDTORIZOTRANSITION
 	
 };
 
@@ -200,6 +201,8 @@ class GoldTorizo : public Boss
 {
 private:
 	FixtureData m_FixtureData{};
+
+	b2Vec2 m_Velocity;
 
 	void createFixture() override;
 	void createActiveAnimations();

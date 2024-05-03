@@ -551,18 +551,30 @@ void GoldTorizo::createFixture()
 	bodyDef.fixedRotation = true;
 	body = Physics::world.CreateBody(&bodyDef);
 
-	b2CircleShape circleShape{};
-	circleShape.m_radius = 2.0f;
-	circleShape.m_p.Set(0, 0);
+	b2PolygonShape polygonShape{};
+	polygonShape.SetAsBox(0.55f, 1.5f);
 	b2FixtureDef fixtureDef{};
 	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
+	fixtureDef.shape = &polygonShape;
+	fixtureDef.density = 1.0f;
+	fixtureDef.friction = 0.0f;
+	fixtureDef.restitution = 0.0f;
+
+	body->CreateFixture(&fixtureDef);
+
+	b2CircleShape circleShape{};
+	circleShape.m_radius = 0.55f;
+	circleShape.m_p.Set(0.0f, -1.0f);
 	fixtureDef.shape = &circleShape;
+	fixtureDef.isSensor = false;
+	body->CreateFixture(&fixtureDef);
+	circleShape.m_p.Set(0.0f, 1.0f);
 	body->CreateFixture(&fixtureDef);
 }
 
 void GoldTorizo::createActiveAnimations()
 {
-	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND };
+	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION };
 
 	// Initialise textures for sheetless Animations
 	std::vector<sf::Texture> blinkTextures
@@ -581,10 +593,26 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Intro_09.png"],
 		Resources::textures["GT_Intro_10.png"]
 	};
+	std::vector<sf::Texture> goldTransitionTextures
+	{
+		Resources::textures["GT_Gold_Transition_01.png"],
+		Resources::textures["GT_Gold_Transition_02.png"],
+		Resources::textures["GT_Gold_Transition_03.png"],
+		Resources::textures["GT_Gold_Transition_04.png"],
+		Resources::textures["GT_Gold_Transition_05.png"],
+		Resources::textures["GT_Gold_Transition_06.png"],
+		Resources::textures["GT_Gold_Transition_07.png"],
+		Resources::textures["GT_Gold_Transition_08.png"],
+		Resources::textures["GT_Gold_Transition_09.png"],
+		Resources::textures["GT_Gold_Transition_10.png"],
+		Resources::textures["GT_Gold_Transition_11.png"],
+		Resources::textures["GT_Gold_Transition_12.png"]
+	};
 
 	// Initialise sheetless animations
-	m_SheetlessAnimations[GOLDTORIZOBLINK] = new SheetlessAnimation(blinkTextures, 0.2f, true, 5);
+	m_SheetlessAnimations[GOLDTORIZOBLINK] = new SheetlessAnimation(blinkTextures, 0.15f, true, 7);
 	m_SheetlessAnimations[GOLDTORIZOSTAND] = new SheetlessAnimation(standTextures, 0.1f, false, 1);
+	m_SheetlessAnimations[GOLDTORIZOTRANSITION] = new SheetlessAnimation(goldTransitionTextures, 0.15f, false, 1);
 }
 
 void GoldTorizo::begin()
@@ -602,10 +630,17 @@ void GoldTorizo::begin()
 
 void GoldTorizo::update(float deltaTime)
 {
-	if (m_SheetlessAnimations[m_CurrentAnimationState]->checkPlaying() == false)
+	if (m_SheetlessAnimations[GOLDTORIZOBLINK]->checkPlaying() == false)
 	{
 		m_CurrentAnimationState = GOLDTORIZOSTAND;
+
+		if (m_SheetlessAnimations[GOLDTORIZOSTAND]->checkPlaying() == false)
+		{
+			m_CurrentAnimationState = GOLDTORIZOTRANSITION;
+		}
 	}
+
+
 
 	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 }
