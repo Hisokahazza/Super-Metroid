@@ -130,7 +130,7 @@ void SheetlessAnimation::begin()
         }
         else
         {
-            m_NextTextureIndex = -1;
+            m_NextTextureIndex = 0;
         }
         
         m_CurrentTexture = m_AnimationTextures[0];
@@ -148,7 +148,7 @@ void SheetlessAnimation::update(float deltaTime)
         }
         else if (m_Reverse == false)
         {
-            m_CurrentTextureSize = m_FrameSizes[m_NextTextureIndex + 1];
+            m_CurrentTextureSize = m_FrameSizes[m_NextTextureIndex];
         }
     }
   
@@ -157,7 +157,7 @@ void SheetlessAnimation::update(float deltaTime)
         playing = true;
     }
 
-    if (m_FrameCount == m_NumTextures * m_TimesPlayed)
+    if (m_FrameCount == (m_NumTextures) * m_TimesPlayed)
     {
         playing = false;
     }
@@ -166,11 +166,13 @@ void SheetlessAnimation::update(float deltaTime)
     {
         m_TotalTime += deltaTime;
 
+        m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
+
         if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             m_TotalTime -= m_SwitchTime;
 
-            if (m_NextTextureIndex != m_NumTextures && m_Reverse == false)
+            if (m_NextTextureIndex != m_NumTextures + 1 && m_Reverse == false)
             {
                 m_NextTextureIndex++;
             }
@@ -178,14 +180,12 @@ void SheetlessAnimation::update(float deltaTime)
             {
                 m_NextTextureIndex--;
             }
-
-            m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
             
-            if (m_NextTextureIndex == m_NumTextures && m_Reverse == false)
+            if (m_NextTextureIndex == m_NumTextures + 1 && m_Reverse == false)
             {
-                m_NextTextureIndex = -1;
+                m_NextTextureIndex = 0;
             }
-            else if (m_NextTextureIndex == 0 && m_Reverse == true)
+            else if (m_NextTextureIndex < 0 && m_Reverse == true)
             {
                 m_NextTextureIndex = m_NumTextures;
             }

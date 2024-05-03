@@ -19,7 +19,7 @@ class Game
 {
 private:
 	std::string m_CurrentStage = "res/Level_Gold_Torizo.png";
-	BossName m_CurrentBoss = SPORESPAWN;
+	BossName m_CurrentBoss = GOLDTORIZO;
 
 	bool m_IsSamusAlive = true;
 

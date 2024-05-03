@@ -663,6 +663,7 @@ void Samus::update(float deltaTime)
 	{
 		// Stop player from moving when death animation is playing
 		m_Velocity = b2Vec2(0, 0);
+		m_CanShoot = false;
 
 		// Play death animation
 		m_CurrentAnimationState = SAMUSDEATHINTRO;

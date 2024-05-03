@@ -612,7 +612,7 @@ void GoldTorizo::update(float deltaTime)
 
 void GoldTorizo::draw(Renderer& renderer)
 {
-	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), position, sf::Vector2f(3.0f, 3.5f));
+	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), sf::Vector2f(position.x, position.y - 0.35f), sf::Vector2f(3.5f, 4.0f));
 }
 
 void GoldTorizo::resetFixture()

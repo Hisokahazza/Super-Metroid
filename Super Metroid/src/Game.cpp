@@ -25,7 +25,6 @@ void Game::createBosses()
 
 void Game::setCurrentStage(std::string& currentStage, bool initStage)
 {
-	//sporeSpawn.resetFixture();
 	m_Bosses[m_CurrentBoss]->resetFixture();
 
 	m_Stages[m_CurrentStage]->clearLevel();
