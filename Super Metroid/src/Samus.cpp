@@ -243,10 +243,10 @@ void Samus::createActiveAnimations()
 		Resources::textures["Samus_Death_07.png"]
 	};
 
-	m_Animations[INVULERABLEFACINGRIGHT] = new SheetlessAnimation(invulnerableRightTextures, 0.1f, false, 1);
-	m_Animations[INVULERABLEFACINGLEFT] = new SheetlessAnimation(invulnerableLeftTextures, 0.1f, false, 1);
-	m_Animations[SAMUSDEATHINTRO] = new SheetlessAnimation(samusDeathIntroTextures, 0.2f, false, 1);
-	m_Animations[SAMUSDEATH] = new SheetlessAnimation(samusDeathTextures, 0.1f, false, 1);
+	m_Animations[INVULERABLEFACINGRIGHT] = new SheetlessAnimation(invulnerableRightTextures, 0.1f, false, false, 1);
+	m_Animations[INVULERABLEFACINGLEFT] = new SheetlessAnimation(invulnerableLeftTextures, 0.1f, false, false, 1);
+	m_Animations[SAMUSDEATHINTRO] = new SheetlessAnimation(samusDeathIntroTextures, 0.2f, false, false, 1);
+	m_Animations[SAMUSDEATH] = new SheetlessAnimation(samusDeathTextures, 0.1f, false, false, 1);
 }
 
 Samus::Samus() : m_NumGroundContacts(0), m_JumpDelayCount(0)

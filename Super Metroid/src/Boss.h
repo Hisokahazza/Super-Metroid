@@ -42,7 +42,10 @@ enum BossAnimationState
 	// Gold Torizo animation states
 	GOLDTORIZOBLINK,
 	GOLDTORIZOSTAND,
-	GOLDTORIZOTRANSITION
+	GOLDTORIZOTRANSITION,
+	GOLDTORIZOWALKLEFT,
+	GOLDTORIZOWALKRIGHT,
+	BOMBSPEWLEFT
 	
 };
 
@@ -55,7 +58,7 @@ protected:
 	int playerHealthOffset = 0;
 	FixtureData* projectileDestroyed;
 
-	std::unordered_map<BossAnimationState, Animation*> m_SheetlessAnimations;
+	std::unordered_map<BossAnimationState, SheetlessAnimation*> m_SheetlessAnimations;
 	std::vector<BossAnimationState> m_ActiveStates = {};
 	BossAnimationState m_CurrentAnimationState;
 
@@ -202,6 +205,8 @@ class GoldTorizo : public Boss
 private:
 	void createFixture() override;
 	void createActiveAnimations();
+
+	Direction m_Orientation;
 
 public:
 	void begin() override;

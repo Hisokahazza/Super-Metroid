@@ -108,8 +108,8 @@ sf::Texture SheetAnimation::getCurrentFrame()
     return m_CurrentFrame;
 }
 
-SheetlessAnimation::SheetlessAnimation(std::vector<sf::Texture> AnimationTextures, float switchTime, bool loop, int timesplayed, bool reverse, std::vector<sf::Vector2f> frameSizes) : 
-    m_SwitchTime(switchTime), m_AnimationTextures(AnimationTextures), m_Loop(loop), m_TimesPlayed(timesplayed), m_Reverse(reverse), m_FrameSizes(frameSizes)
+SheetlessAnimation::SheetlessAnimation(std::vector<sf::Texture> AnimationTextures, float switchTime, bool loop, bool reverse, int timesplayed, std::vector<sf::Vector2f> frameSizes) :
+    m_SwitchTime(switchTime), m_AnimationTextures(AnimationTextures), m_Loop(loop),  m_Reverse(reverse), m_TimesPlayed(timesplayed), m_FrameSizes(frameSizes)
 {
 }
 
@@ -157,7 +157,7 @@ void SheetlessAnimation::update(float deltaTime)
         playing = true;
     }
 
-    if (m_FrameCount == (m_NumTextures) * m_TimesPlayed)
+    if (m_FrameCount == (m_NumTextures) * m_TimesPlayed && m_TimesPlayed != -1)
     {
         playing = false;
     }
@@ -185,7 +185,7 @@ void SheetlessAnimation::update(float deltaTime)
             {
                 m_NextTextureIndex = 0;
             }
-            else if (m_NextTextureIndex < 0 && m_Reverse == true)
+            else if (m_NextTextureIndex <= 0 && m_Reverse == true)
             {
                 m_NextTextureIndex = m_NumTextures;
             }

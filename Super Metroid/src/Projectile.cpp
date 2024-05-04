@@ -83,7 +83,7 @@ void DefaultBullet::begin(b2Vec2 initialPosition)
 		Resources::textures["Default_Bullet.png"]
 	};
 
-	m_BulletDestructionAnim = new SheetlessAnimation(bulletDestructionTextures, 0.1f, false, 1);
+	m_BulletDestructionAnim = new SheetlessAnimation(bulletDestructionTextures, 0.1f, false, false, 1);
 	m_BulletAnim = new SheetlessAnimation(defaultBulletTextures, 0.1f);
 
 	currentSheetlessAnimation = m_BulletAnim;
@@ -215,7 +215,7 @@ void Missile::begin(b2Vec2 initialPosition)
 		sf::Vector2f(1.6f, 1.6f),
 	};
 
-	m_MissileDestructionAnim = new SheetlessAnimation(missileDestructionTextures, 0.1f, false, 1, false, missileDestructionFrameSizes);
+	m_MissileDestructionAnim = new SheetlessAnimation(missileDestructionTextures, 0.1f, false, false, 1, missileDestructionFrameSizes);
 	m_MissileDestructionAnim->begin();
 
 	createFixture(initialPosition);

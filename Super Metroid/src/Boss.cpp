@@ -210,11 +210,11 @@ void SporeSpawn::createActiveAnimations()
 	};
 
 	// Initialise sheetless animations
-	m_SheetlessAnimations[COREOPENING] = new SheetlessAnimation(coreOpeningTextures, 0.2f, false, 1);
+	m_SheetlessAnimations[COREOPENING] = new SheetlessAnimation(coreOpeningTextures, 0.2f, false, false, 1);
 	m_SheetlessAnimations[COREOPENED] = new SheetlessAnimation(coreOpenedTextures, 0.2f, false);
-	m_SheetlessAnimations[CORECLOSING] = new SheetlessAnimation(coreOpeningTextures, 0.1f, false, 1, true);
+	m_SheetlessAnimations[CORECLOSING] = new SheetlessAnimation(coreOpeningTextures, 0.1f, false, true, 1);
 	m_SheetlessAnimations[CORECLOSED] = new SheetlessAnimation(coreClosedTextures);
-	m_SheetlessAnimations[COREFLASHING] = new SheetlessAnimation(coreFlashingTextures, 0.1f, false, 2);
+	m_SheetlessAnimations[COREFLASHING] = new SheetlessAnimation(coreFlashingTextures, 0.1f, false, false, 2);
 }
 
 sf::Vector2f SporeSpawn::determineSegmentPos(float positionOnLine)
@@ -556,6 +556,7 @@ void GoldTorizo::createFixture()
 	b2FixtureDef fixtureDef{};
 	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
 	fixtureDef.shape = &polygonShape;
+	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
 
 	body->CreateFixture(&fixtureDef);
@@ -578,7 +579,7 @@ void GoldTorizo::createFixture()
 
 void GoldTorizo::createActiveAnimations()
 {
-	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION };
+	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, BOMBSPEWLEFT };
 
 	// Initialise textures for sheetless Animations
 	std::vector<sf::Texture> blinkTextures
@@ -612,11 +613,74 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Gold_Transition_11.png"],
 		Resources::textures["GT_Gold_Transition_12.png"]
 	};
+	std::vector<sf::Texture> walkLeftTextures
+	{
+		Resources::textures["GT_Walk_Left_01.png"],
+		Resources::textures["GT_Walk_Left_02.png"],
+		Resources::textures["GT_Walk_Left_03.png"],
+		Resources::textures["GT_Walk_Left_04.png"],
+		Resources::textures["GT_Walk_Left_05.png"],
+		Resources::textures["GT_Walk_Left_06.png"],
+		Resources::textures["GT_Walk_Left_07.png"],
+		Resources::textures["GT_Walk_Left_08.png"],
+		Resources::textures["GT_Walk_Left_09.png"],
+		Resources::textures["GT_Walk_Left_10.png"]
+	};
+	std::vector<sf::Texture> walkRightTextures
+	{
+		Resources::textures["GT_Walk_Right_01.png"],
+		Resources::textures["GT_Walk_Right_02.png"],
+		Resources::textures["GT_Walk_Right_03.png"],
+		Resources::textures["GT_Walk_Right_04.png"],
+		Resources::textures["GT_Walk_Right_05.png"],
+		Resources::textures["GT_Walk_Right_06.png"],
+		Resources::textures["GT_Walk_Right_07.png"],
+		Resources::textures["GT_Walk_Right_08.png"],
+		Resources::textures["GT_Walk_Right_09.png"],
+		Resources::textures["GT_Walk_Right_10.png"]
+	};
+	std::vector<sf::Texture> bombSpewLeftTextures
+	{
+		//Resources::textures["GT_Bomb_Spew_L_01.png"],
+		//Resources::textures["GT_Bomb_Spew_L_02.png"],
+		//Resources::textures["GT_Bomb_Spew_L_03.png"],
+		Resources::textures["GT_Bomb_Spew_L_04.png"],
+		Resources::textures["GT_Bomb_Spew_L_05.png"]
+	};
+
+	// Initialise animation size vectors here applicable
+	std::vector<sf::Vector2f> GoldTorizoGeneralSizes
+	{
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+		sf::Vector2f(3.5f, 4.5f),
+	};
+
+	std::vector<sf::Vector2f> bombSpewLeftSizes
+	{
+		sf::Vector2f(4.2f, 4.5f),
+		sf::Vector2f(4.2f, 4.5f),
+		sf::Vector2f(4.2f, 4.5f),
+		sf::Vector2f(4.2f, 4.5f),
+		sf::Vector2f(4.2f, 4.5f)
+	};
 
 	// Initialise sheetless animations
-	m_SheetlessAnimations[GOLDTORIZOBLINK] = new SheetlessAnimation(blinkTextures, 0.15f, true, 7);
-	m_SheetlessAnimations[GOLDTORIZOSTAND] = new SheetlessAnimation(standTextures, 0.1f, false, 1);
-	m_SheetlessAnimations[GOLDTORIZOTRANSITION] = new SheetlessAnimation(goldTransitionTextures, 0.15f, false, 1);
+	m_SheetlessAnimations[GOLDTORIZOBLINK] = new SheetlessAnimation(blinkTextures, 0.15f, true, false, 7, GoldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOSTAND] = new SheetlessAnimation(standTextures, 0.1f, false, false, 1, GoldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOTRANSITION] = new SheetlessAnimation(goldTransitionTextures, 0.15f, false, false, 1, GoldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOWALKLEFT] = new SheetlessAnimation(walkLeftTextures, 0.1f, false, false, -1, GoldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOWALKRIGHT] = new SheetlessAnimation(walkRightTextures, 0.1f, false, true, -1, GoldTorizoGeneralSizes);
+	m_SheetlessAnimations[BOMBSPEWLEFT] = new SheetlessAnimation(bombSpewLeftTextures, 0.15f, true, false, 100, bombSpewLeftSizes);
 }
 
 void GoldTorizo::begin()
@@ -634,6 +698,8 @@ void GoldTorizo::begin()
 
 void GoldTorizo::update(float deltaTime)
 {
+	b2Vec2 velocity = body->GetLinearVelocity();
+
 	if (m_SheetlessAnimations[GOLDTORIZOBLINK]->checkPlaying() == false)
 	{
 		m_CurrentAnimationState = GOLDTORIZOSTAND;
@@ -644,14 +710,24 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
+	if (m_SheetlessAnimations[GOLDTORIZOTRANSITION]->checkPlaying() == false)
+	{
+		m_CurrentAnimationState = GOLDTORIZOWALKLEFT;
+	}
 
+	if (m_CurrentAnimationState = GOLDTORIZOWALKLEFT)
+	{
+		 velocity.x -= 0.01f;
+	}
 
+	body->SetLinearVelocity(velocity);
+	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 }
 
 void GoldTorizo::draw(Renderer& renderer)
 {
-	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), sf::Vector2f(position.x, position.y - 0.35f), sf::Vector2f(3.5f, 4.0f));
+	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), sf::Vector2f(position.x, position.y - 0.35f), m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrameSize());
 }
 
 void GoldTorizo::resetFixture()
@@ -660,6 +736,14 @@ void GoldTorizo::resetFixture()
 
 void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
 {
+	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
+	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
+
+	if (other == playerHitbox && otherData->type == SAMUS && isPlayerInvulnerable == false)
+	{
+		playerHealthOffset -= 20;
+		m_IsSamusHit = true;
+	}
 }
 
 void GoldTorizo::onEndContact(b2Fixture* self, b2Fixture* other)

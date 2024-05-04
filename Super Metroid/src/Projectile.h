@@ -12,17 +12,6 @@
 #include "Resources.h"
 #include "Animation.h"
 
-enum Direction
-{
-	RIGHT,
-	LEFT,
-	UPRIGHT,
-	UPLEFT,
-	DOWNRIGHT,
-	DOWNLEFT,
-	UP,
-	DOWN
-};
 
 enum ProjectileType
 {

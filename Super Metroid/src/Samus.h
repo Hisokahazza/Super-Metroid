@@ -22,7 +22,6 @@
 #include "MenuManager.h"
 
 extern HUD playerHUD;
-//extern SporeSpawn sporeSpawn;
 extern MenuManager menuManager;
 
 enum AnimationState

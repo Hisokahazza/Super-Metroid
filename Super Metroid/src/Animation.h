@@ -11,6 +11,7 @@ public:
 	bool playing = true;
 
 	virtual sf::Texture getCurrentFrame() = 0;
+
 	virtual void begin() = 0;
 	virtual void update(float deltaTime) = 0;
 	virtual void reset() = 0;
@@ -49,8 +50,6 @@ public:
 	void reset();
 
 	sf::Texture getCurrentFrame();
-
-	
 };
 
 class SheetlessAnimation : public Animation
@@ -77,7 +76,7 @@ private:
 	std::vector<sf::Vector2f> m_FrameSizes;
 	sf::Vector2f m_CurrentTextureSize;
 public:
-	SheetlessAnimation(std::vector<sf::Texture> AnimationTextures, float switchTime = 0.0f, bool loop = false, int timesPlayed = -1, bool reverse = false, std::vector<sf::Vector2f> frameSizes = {});
+	SheetlessAnimation(std::vector<sf::Texture> AnimationTextures, float switchTime = 0.0f, bool loop = false, bool reverse = false, int timesPlayed = -1, std::vector<sf::Vector2f> frameSizes = {});
 
 	void begin();
 	void update(float deltaTime);

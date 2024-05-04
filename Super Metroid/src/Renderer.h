@@ -4,6 +4,18 @@
 #include <filesystem>
 #include "Resources.h"
 
+enum Direction
+{
+	RIGHT,
+	LEFT,
+	UPRIGHT,
+	UPLEFT,
+	DOWNRIGHT,
+	DOWNLEFT,
+	UP,
+	DOWN
+};
+
 class Renderer
 {
 private:
