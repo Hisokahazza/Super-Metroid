@@ -113,9 +113,9 @@ void Spore::onEndContact(b2Fixture* self, b2Fixture* other)
 
 void SporeSpawn::createFixture()
 {
-	m_FixtureData.listener = this;
-	m_FixtureData.type = BOSS;
-	m_FixtureData.boss = this;
+	fixtureData.listener = this;
+	fixtureData.type = BOSS;
+	fixtureData.boss = this;
 
 	// Create boss body
 	b2BodyDef bodyDef{};
@@ -128,7 +128,7 @@ void SporeSpawn::createFixture()
 	circleShape.m_radius = 2.0f;
 	circleShape.m_p.Set(0, 0);
 	b2FixtureDef fixtureDef{};
-	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
+	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
 	fixtureDef.isSensor = true;
 	fixtureDef.shape = &circleShape;
 	fixtureDef.friction = 0.0f;
@@ -540,9 +540,9 @@ void SporeSpawn::onEndContact(b2Fixture* self, b2Fixture* other)
 
 void GoldTorizo::createFixture()
 {
-	m_FixtureData.listener = this;
-	m_FixtureData.type = BOSS;
-	m_FixtureData.boss = this;
+	fixtureData.listener = this;
+	fixtureData.type = BOSS;
+	fixtureData.boss = this;
 
 	// Create boss body
 	b2BodyDef bodyDef{};
@@ -554,21 +554,25 @@ void GoldTorizo::createFixture()
 	b2PolygonShape polygonShape{};
 	polygonShape.SetAsBox(0.55f, 1.5f);
 	b2FixtureDef fixtureDef{};
-	fixtureDef.userData.pointer = (uintptr_t)&m_FixtureData;
+	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
 	fixtureDef.shape = &polygonShape;
-	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.0f;
 
 	body->CreateFixture(&fixtureDef);
 
 	b2CircleShape circleShape{};
-	circleShape.m_radius = 0.55f;
-	circleShape.m_p.Set(0.0f, -1.0f);
+	circleShape.m_radius = 0.75f;
+	circleShape.m_p.Set(0.0f, -1.75f);
 	fixtureDef.shape = &circleShape;
 	fixtureDef.isSensor = false;
 	body->CreateFixture(&fixtureDef);
 	circleShape.m_p.Set(0.0f, 1.0f);
+	body->CreateFixture(&fixtureDef);
+
+	// Generate hitbox
+	polygonShape.SetAsBox(1.2f, 2.25f);
+	fixtureDef.shape = &polygonShape;
+	fixtureDef.isSensor = true;
 	body->CreateFixture(&fixtureDef);
 }
 

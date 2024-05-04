@@ -58,6 +58,8 @@ protected:
 	std::unordered_map<BossAnimationState, Animation*> m_SheetlessAnimations;
 	std::vector<BossAnimationState> m_ActiveStates = {};
 	BossAnimationState m_CurrentAnimationState;
+
+	FixtureData fixtureData{};
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
@@ -146,8 +148,6 @@ public:
 class SporeSpawn : public Boss
 {
 private:
-	FixtureData m_FixtureData{};
-
 	void createFixture() override;
 
 	void closeCore(float deltaTime);
@@ -200,10 +200,6 @@ public:
 class GoldTorizo : public Boss
 {
 private:
-	FixtureData m_FixtureData{};
-
-	b2Vec2 m_Velocity;
-
 	void createFixture() override;
 	void createActiveAnimations();
 
