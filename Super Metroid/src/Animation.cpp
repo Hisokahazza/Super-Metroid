@@ -144,7 +144,7 @@ void SheetlessAnimation::update(float deltaTime)
     {
         if (m_Reverse == true)
         {
-            m_CurrentTextureSize = m_FrameSizes[m_NextTextureIndex - 1];
+            m_CurrentTextureSize = m_FrameSizes[m_NextTextureIndex];
         }
         else if (m_Reverse == false)
         {
@@ -167,7 +167,7 @@ void SheetlessAnimation::update(float deltaTime)
         m_TotalTime += deltaTime;
 
         m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
-
+        
         if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             m_TotalTime -= m_SwitchTime;
@@ -176,7 +176,7 @@ void SheetlessAnimation::update(float deltaTime)
             {
                 m_NextTextureIndex++;
             }
-            else if (m_NextTextureIndex != 0 && m_Reverse == true)
+            else if (m_NextTextureIndex >= 0 && m_Reverse == true)
             {
                 m_NextTextureIndex--;
             }
@@ -185,7 +185,7 @@ void SheetlessAnimation::update(float deltaTime)
             {
                 m_NextTextureIndex = 0;
             }
-            else if (m_NextTextureIndex <= 0 && m_Reverse == true)
+            else if (m_NextTextureIndex < 0 && m_Reverse == true)
             {
                 m_NextTextureIndex = m_NumTextures;
             }

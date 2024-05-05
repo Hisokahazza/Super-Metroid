@@ -702,8 +702,9 @@ void Samus::update(float deltaTime)
 	// Update current animation
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
-	// Set the current samus hitbox from bosses
+	// Set the current samus hitbox and ositiion for bosses
 	m_CurrentBoss->setPlayerHitbox(currentHitbox);
+	m_CurrentBoss->setSamusPosition(position);
 
 	// Set player invulnerabillity status
 	m_CurrentBoss->setPlayerinvulnerabillity(m_IsInvulnerable);

@@ -119,7 +119,7 @@ void SporeSpawn::createFixture()
 
 	// Create boss body
 	b2BodyDef bodyDef{};
-	bodyDef.type = b2_dynamicBody;
+	bodyDef.type = b2_staticBody;
 	bodyDef.position.Set(position.x, position.y);
 	bodyDef.fixedRotation = true;
 	body = Physics::world.CreateBody(&bodyDef);
@@ -347,7 +347,6 @@ void SporeSpawn::update(float deltaTime)
 
 	if (menuManager.menus[menuManager.getSwitchScreen()]->returnToHub == true)
 	{
-		std::cout << "SPORE" << std::endl;
 		for (auto& spore : m_Spores)
 		{
 			spore->~Spore();
@@ -418,7 +417,16 @@ void SporeSpawn::update(float deltaTime)
 			}
 		}
 	}
-	
+
+	if (m_BossComplete == true)
+	{
+		m_CurrentAnimationState = CORECLOSING;
+		if (m_SheetlessAnimations[CORECLOSING]->checkPlaying() == false)
+		{
+			m_CurrentAnimationState = CORECLOSED;
+		}
+	}
+
 	// Handle Animation resetting
 	if (m_CurrentAnimationState == CORECLOSED)
 	{
@@ -429,15 +437,6 @@ void SporeSpawn::update(float deltaTime)
 			{
 				m_SheetlessAnimations[state]->reset();
 			}
-		}
-	}
-
-	if (m_BossComplete == true)
-	{
-		m_CurrentAnimationState = CORECLOSING;
-		if (m_SheetlessAnimations[CORECLOSING]->checkPlaying() == false)
-		{
-			m_CurrentAnimationState = CORECLOSED;
 		}
 	}
 
@@ -546,7 +545,7 @@ void GoldTorizo::createFixture()
 
 	// Create boss body
 	b2BodyDef bodyDef{};
-	bodyDef.type = b2_dynamicBody;
+	bodyDef.type = b2_kinematicBody;
 	bodyDef.position.Set(position.x, position.y);
 	bodyDef.fixedRotation = true;
 	body = Physics::world.CreateBody(&bodyDef);
@@ -699,7 +698,9 @@ void GoldTorizo::begin()
 void GoldTorizo::update(float deltaTime)
 {
 	b2Vec2 velocity = body->GetLinearVelocity();
+	velocity.x = 0;
 
+	// Handle boss Intro
 	if (m_SheetlessAnimations[GOLDTORIZOBLINK]->checkPlaying() == false)
 	{
 		m_CurrentAnimationState = GOLDTORIZOSTAND;
@@ -712,16 +713,39 @@ void GoldTorizo::update(float deltaTime)
 
 	if (m_SheetlessAnimations[GOLDTORIZOTRANSITION]->checkPlaying() == false)
 	{
-		m_CurrentAnimationState = GOLDTORIZOWALKLEFT;
+		m_IntroOver = true;
 	}
 
-	if (m_CurrentAnimationState = GOLDTORIZOWALKLEFT)
+	if (m_IntroOver == true)
 	{
-		 velocity.x -= 0.01f;
+		if (samusPosition.x <= position.x)
+		{
+			m_CurrentAnimationState = GOLDTORIZOWALKLEFT;
+		}
+		if (samusPosition.x >= position.x)
+		{
+			m_CurrentAnimationState = GOLDTORIZOWALKRIGHT;
+		}
+	}
+	
+	/*if (m_SheetlessAnimations[GOLDTORIZOTRANSITION]->checkPlaying() == false)
+	{
+		m_CurrentAnimationState = GOLDTORIZOWALKLEFT;
+	}*/
+
+	// Handle result based on current action
+	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT)
+	{
+		 velocity.x -= 1.0f;
+	}
+	if (m_CurrentAnimationState == GOLDTORIZOWALKRIGHT)
+	{
+		velocity.x += 1.0f;
 	}
 
 	body->SetLinearVelocity(velocity);
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
+
 	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 }
 

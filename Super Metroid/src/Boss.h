@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <queue>
 
 #include <iostream>
 
@@ -66,8 +67,9 @@ protected:
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
+	
 	bool m_IsSamusHit = false;
-
+	sf::Vector2f samusPosition;
 	sf::Vector2f position;
 
 	virtual void createFixture() = 0;
@@ -78,17 +80,19 @@ public:
 	virtual void draw(Renderer& renderer) = 0;
 
 	// Getters and setters
-	int const getPlayerHealthOffset() { return playerHealthOffset; };
-	void setPlayerHealthOffset(int newOffset) { playerHealthOffset = newOffset; };
+	int const getPlayerHealthOffset() { return playerHealthOffset; }
+	void setPlayerHealthOffset(int newOffset) { playerHealthOffset = newOffset; }
 
-	bool const getIsSamusHit() { return m_IsSamusHit; };
-	void const setIsSamusHit(bool isSamusHit) { m_IsSamusHit = isSamusHit; };
+	bool const getIsSamusHit() { return m_IsSamusHit; }
+	void const setIsSamusHit(bool isSamusHit) { m_IsSamusHit = isSamusHit; }
 
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 
 	void setPlayerHitbox(b2Fixture* hitbox) { playerHitbox = hitbox; }
 
 	void setPlayerinvulnerabillity(bool isInvulnerable) { isPlayerInvulnerable = isInvulnerable; }
+
+	void setSamusPosition(sf::Vector2f position) { samusPosition = position; }
 };
 
 class BossComponent : public Collisionlistener
@@ -207,6 +211,9 @@ private:
 	void createActiveAnimations();
 
 	Direction m_Orientation;
+	std::queue<BossAnimationState> m_BossActions;
+
+	bool m_IntroOver = false;
 
 public:
 	void begin() override;
