@@ -140,6 +140,12 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 				circleShape.m_p.Set(3.0f, 0.0f);
 				body->CreateFixture(&fixtureDef);
 			}
+			else if (colour == colours[ROUGE])
+			{
+				m_Grid[x][y] = 5;
+
+
+			}
 			else if (colour == colours[RED])
 			{
 				samusPosition = sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
@@ -196,12 +202,6 @@ void StageHub::draw(Renderer& renderer)
 						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
 							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
 				}
-				else if (m_Grid[x][y] == 2)
-				{
-					renderer.draw(Resources::textures["HUB_Floor_Tile_01.png"],
-						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
-							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
-				}
 				else if (m_Grid[x][y] == 3)
 				{
 					renderer.draw(Resources::textures["HUB_Floor_Tile_03.png"],
@@ -220,7 +220,7 @@ void StageHub::draw(Renderer& renderer)
 		x++;
 	}
 
-	// Parse through grid a third time to render Ship
+	// Parse through grid a third time to render ship and walls/floor 
 	x = 0;
 	for (const auto& column : m_Grid)
 	{
@@ -234,6 +234,12 @@ void StageHub::draw(Renderer& renderer)
 					renderer.draw(Resources::textures["HUB_Starship.png"],
 						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
 							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize * 12.0f, m_CellSize * 5.5f));
+				}
+				else if (m_Grid[x][y] == 2)
+				{
+					renderer.draw(Resources::textures["HUB_Floor_Tile_01.png"],
+						sf::Vector2f(m_CellSize * x + m_CellSize / 2.0f,
+							m_CellSize * y + m_CellSize / 2.0f), sf::Vector2f(m_CellSize, m_CellSize));
 				}
 			}
 			y++;

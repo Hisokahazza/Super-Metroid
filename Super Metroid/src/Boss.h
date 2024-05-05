@@ -208,11 +208,52 @@ class TorizoBomb : public BossComponent
 {
 private:
 	void createFixture() override;
+
+	bool m_CollidedWithMap;
+	int m_ExplodeCounter = 0;
+
+	SheetlessAnimation* m_BombDestructionAnim;
+	SheetlessAnimation* m_BombAnim;
+
+	b2FixtureDef m_FixtureDef{};
+	b2Fixture* m_BombHitbox;
 public:
+	~TorizoBomb();
+
+	bool destroyed;
+	SheetlessAnimation* currentSheetlessAnimation;
+
 	void begin();
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
+
+	// Inherited via Collisionlistener
+	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
+	void onEndContact(b2Fixture* self, b2Fixture* other) override;
 };
+
+class TorizoArk : public BossComponent
+{
+private:
+	void createFixture() override;
+
+	SheetlessAnimation* m_ArkAnim;
+
+public:
+	~TorizoArk();
+
+	bool destroyed;
+	SheetlessAnimation* currentSheetlessAnimation;
+
+	void begin();
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
+
+	// Inherited via Collisionlistener
+	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
+	void onEndContact(b2Fixture* self, b2Fixture* other) override;
+};
+
 
 class GoldTorizo : public Boss
 {
@@ -224,6 +265,18 @@ private:
 	std::queue<BossAnimationState> m_BossActions;
 
 	bool m_IntroOver = false;
+
+	TorizoBomb* m_Bomb;
+	std::vector<TorizoBomb*> m_Bombs;
+
+	TorizoArk* m_Ark;
+	std::vector<TorizoArk*> m_Arks;
+
+	float m_BombSwitchTime = 2.0f;
+	float m_BombTotalTime = 2.0f;
+
+	float m_ArkSwitchTime = 2.0f;
+	float m_ArkTotalTime = 2.0f;
 
 public:
 	void begin() override;

@@ -67,9 +67,12 @@ void Game::Begin(const sf::Window& window)
 
 	camera.position = samus.position;
 
-	m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
-	m_Bosses[m_CurrentBoss]->begin();
-
+	if (m_CurrentStage != m_HubStage)
+	{
+		m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
+		m_Bosses[m_CurrentBoss]->begin();
+	}
+	
 	//sporeSpawn.position = m_MapPositions[1]
 	//sporeSpawn.begin();
 }

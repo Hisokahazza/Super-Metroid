@@ -196,7 +196,8 @@ Missile::~Missile()
 
 void Missile::begin(b2Vec2 initialPosition)
 {
-	std::vector <sf::Texture> missileDestructionTextures = {
+	std::vector <sf::Texture> missileDestructionTextures = 
+	{
 		Resources::textures["Missile_Destroy_01.png"],
 		Resources::textures["Missile_Destroy_02.png"],
 		Resources::textures["Missile_Destroy_03.png"],
@@ -206,7 +207,8 @@ void Missile::begin(b2Vec2 initialPosition)
 
 	};
 
-	std::vector<sf::Vector2f> missileDestructionFrameSizes = {
+	std::vector<sf::Vector2f> missileDestructionFrameSizes = 
+	{
 		sf::Vector2f(0.6f, 0.6f),
 		sf::Vector2f(0.8f, 0.8f),
 		sf::Vector2f(1.0f, 1.0f),

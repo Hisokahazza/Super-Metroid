@@ -70,7 +70,7 @@ void Samus::updateBullet(float deltaTime)
 			if (bullet->currentSheetlessAnimation->checkPlaying() == false)
 			{
 				m_Bullets.erase(std::find(m_Bullets.begin(), m_Bullets.end(), bullet));
-				delete(bullet);
+				delete bullet;
 			}
 		}
 		// update active bullets
@@ -100,7 +100,7 @@ void Samus::updateMissile(float deltaTime)
 			if (missile->currentSheetlessAnimation->checkPlaying() == false)
 			{
 				m_Missiles.erase(std::find(m_Missiles.begin(), m_Missiles.end(), missile));
-				delete(missile);
+				delete missile;
 			}
 		}
 		// update active bullets
@@ -155,7 +155,7 @@ void Samus::createFixture()
 	fixtureDef.shape = &polygonShape;
 	samusHitbox = m_Body->CreateFixture(&fixtureDef);
 	
-	polygonShape.SetAsBox(0.4f, 0.55f, b2Vec2(0.0f, 0.5f), 0.0f);
+	polygonShape.SetAsBox(0.5f, 0.55f, b2Vec2(0.0f, 0.5f), 0.0f);
 	crouchHitbox = m_Body->CreateFixture(&fixtureDef);
 
 	polygonShape.SetAsBox(0.4f, 0.3f, b2Vec2(0.0f, 0.9f), 0.0f);

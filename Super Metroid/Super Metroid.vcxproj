@@ -132,6 +132,7 @@
     <ClInclude Include="src\Animation.h" />
     <ClInclude Include="src\Boss.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Door.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\MenuManager.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\Boss.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Door.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\HUDComponents.cpp" />
