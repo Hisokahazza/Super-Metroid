@@ -108,6 +108,9 @@ protected:
 	b2Fixture* m_PlayerHitbox;
 	bool m_IsPlayerInvulnerable;
 
+	FixtureData fixtureData;
+	b2Fixture* fixture;
+
 public:
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
@@ -122,9 +125,6 @@ class Spore : public BossComponent
 {
 private:
 	int m_PlayerHealthOffset = 0;
-
-	FixtureData m_SporeFixtureData;
-	b2Fixture* m_SporeFixture;
 
 	float m_SwitchTime = 0.01f;
 	float m_TotalTime = 0.0f;
@@ -202,6 +202,16 @@ public:
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
+};
+
+class TorizoBomb : public BossComponent
+{
+private:
+	void createFixture() override;
+public:
+	void begin();
+	void update(float deltaTime) override;
+	void draw(Renderer& renderer) override;
 };
 
 class GoldTorizo : public Boss

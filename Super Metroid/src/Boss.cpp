@@ -1,14 +1,15 @@
 #include "Boss.h"
 
+// SPORESPAWN
 
 void Spore::createFixture()
 {
-	m_SporeFixtureData.type = BOSSCOMPONENT;
-	m_SporeFixtureData.bossComponent = this;
-	m_SporeFixtureData.listener = this;
+	fixtureData.type = BOSSCOMPONENT;
+	fixtureData.bossComponent = this;
+	fixtureData.listener = this;
 	
 	b2BodyDef bodyDef{};
-	bodyDef.type = b2_dynamicBody;
+	bodyDef.type = b2_staticBody;
 	bodyDef.position = b2Vec2(position.x, position.y);
 	bodyDef.fixedRotation = true;
 	body = Physics::world.CreateBody(&bodyDef);
@@ -18,10 +19,10 @@ void Spore::createFixture()
 	circleShape.m_p.Set(0, 0);
 
 	b2FixtureDef fixtureDef{};
-	fixtureDef.userData.pointer = (uintptr_t)&m_SporeFixtureData;
+	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
 	fixtureDef.shape = &circleShape;
 	fixtureDef.isSensor = true;
-	m_SporeFixture = body->CreateFixture(&fixtureDef);
+	fixture = body->CreateFixture(&fixtureDef);
 }
 
 Spore::~Spore()
@@ -29,7 +30,7 @@ Spore::~Spore()
 	if (body)
 	{
 		// Destroy the fixture
-		body->DestroyFixture(m_SporeFixture);
+		body->DestroyFixture(fixture);
 
 		// Destroy the body
 		Physics::world.DestroyBody(body);
@@ -537,6 +538,47 @@ void SporeSpawn::onEndContact(b2Fixture* self, b2Fixture* other)
 	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
 }
 
+// GOLDTORIZO
+
+void TorizoBomb::createFixture()
+{
+	fixtureData.type = BOSSCOMPONENT;
+	fixtureData.bossComponent = this;
+	fixtureData.listener = this;
+
+	b2BodyDef bodyDef{};
+	bodyDef.type = b2_staticBody;
+	bodyDef.position = b2Vec2(position.x, position.y);
+	bodyDef.fixedRotation = true;
+	body = Physics::world.CreateBody(&bodyDef);
+
+	b2CircleShape circleShape{};
+	circleShape.m_radius = 0.25f;
+	circleShape.m_p.Set(0, 0);
+
+	b2FixtureDef fixtureDef{};
+	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
+	fixtureDef.shape = &circleShape;
+	fixtureDef.isSensor = true;
+	fixture = body->CreateFixture(&fixtureDef);
+}
+
+void TorizoBomb::begin()
+{
+	createFixture();
+
+
+}
+
+void TorizoBomb::update(float deltaTime)
+{
+}
+
+void TorizoBomb::draw(Renderer& renderer)
+{
+	renderer.draw(Resources::textures["GT_Bomb.png"], position, );
+}
+
 void GoldTorizo::createFixture()
 {
 	fixtureData.listener = this;
@@ -716,15 +758,18 @@ void GoldTorizo::update(float deltaTime)
 		m_IntroOver = true;
 	}
 
+	// Handle 
 	if (m_IntroOver == true)
 	{
 		if (samusPosition.x <= position.x)
 		{
 			m_CurrentAnimationState = GOLDTORIZOWALKLEFT;
+			m_Orientation = LEFT;
 		}
 		if (samusPosition.x >= position.x)
 		{
 			m_CurrentAnimationState = GOLDTORIZOWALKRIGHT;
+			m_Orientation = RIGHT;
 		}
 	}
 	
