@@ -726,15 +726,21 @@ TorizoArk::~TorizoArk()
 
 void TorizoArk::begin()
 {
-	position = sf::Vector2f(10.0f, 5.0f);
+	position = sf::Vector2f(10.0f, 10.0f);
 
 	createFixture();
 
-	std::vector<sf::Texture> arkTextures
+	std::vector<sf::Texture> arkLeftTextures
 	{
 		Resources::textures["GT_Ark_L_01.png"],
 		Resources::textures["GT_Ark_L_02.png"],
 		Resources::textures["GT_Ark_L_03.png"]
+	};
+	std::vector<sf::Texture> arkRightTextures
+	{
+		Resources::textures["GT_Ark_R_01.png"],
+		Resources::textures["GT_Ark_R_02.png"],
+		Resources::textures["GT_Ark_R_03.png"]
 	};
 
 	std::vector<sf::Vector2f> arkFrameSizes
@@ -744,14 +750,33 @@ void TorizoArk::begin()
 		sf::Vector2f(0.75f, 1.75f),
 	};
 
-	m_ArkAnim = new SheetlessAnimation(arkTextures, 0.2f, false, false, 1, arkFrameSizes);
-	m_ArkAnim->begin();
-	currentSheetlessAnimation = m_ArkAnim;
+	m_ArkLeftAnim = new SheetlessAnimation(arkLeftTextures, 0.2f, false, false, 1, arkFrameSizes);
+	m_ArkRightAnim = new SheetlessAnimation(arkRightTextures, 0.2f, false, false, 1, arkFrameSizes);
+
+	m_ArkLeftAnim->begin();
+	m_ArkRightAnim->begin();
+
+	if (m_Orientation == LEFT)
+	{
+		currentSheetlessAnimation = m_ArkLeftAnim;
+	}
+	else
+	{
+		currentSheetlessAnimation = m_ArkRightAnim;
+	}
 }
 
 void TorizoArk::update(float deltaTime)
 {
-	position.x -= 0.1;
+	if (m_Orientation == LEFT)
+	{
+		position.x -= 0.1;
+	}
+	else
+	{
+		position.x += 0.1;
+	}
+	
 	body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
 
 	currentSheetlessAnimation->update(deltaTime);
@@ -764,6 +789,18 @@ void TorizoArk::draw(Renderer& renderer)
 
 void TorizoArk::onBeginContact(b2Fixture* self, b2Fixture* other)
 {
+	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
+	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
+
+	if (!otherData)
+	{
+		return;
+	}
+
+	if (otherData->type == MAPTILE)
+	{
+		destroyed = true;
+	}
 }
 
 void TorizoArk::onEndContact(b2Fixture* self, b2Fixture* other)
@@ -999,7 +1036,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}*/
 
-	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT)
+	if (m_IntroOver == true)
 	{
 		m_ArkTotalTime += deltaTime;
 
@@ -1009,6 +1046,8 @@ void GoldTorizo::update(float deltaTime)
 
 			m_Ark = new TorizoArk();
 			m_Arks.push_back(m_Ark);
+
+			m_Ark->setOrientation(m_Orientation);
 			m_Ark->begin();
 		}
 	}
@@ -1080,6 +1119,11 @@ void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		playerHealthOffset -= 20;
 		m_IsSamusHit = true;
+	}
+
+	if (otherData->type == BULLET || otherData->type == MISSILE)
+	{
+		projectileDestroyed = otherData;
 	}
 }
 

@@ -12,7 +12,7 @@ void Projectile::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
-	if (otherData->type == MAPTILE)
+	if (otherData->type == MAPTILE || otherData->type == DOOR)
 	{
 		destroyed = true;
 		selfData->isActive = false;

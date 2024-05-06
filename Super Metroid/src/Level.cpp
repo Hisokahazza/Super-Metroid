@@ -21,6 +21,11 @@ void Level::clearLevel()
 			body = nullptr;
 		}
 	}
+
+	/*for (auto door : m_InteractableDoors)
+	{
+		delete door;
+	}*/
 }
 
 StageHub::StageHub(float cellSize) : m_CellSize(cellSize)
@@ -144,7 +149,20 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 			{
 				m_Grid[x][y] = 5;
 
+				if (x < 3)
+				{
+					m_Door = new Door(NOMENU, RIGHT);
+				}
+				else
+				{
+					m_Door = new Door(BOSSMENU, LEFT);
+				}
+				
+				m_Door->setPosition(sf::Vector2f(m_CellSize* x + m_CellSize / 2.0f,
+					m_CellSize* y + m_CellSize / 2.0f));
+				m_Door->Begin();
 
+				m_InteractableDoors.push_back(m_Door);
 			}
 			else if (colour == colours[RED])
 			{

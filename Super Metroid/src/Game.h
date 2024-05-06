@@ -18,7 +18,7 @@ extern Camera camera;
 class Game
 {
 private:
-	std::string m_CurrentStage = "res/Level_Hub.png";
+	std::string m_CurrentStage = "res/Level_Gold_Torizo.png";
 	BossName m_CurrentBoss = GOLDTORIZO;
 
 	bool m_IsSamusAlive = true;
@@ -33,6 +33,9 @@ private:
 
 	sf::Image m_MapImage;
 	std::vector<sf::Vector2f> m_MapPositions;
+	std::vector<Door*> m_InteractableDoors;
+
+	bool m_IsThroughDoor;
 
 	std::string m_HubStage = "res/Level_Hub.png";
 public:

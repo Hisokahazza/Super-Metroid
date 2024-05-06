@@ -23,7 +23,7 @@ void Victory::update(float deltaTime)
 
 void Victory::draw(Renderer& renderer)
 {
-	renderer.draw(Resources::textures["Victory_Screen.png"], sf::Vector2f(0, 0), sf::Vector2f(99.8f, 56.2f));
+	renderer.draw(Resources::textures["Victory_Screen.png"], sf::Vector2f(0, 0), sf::Vector2f(100.0f, 56.2f));
 
 	std::string victoryTextContents = "VICTORY";
 	renderer.drawText(m_Victorytext, sf::Vector2f(-10.0f, -20.0f), sf::Vector2f(0.05f, 0.06f), victoryTextContents);
@@ -54,7 +54,7 @@ void GameOver::update(float deltaTime)
 
 void GameOver::draw(Renderer& renderer)
 {
-	renderer.draw(Resources::textures["Game_Over.jpeg"], sf::Vector2f(0, 0), sf::Vector2f(99.8f, 56.2f));
+	renderer.draw(Resources::textures["Game_Over.jpeg"], sf::Vector2f(0, 0), sf::Vector2f(100.0f, 56.2f));
 
 	std::string gameOverTextContents = "GAME OVER";
 	renderer.drawText(m_GameOvertext, sf::Vector2f(-10.0f, -25.0f), sf::Vector2f(0.05f, 0.06f), gameOverTextContents);
@@ -72,4 +72,22 @@ void NoMenu::update(float deltaTime)
 
 void NoMenu::draw(Renderer& renderer)
 {
+}
+
+void BossMenu::begin()
+{
+
+}
+
+void BossMenu::update(float deltaTime)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	{
+		returnToHub = true;
+	}
+}
+
+void BossMenu::draw(Renderer& renderer)
+{
+	renderer.draw(Resources::textures["Boss_Menu.png"], sf::Vector2f(0, 0), sf::Vector2f(100.0f, 56.2f));
 }

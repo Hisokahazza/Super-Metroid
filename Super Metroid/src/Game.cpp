@@ -86,10 +86,12 @@ void Game::update(float deltaTime)
 	{
 		m_IsSamusAlive = false;
 	}
-
+	
 	if (menuManager.menus[menuManager.getSwitchScreen()]->returnToHub == true)
 	{
+		std::cout << menuManager.getSwitchScreen() << std::endl;
 		menuManager.setSwitchScreen(NOMENU);
+		menuManager.menus[menuManager.getSwitchScreen()]->returnToHub = false;
 
 		setCurrentStage(m_HubStage, false);
 	}
@@ -99,11 +101,31 @@ void Game::update(float deltaTime)
 	Physics::update(deltaTime);
 	samus.update(deltaTime);
 
-	if (m_CurrentStage != "res/Level_Hub.png")
+	if (m_CurrentStage == m_HubStage)
+	{
+		m_InteractableDoors = m_Stages[m_CurrentStage]->getDoors();
+		for (auto door : m_InteractableDoors)
+		{
+			m_IsThroughDoor = door->getIsThroughDoor();
+			door->Update(deltaTime);
+
+			if (m_IsThroughDoor == true)
+			{
+				menuManager.setMenued(true);
+				menuManager.setSwitchScreen(door->getDoorLink());
+
+				if (menuManager.menus[door->getDoorLink()]->returnToHub == true)
+				{
+					door->setIsThroughDoor(false);
+				}
+			}
+		}
+	}
+
+	if (m_CurrentStage != m_HubStage)
 	{
 		// determine which boss to play
 		m_Bosses[m_CurrentBoss]->update(deltaTime);
-		//sporeSpawn.update(deltaTime);
 	}
 }
 
@@ -113,10 +135,17 @@ void Game::draw(Renderer& renderer)
 	m_Stages[m_CurrentStage]->draw(renderer);
 	samus.draw(renderer);
 
-	if (m_CurrentStage != "res/Level_Hub.png")
+	if (m_CurrentStage == m_HubStage)
+	{
+		for (auto door : m_InteractableDoors)
+		{
+			door->draw(renderer);
+		}
+	}
+
+	if (m_CurrentStage != m_HubStage)
 	{
 		m_Bosses[m_CurrentBoss]->draw(renderer);
-		//sporeSpawn.draw(renderer);
 	}
 	
 	Physics::debugDraw(renderer);

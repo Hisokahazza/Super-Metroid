@@ -13,6 +13,7 @@ class Samus;
 class DefaultBullet;
 class Missile;
 class Boss;
+class Door;
 
 
 class Collisionlistener
@@ -30,7 +31,8 @@ enum FixtureType
 	BULLET,
 	MISSILE,
 	BOSS,
-	BOSSCOMPONENT
+	BOSSCOMPONENT,
+	DOOR
 };
 
 struct FixtureData
@@ -47,6 +49,7 @@ struct FixtureData
 		Missile* missile;
 		Boss* boss;
 		BossComponent* bossComponent;
+		Door* door;
 
 		struct
 		{

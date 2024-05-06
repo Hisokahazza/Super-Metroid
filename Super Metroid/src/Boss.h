@@ -237,7 +237,10 @@ class TorizoArk : public BossComponent
 private:
 	void createFixture() override;
 
-	SheetlessAnimation* m_ArkAnim;
+	SheetlessAnimation* m_ArkLeftAnim;
+	SheetlessAnimation* m_ArkRightAnim;
+
+	Direction m_Orientation = LEFT;
 
 public:
 	~TorizoArk();
@@ -248,6 +251,9 @@ public:
 	void begin();
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
+
+	//Getters and setters
+	void const setOrientation(Direction orientation) { m_Orientation = orientation; };
 
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;

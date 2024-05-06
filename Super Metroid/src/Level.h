@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "Resources.h"
 #include "Physics.h"
+#include "Door.h"
 
 enum Colour
 {
@@ -63,11 +64,16 @@ protected:
 	sf::Vector2f samusPosition;
 	sf::Vector2f bossPosition;
 
+	std::vector<Door*> m_InteractableDoors;
+	Door* m_Door;
+
 public:
 	void clearLevel();
 	virtual std::vector<sf::Vector2f> createFromImg(const sf::Image& image) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 	
+	// Getters and setters
+	std::vector<Door*> getDoors() { return m_InteractableDoors; };
 };
 
 class StageHub : public Level
