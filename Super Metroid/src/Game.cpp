@@ -6,8 +6,6 @@ Samus samus;
 HUD playerHUD;
 MenuManager menuManager;
 
-//SporeSpawn sporeSpawn;
-
 float movementSpeed = 0.5f;
 
 void Game::createStages()

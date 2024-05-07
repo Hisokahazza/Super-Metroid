@@ -1022,7 +1022,7 @@ void GoldTorizo::update(float deltaTime)
 		velocity.x += 2.0f;
 	}
 
-	/*if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT)
+	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT)
 	{
 		m_BombTotalTime += deltaTime;
 
@@ -1034,7 +1034,7 @@ void GoldTorizo::update(float deltaTime)
 			m_Bombs.push_back(m_Bomb);
 			m_Bomb->begin();
 		}
-	}*/
+	}
 
 	if (m_IntroOver == true)
 	{

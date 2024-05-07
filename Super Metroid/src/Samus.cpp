@@ -93,7 +93,7 @@ void Samus::updateMissile(float deltaTime)
 		}
 
 		// Check if bullet is destroyed and calls relevant destruction methods
-		if (missile->destroyed == true)
+		if (missile && missile->destroyed == true)
 		{
 			missile->~Missile();
 			missile->currentSheetlessAnimation->update(deltaTime);
@@ -317,7 +317,11 @@ void Samus::update(float deltaTime)
 	// Handle left right movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right))
 	{
-		m_CrouchState = NONE;
+		if (m_CrouchState != MORPHBALL)
+		{
+			m_CrouchState = NONE;
+		}
+
 
 		if (m_NumGroundContacts >= 1)
 		{
@@ -358,7 +362,10 @@ void Samus::update(float deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
 	{
-		m_CrouchState = NONE;
+		if (m_CrouchState != MORPHBALL)
+		{
+			m_CrouchState = NONE;
+		}
 
 		if (m_NumGroundContacts >= 1)
 		{
