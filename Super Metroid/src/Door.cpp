@@ -49,7 +49,7 @@ Door::Door(MenuState doorLink, Direction Orientation) : m_DoorLink(doorLink), m_
 {
 }
 
-Door::~Door()
+void Door::destroyFixture()
 {
 	if (m_OpenBody)
 	{

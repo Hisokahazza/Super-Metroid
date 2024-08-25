@@ -69,6 +69,7 @@ protected:
 
 public:
 	void clearLevel();
+
 	virtual std::vector<sf::Vector2f> createFromImg(const sf::Image& image) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 	

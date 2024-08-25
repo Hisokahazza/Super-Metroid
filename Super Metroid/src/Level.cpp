@@ -22,13 +22,13 @@ void Level::clearLevel()
 			body = nullptr;
 		}
 	}
-
 	for (auto door : m_InteractableDoors)
 	{
-		if (!Physics::world.IsLocked())
-		{
-			delete door;
-		}
+
+		m_InteractableDoors.erase(std::find(m_InteractableDoors.begin(), m_InteractableDoors.end(), door));
+
+		door->destroyFixture();
+		delete door;
 	}
 }
 

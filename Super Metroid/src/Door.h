@@ -33,11 +33,12 @@ private:
 	bool m_IsThroughDoor = false;
 public:
 	Door(MenuState doorLink = NOMENU, Direction Orientation = LEFT);
-	~Door();
-
+	
 	void Begin();
 	void Update(float deltaTime);
 	void draw(Renderer& renderer);
+
+	void destroyFixture();
 
 	// Getters and setters
 	void const setPosition(sf::Vector2f position) { m_Position = position; }
