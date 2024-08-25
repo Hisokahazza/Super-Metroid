@@ -70,9 +70,6 @@ void Game::Begin(const sf::Window& window)
 		m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
 		m_Bosses[m_CurrentBoss]->begin();
 	}
-	
-	//sporeSpawn.position = m_MapPositions[1]
-	//sporeSpawn.begin();
 }
 
 // update function(called every frame)
@@ -87,16 +84,16 @@ void Game::update(float deltaTime)
 	
 	if (menuManager.menus[menuManager.getSwitchScreen()]->returnToHub == true)
 	{
-		std::cout << menuManager.getSwitchScreen() << std::endl;
-		menuManager.setSwitchScreen(NOMENU);
 		menuManager.menus[menuManager.getSwitchScreen()]->returnToHub = false;
-
+		menuManager.setSwitchScreen(NOMENU);
+		
 		setCurrentStage(m_HubStage, false);
 	}
 
 	menuManager.menus[menuManager.getSwitchScreen()]->update(deltaTime);
 	
 	Physics::update(deltaTime);
+
 	samus.update(deltaTime);
 
 	if (m_CurrentStage == m_HubStage)

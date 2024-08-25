@@ -2,6 +2,7 @@
 
 void Door::createFixture()
 {
+	// Create closed door body
 	m_FixtureData->door = this;
 	m_FixtureData->type = DOOR;
 	m_FixtureData->listener = this;
@@ -21,17 +22,19 @@ void Door::createFixture()
 	fixtureDef.friction = 0.0f;
 	m_DoorClosedFixture = m_ClosedBody->CreateFixture(&fixtureDef);
 
+	// Create open door body
 	b2BodyDef openbodyDef{};
 	openbodyDef.position.Set(m_Position.x - 0.2f, m_Position.y);
 	openbodyDef.type = b2_staticBody;
 	m_OpenBody = Physics::world.CreateBody(&openbodyDef);
 
-	shape.SetAsBox(0.4f, 1.5f);
+	shape.SetAsBox(0.4f, 1.4f);
 	m_DoorOpenFixture = m_OpenBody->CreateFixture(&fixtureDef);
 }
 
 void Door::deleteClosedBody()
 {
+	// Destroy closed door body
 	if (m_ClosedBody)
 	{
 		m_ClosedBody->DestroyFixture(m_DoorClosedFixture);
@@ -48,20 +51,21 @@ Door::Door(MenuState doorLink, Direction Orientation) : m_DoorLink(doorLink), m_
 
 Door::~Door()
 {
-	/*if (m_OpenBody)
+	if (m_OpenBody)
 	{
 		m_OpenBody->DestroyFixture(m_DoorOpenFixture);
 
 		Physics::world.DestroyBody(m_OpenBody);
 
 		m_OpenBody = nullptr;
-	}*/
+	}
 }
 
 void Door::Begin()
 {
 	createFixture();
 
+	// Initialise door textures 
 	std::vector<sf::Texture> doorOpenLeftTextures
 	{
 		Resources::textures["HUB_Door_L_01.png"],
@@ -88,6 +92,7 @@ void Door::Begin()
 
 void Door::Update(float deltaTime)
 {
+	// Handle door animation updating and door destruction 
 	if (m_IsDoorOpen == true)
 	{
 		if (m_Orientation == LEFT)
@@ -114,6 +119,7 @@ void Door::Update(float deltaTime)
 
 void Door::draw(Renderer& renderer)
 {
+	// Handle door draw calls
 	if (m_IsDoorOpen == false)
 	{
 		if (m_Orientation == LEFT)
@@ -140,6 +146,7 @@ void Door::draw(Renderer& renderer)
 
 void Door::onBeginContact(b2Fixture* self, b2Fixture* other)
 {
+	// Handle door collisions
 	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
 	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
 
@@ -153,9 +160,10 @@ void Door::onBeginContact(b2Fixture* self, b2Fixture* other)
 		m_IsDoorOpen = true;
 	}
 
-	if (self == m_DoorOpenFixture && otherData->type == SAMUS)
+	if (self == m_DoorOpenFixture && otherData->type == SAMUS && m_IsDoorOpen == true)
 	{
 		m_IsThroughDoor = true;
+		m_IsDoorOpen = false;
 	}
 }
 

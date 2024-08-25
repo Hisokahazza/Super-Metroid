@@ -9,12 +9,14 @@ SheetAnimation::SheetAnimation(const sf::Texture& spriteSheet, const std::string
 
 void SheetAnimation::begin()
 {
+    // set sheet dimensions and initial rect locally
     m_SheetDimensions = { m_SpriteSheet.getSize().x, m_SpriteSheet.getSize().y };
     m_InitialRect = { 0, 0, (int)(m_SheetDimensions.x / m_RowsColumns.x), (int)(m_SheetDimensions.y / m_RowsColumns.y) };
 }
 
 void SheetAnimation::update(float deltaTime)
 {
+    // handle single frame animations (still animations)
     if (m_RowsColumns == sf::Vector2u(1, 1))
     {
         m_CurrentRect = m_InitialRect;
@@ -23,6 +25,7 @@ void SheetAnimation::update(float deltaTime)
 
     if (m_Loop == true)
     {
+        // increment total time in accordance with frame rate (deltaTime is time between frames)
         m_TotalTime += deltaTime;
 
         if (m_FrameCount == 0)
@@ -48,6 +51,7 @@ void SheetAnimation::update(float deltaTime)
             }
         }
 
+        // flip animation direction for looping animations
         if (m_FrameCount == m_RowsColumns.x * m_RowsColumns.y)
         {
             m_AnimDirection = !m_AnimDirection;
@@ -57,6 +61,8 @@ void SheetAnimation::update(float deltaTime)
 
     if (m_Loop == false)
     {
+
+        // increment total time in accordance with frame rate (deltaTime is time between frames)
         m_TotalTime += deltaTime;
 
         if (m_FrameCount == 0)
@@ -81,6 +87,7 @@ void SheetAnimation::update(float deltaTime)
             m_FrameCount++;
         }
 
+        // Halt animation when spritesheet limit is reached
         if (m_FrameCount == (m_TimesPlayed * m_RowsColumns.x * m_RowsColumns.y))
         {
             playing = false;
@@ -90,6 +97,7 @@ void SheetAnimation::update(float deltaTime)
 
 void SheetAnimation::reset()
 {
+    // Reset key animation attributes
     m_FrameCount = 0;
     m_TotalTime = 0;
     m_CurrentRect = m_InitialRect;
@@ -117,6 +125,7 @@ void SheetlessAnimation::begin()
 {
     m_NumTextures = m_AnimationTextures.size() - 1;
 
+    // Set initial frames and texture indicies
     if (m_Reverse == true)
     {
         m_NextTextureIndex = m_NumTextures;
@@ -140,6 +149,7 @@ void SheetlessAnimation::begin()
 
 void SheetlessAnimation::update(float deltaTime)
 {
+    // increment texture sizes on a frame by frame basis
     if (m_FrameSizes.size() > 0)
     {
         if (m_Reverse == true)
@@ -152,11 +162,13 @@ void SheetlessAnimation::update(float deltaTime)
         }
     }
   
+    // Halt playing when animation is over (reverse)
     if (m_FrameCount == 0)
     {
         playing = true;
     }
 
+    // Halt playing when animation is over (not-reverse)
     if (m_FrameCount == (m_NumTextures) * m_TimesPlayed && m_TimesPlayed != -1)
     {
         playing = false;

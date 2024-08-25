@@ -77,6 +77,7 @@ class Samus : public Collisionlistener
 private:
 	Boss* m_CurrentBoss = new SporeSpawn();
 
+	void destroyFixture();
 	void createFixture();
 	void createActiveAnimations();
 

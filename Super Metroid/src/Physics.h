@@ -24,6 +24,7 @@ public:
 	virtual void onEndContact(b2Fixture* self, b2Fixture* other) = 0;
 };
 
+// Enum for fixture types
 enum FixtureType
 {
 	MAPTILE,
@@ -35,13 +36,17 @@ enum FixtureType
 	DOOR
 };
 
+// struct for all fixture data pointers
 struct FixtureData
 {
+	// Each fixture has a listener and type
 	Collisionlistener* listener;
 	FixtureType type;
 
 	bool isActive = true;
 
+	// Union with pointers to collidable objects 
+	// (union is only allocated as much memory as its largest member ensuring each fixture can only collide with a fixture of one other type at a time)
 	union
 	{
 		Samus* samus;

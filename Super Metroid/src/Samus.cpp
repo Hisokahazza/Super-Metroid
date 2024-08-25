@@ -73,7 +73,7 @@ void Samus::updateBullet(float deltaTime)
 				delete bullet;
 			}
 		}
-		// update active bullets
+		// Update active bullets
 		else if (bullet)
 		{
 			bullet->update(deltaTime);
@@ -103,7 +103,7 @@ void Samus::updateMissile(float deltaTime)
 				delete missile;
 			}
 		}
-		// update active bullets
+		// Update active bullets
 		else if (missile)
 		{
 			missile->update(deltaTime);
@@ -111,9 +111,19 @@ void Samus::updateMissile(float deltaTime)
 	}
 }
 
+void Samus::destroyFixture()
+{
+	if (m_Body)
+	{
+		Physics::world.DestroyBody(m_Body);
+
+		m_Body = nullptr;
+	}
+}
+
 void Samus::createFixture()
 {	
-	// set fixtureData members
+	// Set fixtureData members
 	fixtureData.listener = this;
 	fixtureData.type = SAMUS;
 	fixtureData.samus = this;
@@ -411,7 +421,7 @@ void Samus::update(float deltaTime)
 		m_Velocity.y = -jumpVelocity;
 	}
 
-	// allow player to jump higher when holding the key
+	// Allow player to jump higher when holding the key
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Up) && m_NumGroundContacts < 1)
 	{
 		float downwardForce = 100.0f;
@@ -626,7 +636,7 @@ void Samus::update(float deltaTime)
 		m_Animations[INVULERABLEFACINGLEFT]->reset();
 	}
 
-	// handle samus getting hit by bosses
+	// Handle samus getting hit by bosses
 	if (m_SamusHit == true && m_IsSamusAlive == true)
 	{
 		m_IsInvulnerable = true;
@@ -716,7 +726,7 @@ void Samus::update(float deltaTime)
 	// Set player invulnerabillity status
 	m_CurrentBoss->setPlayerinvulnerabillity(m_IsInvulnerable);
 
-	// retrieve health offset from boss
+	// Retrieve health offset from boss
 	m_CurrentHealthOffset = m_CurrentBoss->getPlayerHealthOffset();
 
 	m_CurrentHealth += m_CurrentHealthOffset;
@@ -737,7 +747,7 @@ void Samus::update(float deltaTime)
 	position = sf::Vector2f(m_Body->GetPosition().x, m_Body->GetPosition().y);
 }
 
-// handle render calls
+// Handle render calls
 void Samus::draw(Renderer& renderer)
 {
 	renderer.draw(m_Animations[m_CurrentAnimationState]->getCurrentFrame(), position,
@@ -764,6 +774,7 @@ void Samus::draw(Renderer& renderer)
 
 void Samus::reset()
 {
+	destroyFixture();
 	createFixture();
 
 	setAnimationState(IDLE);
@@ -781,7 +792,6 @@ void Samus::reset()
 	
 	setAnimationState(IDLE);
 	
-
 	m_CurrentAnimationState = IDLE;
 	
 	m_ActiveProjectile = BULLETPROJ;
@@ -800,7 +810,7 @@ void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
-	if (samusGroundFixture == self && otherData->type == MAPTILE)
+	if (samusGroundFixture == self && (otherData->type == MAPTILE || otherData->type == DOOR))
 	{
 		m_NumGroundContacts++;
 	}
@@ -818,7 +828,7 @@ void Samus::onEndContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
-	if (samusGroundFixture == self && data->type == MAPTILE && m_NumGroundContacts > 0)
+	if (samusGroundFixture == self && (data->type == MAPTILE || data->type == DOOR) && m_NumGroundContacts > 0)
 	{
 		m_NumGroundContacts--;
 	}

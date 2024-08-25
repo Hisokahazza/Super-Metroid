@@ -1,6 +1,7 @@
 #include "Level.h"
 #include <iostream>
 
+// Clear all bodies in a level
 void Level::clearLevel()
 {
 	for (auto& body : m_BodiesToDelete)
@@ -22,21 +23,28 @@ void Level::clearLevel()
 		}
 	}
 
-	/*for (auto door : m_InteractableDoors)
+	for (auto door : m_InteractableDoors)
 	{
-		delete door;
-	}*/
+		if (!Physics::world.IsLocked())
+		{
+			delete door;
+		}
+	}
 }
 
 StageHub::StageHub(float cellSize) : m_CellSize(cellSize)
 {
 }
 
+// Generates a grid with integr values to denote tiles based on an image comprised of colours
 std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 {
 	m_Grid.clear();
+	// Create a grid of the same size as the image
 	m_Grid = std::vector(image.getSize().x, std::vector(image.getSize().y, 0));
 
+	// Check each pixel in the image and assign a value to a location in the grid dependent on the colour
+	// Also assigns fixtures where relevant
 	for (size_t x = 0; x < m_Grid.size(); x++)
 	{
 		for (size_t y = 0; y < m_Grid[x].size(); y++)
@@ -70,6 +78,30 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 			else if (colour == colours[GREEN])
 			{
 				m_Grid[x][y] = 2;
+			}
+			else if (colour == colours[ORANGE])
+			{
+				m_Grid[x][y] = 2;
+
+				b2BodyDef bodyDef{};
+				bodyDef.position.Set(m_CellSize * x + m_CellSize / 2.0f,
+					m_CellSize * y + m_CellSize / 2.0f);
+				b2Body* body = Physics::world.CreateBody(&bodyDef);
+				m_BodiesToDelete.push_back(body);
+
+				b2PolygonShape shape{};
+				shape.SetAsBox(m_CellSize / 2, m_CellSize / 2);
+
+				FixtureData* fixtureData = new FixtureData();
+				fixtureData->type = MAPTILE;
+				fixtureData->mapPosx = x;
+				fixtureData->mapPosY = y;
+
+				b2FixtureDef fixtureDef{};
+				fixtureDef.userData.pointer = (uintptr_t)fixtureData;
+				fixtureDef.shape = &shape;
+				fixtureDef.density = 0.0f;
+				body->CreateFixture(&fixtureDef);
 			}
 			else if (colour == colours[BLUE])
 			{
@@ -174,6 +206,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 	return {samusPosition, sf::Vector2f()};
 }
 
+// Goes through each value in the grid vector and renders tiles to those locations within the vector
 void StageHub::draw(Renderer& renderer)
 {
 	int x = 0;

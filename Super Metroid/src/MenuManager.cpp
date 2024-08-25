@@ -1,5 +1,7 @@
 #include "MenuManager.h"
+// MenuManager class acts as an interface between game and menu class 
 
+// Initialise menus with relevant menu objects
 void MenuManager::createMenus()
 {
 	menus[VICTORY] = new Victory();

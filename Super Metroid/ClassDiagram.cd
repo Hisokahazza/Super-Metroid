@@ -1,2 +1,151 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram /> 
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ammo" Collapsed="true">
+    <Position X="7.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAIAIAAAAQAAQAAAAAAAAAAAAMAAA=</HashCode>
+      <FileName>src\HUDComponents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Animation" Collapsed="true">
+    <Position X="7.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAIAAAAAgAAAAQCAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>src\Animation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Boss" Collapsed="true">
+    <Position X="6.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAFAAAAABmAUAAIAIiAQAQAQEg0AgCAAAEAEBAE=</HashCode>
+      <FileName>src\Boss.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossComponent">
+    <Position X="3.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAFAAgAAACAAAQIAIAAAAQAQAAUAAAAAAAAEAAA=</HashCode>
+      <FileName>src\Boss.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossMenu" Collapsed="true">
+    <Position X="3.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAQAAAIAAAAQAAAAAAAAEAAAAAAEAAA=</HashCode>
+      <FileName>src\Menu.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Camera" Collapsed="true">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAIQAAAIAACAAAAgAEEAAAAAAAAAAA=</HashCode>
+      <FileName>src\Camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Collisionlistener" Collapsed="true">
+    <Position X="9.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Physics.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CollisionListenerGlobal" Collapsed="true">
+    <Position X="9" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>src\Physics.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DebugDrawImp" Collapsed="true">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBAAAAAAAAAAAAAAAAQAAAAAAEAAARAIAAABBAAAAAA=</HashCode>
+      <FileName>src\Physics.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DefaultBullet" Collapsed="true">
+    <Position X="4.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAgAoIAAAAQCAAAAIwAAAAAAAAEAAE=</HashCode>
+      <FileName>src\Projectile.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Door" Collapsed="true">
+    <Position X="1.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AASAACAAAKBAIKAEAAIAAAICAAACEAAAAJAIBAEAAEA=</HashCode>
+      <FileName>src\Door.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EnergyBar" Collapsed="true">
+    <Position X="1.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAEAAAAAAAAAAIAAAAYAAAAAAAAAACAAAAEgAQ=</HashCode>
+      <FileName>src\HUDComponents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game" Collapsed="true">
+    <Position X="1.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAABIECBBDBIAAAAoAAAAAACiCEAAAAAAAAAAEACA=</HashCode>
+      <FileName>src\Game.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameOver" Collapsed="true">
+    <Position X="6.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAQAAAIAAAAQAAAAAAAAEAAAAAAEAAA=</HashCode>
+      <FileName>src\Menu.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GoldTorizo">
+    <Position X="2.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAIIABIAAAAKAQAAIAAAAQAAEAkAACAEAAAQAEAAA=</HashCode>
+      <FileName>src\Boss.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HUD" Collapsed="true">
+    <Position X="8.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAEAAAAAAAAAAIAAAAQAAAAAYAAAAAAAAAEABA=</HashCode>
+      <FileName>src\HUD.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Level" Collapsed="true">
+    <Position X="5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAGAABAAAAAAAAIAAgEAIAAAAgAgAAABAAAAAAA=</HashCode>
+      <FileName>src\Level.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Menu" Collapsed="true">
+    <Position X="10.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAIAAAAQAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>src\Menu.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MenuManager" Collapsed="true">
+    <Position X="4.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAASAAAAAAAAAQAAAAAAAQCIAIAAAAAAAAAABAAIA=</HashCode>
+      <FileName>src\MenuManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MiniMap" Collapsed="true">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAQAAAAAIAAgAQAAAAAAAAAAAAAAAEABA=</HashCode>
+      <FileName>src\HUDComponents.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Missile" Collapsed="true">
+    <Position X="10.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAACAAAAIEAEAQAAAAAAQAAAAAAAEEAIE=</HashCode>
+      <FileName>src\Projectile.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

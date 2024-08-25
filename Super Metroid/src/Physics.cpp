@@ -4,7 +4,7 @@
 b2World Physics::world{ b2Vec2(0.0f, 9.81f) };
 DebugDrawImp* Physics::debugDrawObj{};
 
-
+// Code for debug draw associated with the physics engine (largely boilerplate)
 class DebugDrawImp : public b2Draw
 {
 private:
@@ -114,20 +114,26 @@ class CollisionListenerGlobal : public b2ContactListener
 {
 	virtual void BeginContact(b2Contact* contact) override
 	{
+		// Initialises two FixtureData pointers (FixtureData is my own struct detailed in Physics.h) 
+		// Uses data stored in the user data pointer of each fixture 
+		// To be implemented differently for varying objects
 		FixtureData* dataA = (FixtureData*)contact->GetFixtureA()->GetUserData().pointer;
 		FixtureData* dataB = (FixtureData*)contact->GetFixtureB()->GetUserData().pointer;
 
+		// Calls virtual onBeginContact when collision between two fixtures occurs assuming collider is active
 		if (dataA && dataA->listener && dataA->isActive == true)
 		{
 			dataA->listener->onBeginContact(contact->GetFixtureA(), contact->GetFixtureB());
 		}
 
+		// The same as above for second fixtures
 		if (dataB && dataB->listener && dataB->isActive == true)
 		{
 			dataB->listener->onBeginContact(contact->GetFixtureB(), contact->GetFixtureA());
 		}
 	}
 
+	// The same as the above function for when fixtures cease contact
 	virtual void EndContact(b2Contact* contact) override
 	{
 		FixtureData* dataA = (FixtureData*)contact->GetFixtureA()->GetUserData().pointer;
@@ -150,6 +156,7 @@ void Physics::init()
 
 }
 
+// Updates world and sets new global collision listener each frame
 void Physics::update(float deltaTime)
 {
 	world.Step(deltaTime, 6, 2);
@@ -164,7 +171,7 @@ void Physics::debugDraw(Renderer& renderer)
 		// Initialise debugDraw object 
 		debugDrawObj = new DebugDrawImp(renderer.target);
 		// Sets flags for debug drawer to pick up
-		//debugDrawObj->SetFlags(b2Draw::e_shapeBit);
+		debugDrawObj->SetFlags(b2Draw::e_shapeBit);
 		// Sets the world debug drawer
 		world.SetDebugDraw(debugDrawObj);
 	}

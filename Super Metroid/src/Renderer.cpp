@@ -25,6 +25,7 @@ Renderer::~Renderer()
 
 void Renderer::draw(const sf::Texture& texture, const sf::Vector2f& position, const sf::Vector2f& size, float angle, sf::IntRect textureRect)
 {
+	// Abstract texture rendering process
 	m_Sprite.setTexture(texture, true);
 	m_Sprite.setOrigin((sf::Vector2f)texture.getSize() / 2.0f);
 	m_Sprite.setPosition(position);
@@ -41,6 +42,7 @@ void Renderer::draw(const sf::Texture& texture, const sf::Vector2f& position, co
 
 void Renderer::drawRectangleShape(sf::RectangleShape& rectangle, const sf::Vector2f& position, const sf::Vector2f& size, const sf::Color& fillColour)
 {
+	// Abstract rectangle rendering process
 	rectangle.setPosition(position);
 	rectangle.setSize(size);
 	rectangle.setFillColor(fillColour);
@@ -50,6 +52,7 @@ void Renderer::drawRectangleShape(sf::RectangleShape& rectangle, const sf::Vecto
 
 void Renderer::drawText(sf::Text& text, const sf::Vector2f& position, const sf::Vector2f& size, std::string& textContents)
 {
+	// Abstract text rendering process
 	sf::Font superMetroidFont;
 	superMetroidFont.loadFromFile("res/Fonts/super-metroid-small-alt-snes.ttf");
 

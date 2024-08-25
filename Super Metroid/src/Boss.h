@@ -46,8 +46,9 @@ enum BossAnimationState
 	GOLDTORIZOTRANSITION,
 	GOLDTORIZOWALKLEFT,
 	GOLDTORIZOWALKRIGHT,
-	BOMBSPEWLEFT
-	
+	BOMBSPEWLEFT,
+	BOMBSPEWRIGHT,
+	GOLDTORIZOTURN
 };
 
 class Boss : public Collisionlistener
@@ -190,7 +191,6 @@ private:
 	bool m_IsCoreHit = false;
 	bool m_IsHittable = false;
 
-
 	bool m_BossComplete = false;
 public:
 	void begin() override;
@@ -271,6 +271,7 @@ private:
 	std::queue<BossAnimationState> m_BossActions;
 
 	bool m_IntroOver = false;
+	bool m_Turning = false;
 
 	TorizoBomb* m_Bomb;
 	std::vector<TorizoBomb*> m_Bombs;

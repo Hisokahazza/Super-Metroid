@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+// Collision handling 
 void Projectile::onBeginContact(b2Fixture* self, b2Fixture* other)
 {
 	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
@@ -23,6 +24,7 @@ void Projectile::onEndContact(b2Fixture* self, b2Fixture* other)
 {
 }
 
+// Create bullet fixture
 void DefaultBullet::createFixture(b2Vec2 initialPosition)
 {
 	fixtureData.type = BULLET;
@@ -50,6 +52,7 @@ DefaultBullet::DefaultBullet(Direction bulletDirection) : m_BulletDirection(bull
 {
 }
 
+// bullet destructor to be called when bullets are deleted
 DefaultBullet::~DefaultBullet()
 {
 	currentSheetlessAnimation = m_BulletDestructionAnim;
@@ -83,6 +86,7 @@ void DefaultBullet::begin(b2Vec2 initialPosition)
 		Resources::textures["Default_Bullet.png"]
 	};
 
+	// Create animation objects
 	m_BulletDestructionAnim = new SheetlessAnimation(bulletDestructionTextures, 0.1f, false, false, 1);
 	m_BulletAnim = new SheetlessAnimation(defaultBulletTextures, 0.1f);
 
@@ -94,12 +98,13 @@ void DefaultBullet::begin(b2Vec2 initialPosition)
 
 void DefaultBullet::update(float deltaTime)
 {
+	// Get and set bullet velocity each frame
 	b2Vec2 velocity = body->GetLinearVelocity();
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
 	projectileSpeed = 10.0f;
 
-	// check for direction determined in samus class
+	// Check for direction determined in samus class and adjust bullet direction accordingly
 	switch (m_BulletDirection)
 	{
 	case RIGHT:
@@ -132,15 +137,19 @@ void DefaultBullet::update(float deltaTime)
 		break;
 	}
 	
+	// Set new velocity
 	body->SetLinearVelocity(velocity);
-	// alter position each frame
+
+	// Alter position each frame
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
+	// Update animation
 	currentSheetlessAnimation->update(deltaTime);
 }
 
 void DefaultBullet::draw(Renderer& renderer)
 {
+	// Handle projectile draw calls
 	if (currentSheetlessAnimation == m_BulletAnim)
 	{
 		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, sf::Vector2f(0.3f, 0.3f));
@@ -151,6 +160,7 @@ void DefaultBullet::draw(Renderer& renderer)
 	}
 }
 
+// Create missile fixture
 void Missile::createFixture(b2Vec2 initialPosition)
 {
 	fixtureData.type = MISSILE;
@@ -178,6 +188,7 @@ Missile::Missile(Direction missileDirection) : m_MissileDirection(missileDirecti
 {
 }
 
+// Missile destructor to be called when bullets are deleted
 Missile::~Missile()
 {
 	currentSheetlessAnimation = m_MissileDestructionAnim;
@@ -217,6 +228,7 @@ void Missile::begin(b2Vec2 initialPosition)
 		sf::Vector2f(1.6f, 1.6f),
 	};
 
+	// Initialise missile destruction animation
 	m_MissileDestructionAnim = new SheetlessAnimation(missileDestructionTextures, 0.1f, false, false, 1, missileDestructionFrameSizes);
 	m_MissileDestructionAnim->begin();
 
@@ -228,11 +240,13 @@ void Missile::update(float deltaTime)
 {
 	m_MaxSpeed = 15.0f;
 
+	// Handle variable missile velocity
 	if (projectileSpeed <= m_MaxSpeed)
 	{
 		projectileSpeed *= 2.0f;
 	}
 
+	// Get and set velocity
 	b2Vec2 velocity = body->GetLinearVelocity();
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
@@ -270,13 +284,16 @@ void Missile::update(float deltaTime)
 		break;
 	}
 
+	// Set determined velocity
 	body->SetLinearVelocity(velocity);
-	// alter position each frame
+
+	// Alter position each frame
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 }
 
 void Missile::draw(Renderer& renderer)
 {
+	// Handle missile rendering
 	switch (m_MissileDirection)
 	{
 	case RIGHT:

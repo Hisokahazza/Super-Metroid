@@ -1,5 +1,6 @@
 #include "Menu.h"
 
+// Handles victory menu rendering
 void Victory::begin()
 {
 	m_ReturnTextures = {
@@ -31,6 +32,7 @@ void Victory::draw(Renderer& renderer)
 	renderer.draw(m_ReturnTextAnim->getCurrentFrame(), sf::Vector2f(35.0f, 26.0f), sf::Vector2f(25.0f, 3.0f));
 }
 
+// Handles gameover menu rendering
 void GameOver::begin()
 {
 	m_ReturnTextures = {
@@ -62,6 +64,7 @@ void GameOver::draw(Renderer& renderer)
 	renderer.draw(m_ReturnTextAnim->getCurrentFrame(), sf::Vector2f(35.0f, 26.0f), sf::Vector2f(25.0f, 3.0f));
 }
 
+// empty menu class to be assigned when no menu is active
 void NoMenu::begin()
 {
 }
@@ -74,6 +77,7 @@ void NoMenu::draw(Renderer& renderer)
 {
 }
 
+// Handles boss menu rendering
 void BossMenu::begin()
 {
 
