@@ -454,11 +454,17 @@ void Samus::update(float deltaTime)
 		}
 	}
 
-	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && m_CrouchState != NONE)
+	// Determines whether user has released the crouch key whilst being crouched or in morphball
+	if (m_CrouchState == NONE)
+	{
+		m_ReleasedCrouch = false;
+	}
+	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && m_CrouchState != NONE)
 	{
 		m_ReleasedCrouch = true;
 	}
 
+	// Handles uncrouching
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Up) && m_NumGroundContacts >= 1)
 	{
 		if (m_CrouchState == CROUCH && m_ReleasedCrouch == true)
@@ -472,7 +478,8 @@ void Samus::update(float deltaTime)
 			m_CrouchState = CROUCH;
 		}
 	}
-
+	
+	// Handles attributes related to the CROUCH state
 	if (m_CrouchState == CROUCH && (!sf::Keyboard::isKeyPressed(sf::Keyboard::A) && !sf::Keyboard::isKeyPressed(sf::Keyboard::D)))
 	{
 		// Set current hitbox
@@ -491,6 +498,7 @@ void Samus::update(float deltaTime)
 		}
 	}
 
+	// Handles attributes associated with the MORPHBALL state
 	if (m_CrouchState == MORPHBALL)
 	{
 		// Restrict shooting
