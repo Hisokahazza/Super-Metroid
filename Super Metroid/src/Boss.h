@@ -212,12 +212,16 @@ private:
 	bool m_CollidedWithMap;
 	int m_ExplodeCounter = 0;
 
+	sf::Vector2f m_BossPosition;
+	Direction m_BossOrientation;
+
 	SheetlessAnimation* m_BombDestructionAnim;
 	SheetlessAnimation* m_BombAnim;
 
 	b2FixtureDef m_FixtureDef{};
 	b2Fixture* m_BombHitbox;
 public:
+	TorizoBomb(sf::Vector2f bossPosition, Direction orientation);
 	~TorizoBomb();
 
 	bool destroyed;
@@ -260,18 +264,24 @@ public:
 	void onEndContact(b2Fixture* self, b2Fixture* other) override;
 };
 
-
 class GoldTorizo : public Boss
 {
 private:
 	void createFixture() override;
 	void createActiveAnimations();
 
+	void activateBombs();
+	void activateArks();
+
 	Direction m_Orientation;
 	std::queue<BossAnimationState> m_BossActions;
 
 	bool m_IntroOver = false;
 	bool m_Turning = false;
+	bool m_IsHit = false;
+
+	bool m_BombsActive = false;
+	bool m_ArksActive = false;
 
 	TorizoBomb* m_Bomb;
 	std::vector<TorizoBomb*> m_Bombs;
@@ -279,8 +289,8 @@ private:
 	TorizoArk* m_Ark;
 	std::vector<TorizoArk*> m_Arks;
 
-	float m_BombSwitchTime = 2.0f;
-	float m_BombTotalTime = 2.0f;
+	float m_BombSwitchTime = 0.2f;
+	float m_BombTotalTime = 0.2f;
 
 	float m_ArkSwitchTime = 2.0f;
 	float m_ArkTotalTime = 2.0f;

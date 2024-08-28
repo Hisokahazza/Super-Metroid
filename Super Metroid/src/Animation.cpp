@@ -230,7 +230,6 @@ void SheetlessAnimation::update(float deltaTime)
 
             m_FrameCount++;
 
-            std::cout << m_NextTextureIndex << std::endl;
             m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
         }
     }
