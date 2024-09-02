@@ -18,8 +18,8 @@ extern Camera camera;
 class Game
 {
 private:
-	std::string m_CurrentStage = "res/Level_Gold_Torizo.png";
-	BossName m_CurrentBoss = GOLDTORIZO;
+	std::string m_CurrentStage = "res/Level_Hub.png";
+	BossName m_CurrentBoss = SPORESPAWN;
 
 	bool m_IsSamusAlive = true;
 

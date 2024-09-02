@@ -286,8 +286,12 @@ void Samus::begin()
 void Samus::update(float deltaTime)
 {
 	float move = movementSpeed;
-	m_CanShoot = true;
 	currentHitbox = samusHitbox;
+
+	if (m_IsSamusAlive == true)
+	{
+		m_CanShoot = true;
+	}
 
 	// Determine relevant idle Animation state
 	if (m_Orientation == RIGHT)
@@ -332,7 +336,6 @@ void Samus::update(float deltaTime)
 			m_CrouchState = NONE;
 		}
 
-
 		if (m_NumGroundContacts >= 1)
 		{
 			m_Velocity.x += move;
@@ -370,7 +373,7 @@ void Samus::update(float deltaTime)
 		m_Orientation = RIGHT;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		if (m_CrouchState != MORPHBALL)
 		{
@@ -437,7 +440,7 @@ void Samus::update(float deltaTime)
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && m_NumGroundContacts >= 1)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && m_NumGroundContacts >= 1 && !sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		// Determine crouch state
 		if (m_CrouchState == NONE)

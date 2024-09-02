@@ -24,6 +24,6 @@ sf::View Camera::getView(sf::Vector2u windowSize)
 sf::View Camera::getHUDView()
 {
 	float aspect = m_ViewSize.x / m_ViewSize.y;
-	m_ViewSize = sf::Vector2f(100.0f * scaleView.x, (100.0f / aspect) * scaleView.y);
+	m_ViewSize = sf::Vector2f(100.0f, 100.0f / aspect);
 	return sf::View(sf::Vector2f(), m_ViewSize);
 }

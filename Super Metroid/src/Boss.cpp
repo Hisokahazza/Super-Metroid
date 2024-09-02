@@ -609,6 +609,11 @@ TorizoBomb::~TorizoBomb()
 	}
 }
 
+void TorizoBomb::destroyFixture()
+{
+	body->DestroyFixture(fixture);
+}
+
 void TorizoBomb::begin()
 {
 	position = sf::Vector2f(m_BossPosition.x - 0.4f, m_BossPosition.y - 2.0f);
@@ -705,6 +710,12 @@ void TorizoBomb::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	if (otherData->type == SAMUS && m_PlayerHitbox == other && m_IsPlayerInvulnerable == false && self == m_BombHitbox)
+	{
+		m_PlayerHealthOffset = -50;
+		collided = true;
+	}
+
 	if (otherData->type == MAPTILE && self == fixture)
 	{
 		m_CollidedWithMap = true;
@@ -729,7 +740,7 @@ void TorizoArk::createFixture()
 	body = Physics::world.CreateBody(&bodyDef);
 
 	b2PolygonShape polygonShape{};
-	polygonShape.SetAsBox(0.5f, 1.0f);
+	polygonShape.SetAsBox(0.25f, 1.0f);
 
 	b2FixtureDef fixtureDef{};
 	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
@@ -754,10 +765,14 @@ TorizoArk::~TorizoArk()
 	}
 }
 
+TorizoArk::TorizoArk(sf::Vector2f bossPosition, Direction orientation) : m_BossPosition(bossPosition), m_BossOrientation(orientation)
+{
+}
+
 void TorizoArk::begin()
 {
 	// Set initial position
-	position = sf::Vector2f(10.0f, 10.0f);
+	position = sf::Vector2f(m_BossPosition.x, m_BossPosition.y);
 
 	createFixture();
 
@@ -778,9 +793,9 @@ void TorizoArk::begin()
 	// Initialise ark frame sizes
 	std::vector<sf::Vector2f> arkFrameSizes
 	{
-		sf::Vector2f(1.75f, 0.75f),
-		sf::Vector2f(1.25f, 1.25f),
-		sf::Vector2f(0.75f, 1.75f),
+		sf::Vector2f(0.8f, 1.5f),
+		sf::Vector2f(0.6f, 1.75f),
+		sf::Vector2f(0.3f, 2.0f),
 	};
 
 	m_ArkLeftAnim = new SheetlessAnimation(arkLeftTextures, 0.2f, false, false, 1, arkFrameSizes);
@@ -805,13 +820,26 @@ void TorizoArk::update(float deltaTime)
 	if (m_Orientation == LEFT)
 	{
 		position.x -= 0.1;
+
+		// Handle destruction of ark objects when the leave the players POV
+		if (position.x < -15.0f)
+		{
+			destroyed = true;
+		}
 	}
 	else
 	{
 		position.x += 0.1;
+
+		if (position.x > 50.0f)
+		{
+			destroyed = true;
+		}
 	}
 	
 	body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
+
+	
 
 	currentSheetlessAnimation->update(deltaTime);
 }
@@ -830,6 +858,12 @@ void TorizoArk::onBeginContact(b2Fixture* self, b2Fixture* other)
 	if (!otherData)
 	{
 		return;
+	}
+
+	if (otherData->type == SAMUS && m_PlayerHitbox == other && m_IsPlayerInvulnerable == false)
+	{
+		m_PlayerHealthOffset = -20;
+		collided = true;
 	}
 
 	if (otherData->type == MAPTILE)
@@ -872,7 +906,7 @@ void GoldTorizo::createFixture()
 	b2FixtureDef fixtureDef{};
 	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
 	fixtureDef.shape = &polygonShape;
-	fixtureDef.density = 1.0f;
+	fixtureDef.density = 0.1f;
 	fixtureDef.friction = 0.0f;
 
 	body->CreateFixture(&fixtureDef);
@@ -895,7 +929,7 @@ void GoldTorizo::createFixture()
 
 void GoldTorizo::createActiveAnimations()
 {
-	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, BOMBSPEWLEFT, BOMBSPEWRIGHT, GOLDTORIZOTURN };
+	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, PROJECTILESPEWLEFT, PROJECTILESPEWRIGHT, GOLDTORIZOTURN, GOLDTORIZOJUMPBACK, GOLDTORIZOJUMPFORWARD };
 
 	// Initialise textures for sheetless Animations
 	std::vector<sf::Texture> blinkTextures
@@ -955,7 +989,7 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Walk_Right_09.png"],
 		Resources::textures["GT_Walk_Right_10.png"]
 	};
-	std::vector<sf::Texture> bombSpewLeftTextures
+	std::vector<sf::Texture>projectileSpewLeftTextures
 	{
 		Resources::textures["GT_Bomb_Spew_L_01.png"],
 		Resources::textures["GT_Bomb_Spew_L_02.png"],
@@ -963,7 +997,7 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Bomb_Spew_L_04.png"],
 		Resources::textures["GT_Bomb_Spew_L_05.png"]
 	};
-	std::vector<sf::Texture> bombSpewRightTextures
+	std::vector<sf::Texture> projectileSpewRightTextures
 	{
 		Resources::textures["GT_Bomb_Spew_R_01.png"],
 		Resources::textures["GT_Bomb_Spew_R_02.png"],
@@ -976,6 +1010,13 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Turn_01.png"],
 		Resources::textures["GT_Turn_02.png"],
 		Resources::textures["GT_Turn_03.png"]
+	};
+	std::vector<sf::Texture> GoldTorizoJumpTextures
+	{
+		Resources::textures["GT_Jump_01.png"],
+		Resources::textures["GT_Jump_02.png"],
+		Resources::textures["GT_Jump_03.png"],
+		Resources::textures["GT_Jump_04.png"]
 	};
 
 	// Initialise animation size vectors here applicable
@@ -994,7 +1035,7 @@ void GoldTorizo::createActiveAnimations()
 		sf::Vector2f(3.5f, 4.5f),
 		sf::Vector2f(3.5f, 4.5f)
 	};
-	std::vector<sf::Vector2f> bombSpewSizes
+	std::vector<sf::Vector2f> projectileSpewSizes
 	{
 		sf::Vector2f(4.2f, 4.5f),
 		sf::Vector2f(4.2f, 4.5f),
@@ -1015,9 +1056,11 @@ void GoldTorizo::createActiveAnimations()
 	m_SheetlessAnimations[GOLDTORIZOTRANSITION] = new SheetlessAnimation(goldTransitionTextures, 0.15f, false, false, 1, goldTorizoGeneralSizes);
 	m_SheetlessAnimations[GOLDTORIZOWALKLEFT] = new SheetlessAnimation(walkLeftTextures, 0.1f, false, false, -1, goldTorizoGeneralSizes);
 	m_SheetlessAnimations[GOLDTORIZOWALKRIGHT] = new SheetlessAnimation(walkRightTextures, 0.1f, false, true, -1, goldTorizoGeneralSizes);
-	m_SheetlessAnimations[BOMBSPEWLEFT] = new SheetlessAnimation(bombSpewLeftTextures, 0.15f, true, false, 100, bombSpewSizes);
-	m_SheetlessAnimations[BOMBSPEWRIGHT] = new SheetlessAnimation(bombSpewRightTextures, 0.15f, true, false, 100, bombSpewSizes);
+	m_SheetlessAnimations[PROJECTILESPEWLEFT] = new SheetlessAnimation(projectileSpewLeftTextures, 0.15f, true, false, 100, projectileSpewSizes);
+	m_SheetlessAnimations[PROJECTILESPEWRIGHT] = new SheetlessAnimation(projectileSpewRightTextures, 0.15f, true, false, 100, projectileSpewSizes);
 	m_SheetlessAnimations[GOLDTORIZOTURN] = new SheetlessAnimation(GoldTorizoTurnTextures, 1.0f, false, false, 1, goldTorizoTurnSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPBACK] = new SheetlessAnimation(GoldTorizoJumpTextures, 0.2f, false, true, 1, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPFORWARD] = new SheetlessAnimation(GoldTorizoJumpTextures, 0.2f, false, false, 1, goldTorizoGeneralSizes);
 }
 
 void GoldTorizo::activateBombs()
@@ -1026,16 +1069,26 @@ void GoldTorizo::activateBombs()
 
 	if (m_Orientation == LEFT)
 	{
-		m_CurrentAnimationState = BOMBSPEWLEFT;
+		m_CurrentAnimationState = PROJECTILESPEWLEFT;
 	}
 	else
 	{
-		m_CurrentAnimationState = BOMBSPEWRIGHT;
+		m_CurrentAnimationState = PROJECTILESPEWRIGHT;
 	}
 }
 
 void GoldTorizo::activateArks()
 {
+	m_ArksActive = true;
+
+	if (m_Orientation == LEFT)
+	{
+		m_CurrentAnimationState = PROJECTILESPEWLEFT;
+	}
+	else
+	{
+		m_CurrentAnimationState = PROJECTILESPEWRIGHT;
+	}
 }
 
 void GoldTorizo::begin()
@@ -1073,7 +1126,7 @@ void GoldTorizo::update(float deltaTime)
 	}
 
 	// Handle torizo walking
-	if (m_IntroOver == true)
+	if (m_IntroOver == true && m_IsAttacking == false)
 	{
 		if (samusPosition.x <= position.x)
 		{
@@ -1084,17 +1137,6 @@ void GoldTorizo::update(float deltaTime)
 		{
 			m_CurrentAnimationState = GOLDTORIZOWALKRIGHT;
 			m_Orientation = RIGHT;
-		}
-	}
-
-	// Handle Turning
-	if (m_Turning == true)
-	{
-		m_CurrentAnimationState = GOLDTORIZOTURN;
-
-		if (m_SheetlessAnimations[GOLDTORIZOTURN]->checkPlaying() == false)
-		{
-			m_Turning = false;
 		}
 	}
 
@@ -1113,8 +1155,8 @@ void GoldTorizo::update(float deltaTime)
 		activateBombs();
 	}
 
-	// Spawn bombs dependent on current animation state
-	if (m_CurrentAnimationState == BOMBSPEWLEFT || m_CurrentAnimationState == BOMBSPEWRIGHT)
+	// Spawn bombs
+	if (m_BombsActive == true)
 	{
 		m_BombTotalTime += deltaTime;
 
@@ -1128,25 +1170,32 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
-	if (m_IntroOver == true)
+	// Spawn arks
+	if (m_ArksActive == true)
 	{
-		//// Spawn arks
-		//m_ArkTotalTime += deltaTime;
+		// Spawn arks
+		m_ArkTotalTime += deltaTime;
 
-		//if (m_ArkTotalTime >= m_ArkSwitchTime)
-		//{
-		//	m_ArkTotalTime -= m_ArkSwitchTime;
+		if (m_ArkTotalTime >= m_ArkSwitchTime)
+		{
+			m_ArkTotalTime -= m_ArkSwitchTime;
 
-		//	m_Ark = new TorizoArk();
-		//	m_Arks.push_back(m_Ark);
+			m_Ark = new TorizoArk(position, m_Orientation);
+			m_Arks.push_back(m_Ark);
 
-		//	m_Ark->setOrientation(m_Orientation);
-		//	m_Ark->begin();
-		//}
+			m_Ark->setOrientation(m_Orientation);
+			m_Ark->begin();
+		}
 	}
 
 	for (auto bomb : m_Bombs)
 	{
+		if (bomb->collided == true)
+		{
+			playerHealthOffset += bomb->getPlayerHealthOffset();
+			bomb->collided = false;
+		}
+
 		// Delete or update bombs
 		if (bomb->destroyed == true)
 		{
@@ -1161,11 +1210,19 @@ void GoldTorizo::update(float deltaTime)
 		else if (bomb)
 		{
 			bomb->update(deltaTime);
+			bomb->setPlayerHitbox(playerHitbox);
+			bomb->setPlayerinvulnerabillity(isPlayerInvulnerable);
 		}
 	}
 
 	for (auto ark : m_Arks)
 	{
+		if (ark->collided == true)
+		{
+			playerHealthOffset += ark->getPlayerHealthOffset();
+			ark->collided = false;
+		}
+
 		// Delete or update arks
 		if (ark->destroyed == true)
 		{
@@ -1173,15 +1230,17 @@ void GoldTorizo::update(float deltaTime)
 			m_Arks.erase(std::find(m_Arks.begin(), m_Arks.end(), ark));
 			delete ark;
 		}
-		if (ark)
+		else
 		{
 			ark->update(deltaTime);
+			ark->setPlayerHitbox(playerHitbox);
+			ark->setPlayerinvulnerabillity(isPlayerInvulnerable);
 		}
 	}
 	
 	body->SetLinearVelocity(velocity);
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
-
+	
 	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 }
 
@@ -1206,6 +1265,19 @@ void GoldTorizo::draw(Renderer& renderer)
 
 void GoldTorizo::resetFixture()
 {
+	if (body)
+	{
+		b2Fixture* fixturesToDelete = body->GetFixtureList();
+		body->DestroyFixture(fixturesToDelete);
+
+		Physics::world.DestroyBody(body);
+	}
+
+	for (auto bomb : m_Bombs)
+	{
+		bomb->destroyFixture();
+	}
+	m_Bombs.clear();
 }
 
 void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)

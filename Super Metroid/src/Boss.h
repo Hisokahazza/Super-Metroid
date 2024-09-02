@@ -46,9 +46,11 @@ enum BossAnimationState
 	GOLDTORIZOTRANSITION,
 	GOLDTORIZOWALKLEFT,
 	GOLDTORIZOWALKRIGHT,
-	BOMBSPEWLEFT,
-	BOMBSPEWRIGHT,
-	GOLDTORIZOTURN
+	PROJECTILESPEWLEFT,
+	PROJECTILESPEWRIGHT,
+	GOLDTORIZOTURN,
+	GOLDTORIZOJUMPBACK,
+	GOLDTORIZOJUMPFORWARD
 };
 
 class Boss : public Collisionlistener
@@ -100,6 +102,8 @@ class BossComponent : public Collisionlistener
 {
 private:
 protected:
+	int m_PlayerHealthOffset = 0;
+
 	b2Body* body;
 
 	sf::Vector2f position;
@@ -113,6 +117,9 @@ protected:
 	b2Fixture* fixture;
 
 public:
+	bool destroyed = false;
+	bool collided = false;
+
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 
@@ -120,13 +127,12 @@ public:
 	void setPlayerHitbox(b2Fixture* hitbox) { m_PlayerHitbox = hitbox; }
 	void setPlayerinvulnerabillity(bool isInvulnerable) { m_IsPlayerInvulnerable = isInvulnerable; }
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
+	int const getPlayerHealthOffset() { return m_PlayerHealthOffset; };
 };
 
 class Spore : public BossComponent
 {
 private:
-	int m_PlayerHealthOffset = 0;
-
 	float m_SwitchTime = 0.01f;
 	float m_TotalTime = 0.0f;
 
@@ -137,16 +143,11 @@ private:
 	std::vector<sf::Texture> m_SporeFrames;
 	SheetlessAnimation* m_SporeAnimation;
 public:
-	bool destroyed = false;
-	bool collided = false;
-
 	~Spore();
 
 	void begin(unsigned int positionIndex);
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
-
-	int const getPlayerHealthOffset() { return m_PlayerHealthOffset; };
 
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
@@ -224,7 +225,8 @@ public:
 	TorizoBomb(sf::Vector2f bossPosition, Direction orientation);
 	~TorizoBomb();
 
-	bool destroyed;
+	void destroyFixture();
+
 	SheetlessAnimation* currentSheetlessAnimation;
 
 	void begin();
@@ -243,13 +245,16 @@ private:
 
 	SheetlessAnimation* m_ArkLeftAnim;
 	SheetlessAnimation* m_ArkRightAnim;
+	
+	sf::Vector2f m_BossPosition;
+	Direction m_BossOrientation;
 
-	Direction m_Orientation = LEFT;
-
+	Direction m_Orientation;
+	
 public:
+	TorizoArk(sf::Vector2f bossPosition, Direction orientation);
 	~TorizoArk();
 
-	bool destroyed;
 	SheetlessAnimation* currentSheetlessAnimation;
 
 	void begin();
@@ -279,9 +284,11 @@ private:
 	bool m_IntroOver = false;
 	bool m_Turning = false;
 	bool m_IsHit = false;
+	bool m_IsAttacking = false;
 
 	bool m_BombsActive = false;
 	bool m_ArksActive = false;
+	bool m_Jumping = false;
 
 	TorizoBomb* m_Bomb;
 	std::vector<TorizoBomb*> m_Bombs;
@@ -292,8 +299,15 @@ private:
 	float m_BombSwitchTime = 0.2f;
 	float m_BombTotalTime = 0.2f;
 
-	float m_ArkSwitchTime = 2.0f;
-	float m_ArkTotalTime = 2.0f;
+	float m_ArkSwitchTime = 0.75f;
+	float m_ArkTotalTime = 0.75f;
+
+	float m_AttackWalkSwitchTime = 0.75f;
+	float m_AttackWalkTotalTime = 0.75f;
+	float m_AttackSwitchTime = 0.75f;
+	float m_AttackTotalTime = 0.75f;
+
+	int count = 0;
 
 public:
 	void begin() override;
