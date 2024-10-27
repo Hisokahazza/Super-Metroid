@@ -55,8 +55,6 @@ void Game::Begin(const sf::Window& window)
 	createStages();
 	createBosses();
 
-	Physics::init();
-
 	//load map image
 	setCurrentStage(m_CurrentStage, true);
 

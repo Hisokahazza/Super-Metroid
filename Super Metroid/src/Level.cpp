@@ -41,8 +41,9 @@ StageHub::StageHub(float cellSize) : m_CellSize(cellSize)
 // Generates a grid with integr values to denote tiles based on an image comprised of colours
 std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 {
+
 	m_Grid.clear();
-	// Create a grid of the same size as the image
+	// Create a grid of the same size as the image using the fill constructor to fill each element with 0
 	m_Grid = std::vector(image.getSize().x, std::vector(image.getSize().y, 0));
 
 	// Check each pixel in the image and assign a value to a location in the grid dependent on the colour

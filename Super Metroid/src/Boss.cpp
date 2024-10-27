@@ -319,8 +319,6 @@ void SporeSpawn::update(float deltaTime)
 		openCore(deltaTime);
 	}
 
-
-
 	// Update and check for collisions of spore objects
 	for (auto spore : m_Spores)
 	{
@@ -1091,6 +1089,35 @@ void GoldTorizo::activateArks()
 	}
 }
 
+void GoldTorizo::activateJump(bool shouldJumpLeft)
+{
+	m_Jumping = true;
+	
+	if (shouldJumpLeft == true)
+	{
+		b2Vec2 newPosition = calculateJumpPosition(m_StartingJumpPosition, b2Vec2(-5.0f, -7.5f));
+		body->SetTransform(newPosition, 0);
+	}
+	else
+	{
+		b2Vec2 newPosition = calculateJumpPosition(m_StartingJumpPosition, b2Vec2(5.0f, -7.5f));
+		body->SetTransform(newPosition, 0);
+	}
+}
+
+b2Vec2 GoldTorizo::calculateJumpPosition(b2Vec2 startingPosition, b2Vec2 startingVelocity)
+{
+	m_JumpTimeStep++;
+	b2Vec2 positionRes;
+	float t = 1 / 60.0f;
+	b2Vec2 stepVelocity = t * startingVelocity;
+	b2Vec2 stepGravity = pow(t, 2) * Physics::world.GetGravity();
+
+	positionRes = startingPosition + m_JumpTimeStep * stepVelocity + 0.5f * (pow(m_JumpTimeStep, 2) + m_JumpTimeStep) * stepGravity;
+
+	return b2Vec2(positionRes.x, positionRes.y);
+}
+
 void GoldTorizo::begin()
 {
 	createFixture();
@@ -1109,6 +1136,15 @@ void GoldTorizo::update(float deltaTime)
 	b2Vec2 velocity = body->GetLinearVelocity();
 	velocity.x = 0;
 
+	std::cout << m_BossPlayerDistance << std::endl;
+
+	// Update jump start position whilst boss is not mid jump
+	if (m_Jumping == false)
+	{
+		m_StartingJumpPosition.x = position.x;
+		m_StartingJumpPosition.y = position.y;
+	}
+
 	// Handle boss Intro
 	if (m_SheetlessAnimations[GOLDTORIZOBLINK]->checkPlaying() == false)
 	{
@@ -1126,7 +1162,7 @@ void GoldTorizo::update(float deltaTime)
 	}
 
 	// Handle torizo walking
-	if (m_IntroOver == true && m_IsAttacking == false)
+	if (m_IntroOver == true)
 	{
 		if (samusPosition.x <= position.x)
 		{
@@ -1141,18 +1177,66 @@ void GoldTorizo::update(float deltaTime)
 	}
 
 	// Handle result based on current action
-	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT && m_BombsActive == false && m_ArksActive == false)
+	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false)	
 	{
 		velocity.x -= 2.0f;
 	}
-	if (m_CurrentAnimationState == GOLDTORIZOWALKRIGHT && m_BombsActive == false && m_ArksActive == false)
+
+	if (m_CurrentAnimationState == GOLDTORIZOWALKRIGHT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false)
 	{
 		velocity.x += 2.0f;
 	}
 
-	if (m_IntroOver == true)
+	// Handle activation of jump
+	m_BossPlayerDistance = samusPosition.x - position.x;
+
+	if (abs(m_BossPlayerDistance) > 10.0f && m_IntroOver == true && m_Jumping == false)
 	{
-		activateBombs();
+		m_Jumping = true;
+		m_ShouldJumpForward = true;
+	}
+	else if (abs(m_BossPlayerDistance) < 2.0f && m_IntroOver == true && m_Jumping == false)
+	{
+		m_Jumping = true;
+		m_ShouldJumpForward = false;
+	}
+
+	if (m_Jumping == true)
+	{
+		if (position.y > m_StartingJumpPosition.y)
+		{
+			m_Jumping = false;
+			m_JumpTimeStep = 0;
+			body->SetTransform(b2Vec2(position.x, 14.5f), 0);
+		}
+	}
+
+	if (m_Jumping == true)
+	{
+		if (m_ShouldJumpForward == true)
+		{
+			m_CurrentAnimationState = GOLDTORIZOJUMPFORWARD;
+			if (m_BossPlayerDistance < 0)
+			{
+				activateJump(true);
+			}
+			else
+			{
+				activateJump(false);
+			}
+		}
+		else if (m_ShouldJumpForward == false)
+		{
+			m_CurrentAnimationState = GOLDTORIZOJUMPBACK;
+			if (m_BossPlayerDistance < 0)
+			{
+				activateJump(false);
+			}
+			else
+			{
+				activateJump(true);
+			}
+		}
 	}
 
 	// Spawn bombs
@@ -1188,6 +1272,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
+	// Handle destruction and collision of bombs
 	for (auto bomb : m_Bombs)
 	{
 		if (bomb->collided == true)
@@ -1215,6 +1300,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
+	// Handle destruction and collision of arks
 	for (auto ark : m_Arks)
 	{
 		if (ark->collided == true)
@@ -1237,10 +1323,10 @@ void GoldTorizo::update(float deltaTime)
 			ark->setPlayerinvulnerabillity(isPlayerInvulnerable);
 		}
 	}
-	
+
 	body->SetLinearVelocity(velocity);
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
-	
+
 	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
 }
 

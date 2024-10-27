@@ -69,7 +69,6 @@ class Physics
 {
 private:
 public:
-	static void init();
 	static void update(float deltaTime);
 	static void debugDraw(Renderer& renderer);
 

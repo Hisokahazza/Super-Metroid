@@ -151,11 +151,6 @@ class CollisionListenerGlobal : public b2ContactListener
 	}
 };
 
-void Physics::init()
-{
-
-}
-
 // Updates world and sets new global collision listener each frame
 void Physics::update(float deltaTime)
 {

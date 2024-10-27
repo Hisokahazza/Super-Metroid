@@ -67,6 +67,8 @@ protected:
 	BossAnimationState m_CurrentAnimationState;
 
 	FixtureData fixtureData{};
+
+	bool m_BossComplete = false;
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
@@ -192,7 +194,6 @@ private:
 	bool m_IsCoreHit = false;
 	bool m_IsHittable = false;
 
-	bool m_BossComplete = false;
 public:
 	void begin() override;
 	void update(float deltaTime) override;
@@ -277,6 +278,14 @@ private:
 
 	void activateBombs();
 	void activateArks();
+	
+	void activateJump(bool shouldJumpLeft);
+	b2Vec2 calculateJumpPosition(b2Vec2 startingPosition, b2Vec2 startingVelocity);
+
+	unsigned int m_JumpTimeStep = 0;
+	b2Vec2 m_StartingJumpPosition = b2Vec2(27.5f, 14.5f);
+	int m_BossPlayerDistance;
+	bool m_ShouldJumpForward;
 
 	Direction m_Orientation;
 	std::queue<BossAnimationState> m_BossActions;
@@ -284,7 +293,6 @@ private:
 	bool m_IntroOver = false;
 	bool m_Turning = false;
 	bool m_IsHit = false;
-	bool m_IsAttacking = false;
 
 	bool m_BombsActive = false;
 	bool m_ArksActive = false;
@@ -301,11 +309,6 @@ private:
 
 	float m_ArkSwitchTime = 0.75f;
 	float m_ArkTotalTime = 0.75f;
-
-	float m_AttackWalkSwitchTime = 0.75f;
-	float m_AttackWalkTotalTime = 0.75f;
-	float m_AttackSwitchTime = 0.75f;
-	float m_AttackTotalTime = 0.75f;
 
 	int count = 0;
 
