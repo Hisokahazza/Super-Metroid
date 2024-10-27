@@ -4,8 +4,6 @@
 // Clear all bodies in a level
 void Level::clearLevel()
 {
-	std::cout << "CLEARED" << std::endl;
-
 	for (auto& body : m_BodiesToDelete)
 	{
 		/*if (m_BodiesToDelete.size() > 0)

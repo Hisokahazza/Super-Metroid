@@ -49,8 +49,10 @@ enum BossAnimationState
 	PROJECTILESPEWLEFT,
 	PROJECTILESPEWRIGHT,
 	GOLDTORIZOTURN,
-	GOLDTORIZOJUMPBACK,
-	GOLDTORIZOJUMPFORWARD
+	GOLDTORIZOJUMPBACKLEFT,
+	GOLDTORIZOJUMPFORWARDLEFT,
+	GOLDTORIZOJUMPBACKRIGHT,
+	GOLDTORIZOJUMPFORWARDRIGHT
 };
 
 class Boss : public Collisionlistener
@@ -215,7 +217,7 @@ private:
 	int m_ExplodeCounter = 0;
 
 	sf::Vector2f m_BossPosition;
-	Direction m_BossOrientation;
+	Direction m_Orientation;
 
 	SheetlessAnimation* m_BombDestructionAnim;
 	SheetlessAnimation* m_BombAnim;
@@ -223,7 +225,7 @@ private:
 	b2FixtureDef m_FixtureDef{};
 	b2Fixture* m_BombHitbox;
 public:
-	TorizoBomb(sf::Vector2f bossPosition, Direction orientation);
+	TorizoBomb(sf::Vector2f bossPosition);
 	~TorizoBomb();
 
 	void destroyFixture();
@@ -233,6 +235,9 @@ public:
 	void begin();
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
+
+	//Getters and setters
+	void const setOrientation(Direction orientation) { m_Orientation = orientation; };
 
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
@@ -248,12 +253,11 @@ private:
 	SheetlessAnimation* m_ArkRightAnim;
 	
 	sf::Vector2f m_BossPosition;
-	Direction m_BossOrientation;
 
 	Direction m_Orientation;
 	
 public:
-	TorizoArk(sf::Vector2f bossPosition, Direction orientation);
+	TorizoArk(sf::Vector2f bossPosition);
 	~TorizoArk();
 
 	SheetlessAnimation* currentSheetlessAnimation;
@@ -278,13 +282,17 @@ private:
 
 	void activateBombs();
 	void activateArks();
+	void attack(float deltaTime);
 	
 	void activateJump(bool shouldJumpLeft);
 	b2Vec2 calculateJumpPosition(b2Vec2 startingPosition, b2Vec2 startingVelocity);
 
 	unsigned int m_JumpTimeStep = 0;
 	b2Vec2 m_StartingJumpPosition = b2Vec2(27.5f, 14.5f);
+	b2Vec2 m_SamusJumpStartingPosition;
 	int m_BossPlayerDistance;
+	std::pair<float, float> m_RoomXDimensions = std::make_pair(2.0f, 30.0f);
+	std::pair<float, float> m_BossWallDistance;
 	bool m_ShouldJumpForward;
 
 	Direction m_Orientation;
@@ -296,7 +304,10 @@ private:
 
 	bool m_BombsActive = false;
 	bool m_ArksActive = false;
+	bool m_CanJumpLeft = false;
+	bool m_CanJumpRight = false;
 	bool m_Jumping = false;
+	bool m_Attacking = false;
 
 	TorizoBomb* m_Bomb;
 	std::vector<TorizoBomb*> m_Bombs;
@@ -306,9 +317,13 @@ private:
 
 	float m_BombSwitchTime = 0.2f;
 	float m_BombTotalTime = 0.2f;
+	float m_BombTotalActivatonTime = 0.0f;
+	float m_BombStopActivatonTime = 3.0f;
 
 	float m_ArkSwitchTime = 0.75f;
 	float m_ArkTotalTime = 0.75f;
+	float m_ArkTotalActivatonTime = 0.0f;
+	float m_ArkStopActivatonTime = 5.0f;
 
 	int count = 0;
 

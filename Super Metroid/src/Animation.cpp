@@ -251,4 +251,5 @@ void SheetlessAnimation::reset()
     }
 
     playing = true;
+    m_TotalTime = 0;
 }

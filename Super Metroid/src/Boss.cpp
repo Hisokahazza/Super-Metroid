@@ -244,10 +244,9 @@ sf::Vector2f SporeSpawn::determineSegmentPos(float positionOnLine)
 void SporeSpawn::begin()
 {
 	createFixture();
+	createActiveAnimations();
 
 	attributes = { 1000, 1 };
-
-	createActiveAnimations();
 
 	for (auto state : m_ActiveStates)
 	{
@@ -512,7 +511,6 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		if (m_CurrentAnimationState == CORECLOSED && self == m_CoreClosed)
 		{
-			std::cout << "COLLIDED" << std::endl;
 			playerHealthOffset -= 20;
 			m_IsSamusHit = true;
 		}
@@ -572,7 +570,7 @@ void TorizoBomb::createFixture()
 	fixture = body->CreateFixture(&m_FixtureDef);
 }
 
-TorizoBomb::TorizoBomb(sf::Vector2f bossPosition, Direction orientation) : m_BossPosition(bossPosition), m_BossOrientation(orientation)
+TorizoBomb::TorizoBomb(sf::Vector2f bossPosition) : m_BossPosition(bossPosition)
 {
 }
 
@@ -614,7 +612,15 @@ void TorizoBomb::destroyFixture()
 
 void TorizoBomb::begin()
 {
-	position = sf::Vector2f(m_BossPosition.x - 0.4f, m_BossPosition.y - 2.0f);
+	if (m_Orientation == LEFT)
+	{
+		position = sf::Vector2f(m_BossPosition.x - 0.4f, m_BossPosition.y - 2.0f);
+	}
+	else if (m_Orientation == RIGHT)
+	{
+		position = sf::Vector2f(m_BossPosition.x + 0.4f, m_BossPosition.y - 2.0f);
+	}
+	
 
 	createFixture();
 
@@ -652,7 +658,7 @@ void TorizoBomb::begin()
 
 	currentSheetlessAnimation = m_BombAnim;
 
-	if (m_BossOrientation == LEFT)
+	if (m_Orientation == LEFT)
 	{
 		body->ApplyLinearImpulseToCenter(b2Vec2(-0.5f, 1.0f), true);
 	}
@@ -667,7 +673,14 @@ void TorizoBomb::update(float deltaTime)
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
 	// Handle bombs bouncing
-	if (m_CollidedWithMap == true)
+	if (m_CollidedWithMap == true && m_Orientation == LEFT)
+	{
+		body->ApplyLinearImpulseToCenter(b2Vec2(-0.1f, -1.0f), true);
+		m_CollidedWithMap = false;
+
+		m_ExplodeCounter++;
+	}
+	else if (m_CollidedWithMap == true && m_Orientation == RIGHT)
 	{
 		body->ApplyLinearImpulseToCenter(b2Vec2(0.1f, -1.0f), true);
 		m_CollidedWithMap = false;
@@ -763,7 +776,7 @@ TorizoArk::~TorizoArk()
 	}
 }
 
-TorizoArk::TorizoArk(sf::Vector2f bossPosition, Direction orientation) : m_BossPosition(bossPosition), m_BossOrientation(orientation)
+TorizoArk::TorizoArk(sf::Vector2f bossPosition) : m_BossPosition(bossPosition)
 {
 }
 
@@ -927,7 +940,7 @@ void GoldTorizo::createFixture()
 
 void GoldTorizo::createActiveAnimations()
 {
-	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, PROJECTILESPEWLEFT, PROJECTILESPEWRIGHT, GOLDTORIZOTURN, GOLDTORIZOJUMPBACK, GOLDTORIZOJUMPFORWARD };
+	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, PROJECTILESPEWLEFT, PROJECTILESPEWRIGHT, GOLDTORIZOTURN, GOLDTORIZOJUMPBACKLEFT, GOLDTORIZOJUMPFORWARDLEFT, GOLDTORIZOJUMPBACKRIGHT, GOLDTORIZOJUMPFORWARDRIGHT };
 
 	// Initialise textures for sheetless Animations
 	std::vector<sf::Texture> blinkTextures
@@ -1009,14 +1022,21 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Turn_02.png"],
 		Resources::textures["GT_Turn_03.png"]
 	};
-	std::vector<sf::Texture> GoldTorizoJumpTextures
+	std::vector<sf::Texture> GoldTorizoJumpLeftTextures
 	{
-		Resources::textures["GT_Jump_01.png"],
-		Resources::textures["GT_Jump_02.png"],
-		Resources::textures["GT_Jump_03.png"],
-		Resources::textures["GT_Jump_04.png"]
+		Resources::textures["GT_Jump_01_L.png"],
+		Resources::textures["GT_Jump_02_L.png"],
+		Resources::textures["GT_Jump_03_L.png"],
+		Resources::textures["GT_Jump_04_L.png"]
 	};
-
+	std::vector<sf::Texture> GoldTorizoJumpRightTextures
+	{
+		Resources::textures["GT_Jump_01_R.png"],
+		Resources::textures["GT_Jump_02_R.png"],
+		Resources::textures["GT_Jump_03_R.png"],
+		Resources::textures["GT_Jump_04_R.png"]
+	};
+	
 	// Initialise animation size vectors here applicable
 	std::vector<sf::Vector2f> goldTorizoGeneralSizes
 	{
@@ -1057,8 +1077,10 @@ void GoldTorizo::createActiveAnimations()
 	m_SheetlessAnimations[PROJECTILESPEWLEFT] = new SheetlessAnimation(projectileSpewLeftTextures, 0.15f, true, false, 100, projectileSpewSizes);
 	m_SheetlessAnimations[PROJECTILESPEWRIGHT] = new SheetlessAnimation(projectileSpewRightTextures, 0.15f, true, false, 100, projectileSpewSizes);
 	m_SheetlessAnimations[GOLDTORIZOTURN] = new SheetlessAnimation(GoldTorizoTurnTextures, 1.0f, false, false, 1, goldTorizoTurnSizes);
-	m_SheetlessAnimations[GOLDTORIZOJUMPBACK] = new SheetlessAnimation(GoldTorizoJumpTextures, 0.2f, false, true, 1, goldTorizoGeneralSizes);
-	m_SheetlessAnimations[GOLDTORIZOJUMPFORWARD] = new SheetlessAnimation(GoldTorizoJumpTextures, 0.2f, false, false, 1, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPBACKLEFT] = new SheetlessAnimation(GoldTorizoJumpLeftTextures, 0.25f, false, true, 1, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPFORWARDLEFT] = new SheetlessAnimation(GoldTorizoJumpLeftTextures, 0.25f, false, false, 1, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPBACKRIGHT] = new SheetlessAnimation(GoldTorizoJumpRightTextures, 0.25f, false, true, 1, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPFORWARDRIGHT] = new SheetlessAnimation(GoldTorizoJumpRightTextures, 0.25f, false, false, 1, goldTorizoGeneralSizes);
 }
 
 void GoldTorizo::activateBombs()
@@ -1087,6 +1109,27 @@ void GoldTorizo::activateArks()
 	{
 		m_CurrentAnimationState = PROJECTILESPEWRIGHT;
 	}
+}
+
+void GoldTorizo::attack(float deltaTime)
+{
+	m_Attacking = true;
+	
+	m_BombTotalActivatonTime += deltaTime;
+	if (m_BombTotalActivatonTime < m_BombStopActivatonTime)
+	{
+		activateBombs();
+	}
+	if (m_BombTotalActivatonTime > m_BombStopActivatonTime)
+	{
+		m_BombsActive = false;
+		m_ArkTotalActivatonTime += deltaTime;
+		if (m_ArkTotalActivatonTime < m_ArkStopActivatonTime)
+		{
+			activateArks();
+		}
+	}
+	
 }
 
 void GoldTorizo::activateJump(bool shouldJumpLeft)
@@ -1123,6 +1166,8 @@ void GoldTorizo::begin()
 	createFixture();
 	createActiveAnimations();
 
+	attributes = { 13500, 1 };
+
 	for (auto state : m_ActiveStates)
 	{
 		m_SheetlessAnimations[state]->begin();
@@ -1136,13 +1181,18 @@ void GoldTorizo::update(float deltaTime)
 	b2Vec2 velocity = body->GetLinearVelocity();
 	velocity.x = 0;
 
-	std::cout << m_BossPlayerDistance << std::endl;
-
 	// Update jump start position whilst boss is not mid jump
 	if (m_Jumping == false)
 	{
 		m_StartingJumpPosition.x = position.x;
 		m_StartingJumpPosition.y = position.y;
+
+		m_SamusJumpStartingPosition = b2Vec2(samusPosition.x, samusPosition.y);
+
+		m_SheetlessAnimations[GOLDTORIZOJUMPBACKLEFT]->reset();
+		m_SheetlessAnimations[GOLDTORIZOJUMPFORWARDLEFT]->reset();
+		m_SheetlessAnimations[GOLDTORIZOJUMPBACKRIGHT]->reset();
+		m_SheetlessAnimations[GOLDTORIZOJUMPFORWARDRIGHT]->reset();
 	}
 
 	// Handle boss Intro
@@ -1164,12 +1214,12 @@ void GoldTorizo::update(float deltaTime)
 	// Handle torizo walking
 	if (m_IntroOver == true)
 	{
-		if (samusPosition.x <= position.x)
+		if (samusPosition.x <= position.x && m_Jumping == false)
 		{
 			m_CurrentAnimationState = GOLDTORIZOWALKLEFT;
 			m_Orientation = LEFT;
 		}
-		if (samusPosition.x >= position.x)
+		if (samusPosition.x >= position.x && m_Jumping == false)
 		{
 			m_CurrentAnimationState = GOLDTORIZOWALKRIGHT;
 			m_Orientation = RIGHT;
@@ -1187,27 +1237,59 @@ void GoldTorizo::update(float deltaTime)
 		velocity.x += 2.0f;
 	}
 
-	// Handle activation of jump
-	m_BossPlayerDistance = samusPosition.x - position.x;
+	// Update player boss / wall boss distances
+	m_BossPlayerDistance = m_SamusJumpStartingPosition.x - position.x;
+	m_BossWallDistance = std::make_pair(abs(m_StartingJumpPosition.x - m_RoomXDimensions.first), abs(m_StartingJumpPosition.x - m_RoomXDimensions.second));
 
-	if (abs(m_BossPlayerDistance) > 10.0f && m_IntroOver == true && m_Jumping == false)
+	// Determine whether boss can jumpp based on distance from the boundaries of the map
+	if (m_BossWallDistance.first >= 8)
+	{
+		m_CanJumpLeft = true;
+	}
+	else
+	{
+		m_CanJumpLeft = false;
+	}
+
+	if (m_BossWallDistance.second >= 8)
+	{
+		m_CanJumpRight = true;
+	}
+	else
+	{
+		m_CanJumpRight = false;
+	}
+
+	if (abs(m_BossPlayerDistance) > 10.0f && m_IntroOver == true && m_Jumping == false && m_Attacking == false)
 	{
 		m_Jumping = true;
 		m_ShouldJumpForward = true;
 	}
-	else if (abs(m_BossPlayerDistance) < 2.0f && m_IntroOver == true && m_Jumping == false)
+	else if (abs(m_BossPlayerDistance) < 2.0f && m_IntroOver == true && m_Jumping == false && m_Attacking == false)
 	{
 		m_Jumping = true;
 		m_ShouldJumpForward = false;
 	}
 
+	// Handle events once boss hits the ground
 	if (m_Jumping == true)
 	{
 		if (position.y > m_StartingJumpPosition.y)
 		{
 			m_Jumping = false;
 			m_JumpTimeStep = 0;
+			m_CanJumpLeft = false;
+			m_CanJumpRight = false;
+
 			body->SetTransform(b2Vec2(position.x, 14.5f), 0);
+
+			if (m_ShouldJumpForward == true)
+			{
+			}
+			else if (m_ShouldJumpForward == false)
+			{
+				attack(deltaTime);
+			}
 		}
 	}
 
@@ -1215,29 +1297,69 @@ void GoldTorizo::update(float deltaTime)
 	{
 		if (m_ShouldJumpForward == true)
 		{
-			m_CurrentAnimationState = GOLDTORIZOJUMPFORWARD;
-			if (m_BossPlayerDistance < 0)
+			// Determine jump animation orientation
+			if (m_Orientation == LEFT && m_CanJumpLeft == true)
+			{
+				m_CurrentAnimationState = GOLDTORIZOJUMPFORWARDLEFT;
+			}
+			else if (m_Orientation == RIGHT && m_CanJumpRight == true)
+			{
+				m_CurrentAnimationState = GOLDTORIZOJUMPFORWARDRIGHT;
+			}
+			
+			// Determine jumpp directioon and activate jump
+			if (m_BossPlayerDistance < 0 && m_CanJumpLeft == true)
 			{
 				activateJump(true);
 			}
-			else
+			else if (m_BossPlayerDistance > 0 && m_CanJumpRight == true)
 			{
 				activateJump(false);
 			}
 		}
 		else if (m_ShouldJumpForward == false)
 		{
-			m_CurrentAnimationState = GOLDTORIZOJUMPBACK;
-			if (m_BossPlayerDistance < 0)
+			std::cout << m_CanJumpRight << std::endl;
+
+			// Determine jump animation orientation
+			if (m_Orientation == LEFT && m_CanJumpRight == true)
+			{
+				m_CurrentAnimationState = GOLDTORIZOJUMPBACKLEFT;
+			}
+			else if (m_Orientation == RIGHT && m_CanJumpLeft == true)
+			{
+				m_CurrentAnimationState = GOLDTORIZOJUMPBACKRIGHT;
+			}
+
+			std::cout << m_CanJumpLeft << std::endl;
+
+			// Determine jump direction and activate jump
+			if (m_BossPlayerDistance < 0 && m_CanJumpRight == true)
 			{
 				activateJump(false);
 			}
-			else
+			else if (m_BossPlayerDistance > 0 && m_CanJumpLeft == true)
 			{
 				activateJump(true);
 			}
 		}
 	}
+
+	if (m_Attacking == true)
+	{
+		if (m_ArkTotalActivatonTime < m_ArkStopActivatonTime)
+		{
+			attack(deltaTime);
+		}
+		else if (m_ArkTotalActivatonTime > m_ArkStopActivatonTime)
+		{
+			m_Attacking = false;
+			m_ArkTotalActivatonTime = 0;
+			m_BombTotalActivatonTime = 0;
+			m_ArksActive = false;
+		}
+	}
+
 
 	// Spawn bombs
 	if (m_BombsActive == true)
@@ -1248,8 +1370,9 @@ void GoldTorizo::update(float deltaTime)
 		{
 			m_BombTotalTime -= m_BombSwitchTime;
 
-			m_Bomb = new TorizoBomb(position, m_Orientation);
+			m_Bomb = new TorizoBomb(position);
 			m_Bombs.push_back(m_Bomb);
+			m_Bomb->setOrientation(m_Orientation);
 			m_Bomb->begin();
 		}
 	}
@@ -1264,7 +1387,7 @@ void GoldTorizo::update(float deltaTime)
 		{
 			m_ArkTotalTime -= m_ArkSwitchTime;
 
-			m_Ark = new TorizoArk(position, m_Orientation);
+			m_Ark = new TorizoArk(position);
 			m_Arks.push_back(m_Ark);
 
 			m_Ark->setOrientation(m_Orientation);
@@ -1383,6 +1506,11 @@ void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		projectileDestroyed = otherData;
 		m_IsHit = true;
+	}
+
+	if (otherData->type == MISSILE)
+	{
+		attributes.health -= 600;
 	}
 }
 
