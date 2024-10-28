@@ -52,7 +52,11 @@ enum BossAnimationState
 	GOLDTORIZOJUMPBACKLEFT,
 	GOLDTORIZOJUMPFORWARDLEFT,
 	GOLDTORIZOJUMPBACKRIGHT,
-	GOLDTORIZOJUMPFORWARDRIGHT
+	GOLDTORIZOJUMPFORWARDRIGHT,
+	GOLDTORIZOWALKLEFTFLASHING,
+	GOLDTORIZOWALKRIGHTFLASHING,
+	GOLDTORIZOJUMPLEFTFLASHING,
+	GOLDTORIZOJUMPRIGHTFLASHING
 };
 
 class Boss : public Collisionlistener
@@ -299,13 +303,14 @@ private:
 	std::queue<BossAnimationState> m_BossActions;
 
 	bool m_IntroOver = false;
-	bool m_Turning = false;
 	bool m_IsHit = false;
 
 	bool m_BombsActive = false;
 	bool m_ArksActive = false;
+
 	bool m_CanJumpLeft = false;
 	bool m_CanJumpRight = false;
+	
 	bool m_Jumping = false;
 	bool m_Attacking = false;
 
@@ -324,8 +329,6 @@ private:
 	float m_ArkTotalTime = 0.75f;
 	float m_ArkTotalActivatonTime = 0.0f;
 	float m_ArkStopActivatonTime = 5.0f;
-
-	int count = 0;
 
 public:
 	void begin() override;

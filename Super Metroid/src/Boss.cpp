@@ -940,7 +940,12 @@ void GoldTorizo::createFixture()
 
 void GoldTorizo::createActiveAnimations()
 {
-	m_ActiveStates = { GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, PROJECTILESPEWLEFT, PROJECTILESPEWRIGHT, GOLDTORIZOTURN, GOLDTORIZOJUMPBACKLEFT, GOLDTORIZOJUMPFORWARDLEFT, GOLDTORIZOJUMPBACKRIGHT, GOLDTORIZOJUMPFORWARDRIGHT };
+	m_ActiveStates = 
+	{ 
+		GOLDTORIZOBLINK, GOLDTORIZOSTAND, GOLDTORIZOTRANSITION, GOLDTORIZOWALKLEFT, GOLDTORIZOWALKRIGHT, PROJECTILESPEWLEFT, PROJECTILESPEWRIGHT, 
+		GOLDTORIZOTURN, GOLDTORIZOJUMPBACKLEFT, GOLDTORIZOJUMPFORWARDLEFT, GOLDTORIZOJUMPBACKRIGHT, GOLDTORIZOJUMPFORWARDRIGHT, GOLDTORIZOWALKLEFTFLASHING, 
+		GOLDTORIZOWALKRIGHTFLASHING, GOLDTORIZOJUMPLEFTFLASHING, GOLDTORIZOJUMPRIGHTFLASHING 
+	};
 
 	// Initialise textures for sheetless Animations
 	std::vector<sf::Texture> blinkTextures
@@ -1036,6 +1041,30 @@ void GoldTorizo::createActiveAnimations()
 		Resources::textures["GT_Jump_03_R.png"],
 		Resources::textures["GT_Jump_04_R.png"]
 	};
+	std::vector<sf::Texture> GoldTorizoWalkRightFlashingTextures
+	{
+		Resources::textures["GT_Walk_Right_Flashing_01.png"],
+		Resources::textures["GT_Walk_Right_Flashing_02.png"],
+		Resources::textures["GT_Walk_Right_Flashing_03.png"]
+	};
+	std::vector<sf::Texture> GoldTorizoWalkLeftFlashingTextures
+	{
+		Resources::textures["GT_Walk_Left_Flashing_01.png"],
+		Resources::textures["GT_Walk_Left_Flashing_02.png"],
+		Resources::textures["GT_Walk_Left_Flashing_03.png"]
+	};
+	std::vector<sf::Texture> GoldTorizoJumpRightFlashingTextures
+	{
+		Resources::textures["GT_Jump_R_Flashing_01.png"],
+		Resources::textures["GT_Jump_R_Flashing_02.png"],
+		Resources::textures["GT_Jump_R_Flashing_03.png"]
+	};
+	std::vector<sf::Texture> GoldTorizoJumpLeftFlashingTextures
+	{
+		Resources::textures["GT_Jump_L_Flashing_01.png"],
+		Resources::textures["GT_Jump_L_Flashing_02.png"],
+		Resources::textures["GT_Jump_L_Flashing_03.png"]
+	};
 	
 	// Initialise animation size vectors here applicable
 	std::vector<sf::Vector2f> goldTorizoGeneralSizes
@@ -1081,6 +1110,10 @@ void GoldTorizo::createActiveAnimations()
 	m_SheetlessAnimations[GOLDTORIZOJUMPFORWARDLEFT] = new SheetlessAnimation(GoldTorizoJumpLeftTextures, 0.25f, false, false, 1, goldTorizoGeneralSizes);
 	m_SheetlessAnimations[GOLDTORIZOJUMPBACKRIGHT] = new SheetlessAnimation(GoldTorizoJumpRightTextures, 0.25f, false, true, 1, goldTorizoGeneralSizes);
 	m_SheetlessAnimations[GOLDTORIZOJUMPFORWARDRIGHT] = new SheetlessAnimation(GoldTorizoJumpRightTextures, 0.25f, false, false, 1, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOWALKLEFTFLASHING] = new SheetlessAnimation(GoldTorizoWalkLeftFlashingTextures, 0.1f, false, false, 3, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOWALKRIGHTFLASHING] = new SheetlessAnimation(GoldTorizoWalkRightFlashingTextures, 0.1f, false, false, 3, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPLEFTFLASHING] = new SheetlessAnimation(GoldTorizoJumpLeftFlashingTextures, 0.1f, false, false, 3, goldTorizoGeneralSizes);
+	m_SheetlessAnimations[GOLDTORIZOJUMPRIGHTFLASHING] = new SheetlessAnimation(GoldTorizoJumpRightFlashingTextures, 0.1f, false, false, 3, goldTorizoGeneralSizes);
 }
 
 void GoldTorizo::activateBombs()
@@ -1166,7 +1199,7 @@ void GoldTorizo::begin()
 	createFixture();
 	createActiveAnimations();
 
-	attributes = { 13500, 1 };
+	attributes = { 3600, 1 };
 
 	for (auto state : m_ActiveStates)
 	{
@@ -1180,6 +1213,8 @@ void GoldTorizo::update(float deltaTime)
 {
 	b2Vec2 velocity = body->GetLinearVelocity();
 	velocity.x = 0;
+
+	std::cout << attributes.health << std::endl;
 
 	// Update jump start position whilst boss is not mid jump
 	if (m_Jumping == false)
@@ -1227,12 +1262,12 @@ void GoldTorizo::update(float deltaTime)
 	}
 
 	// Handle result based on current action
-	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false)	
+	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false && m_IsHit == false)	
 	{
 		velocity.x -= 2.0f;
 	}
 
-	if (m_CurrentAnimationState == GOLDTORIZOWALKRIGHT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false)
+	if (m_CurrentAnimationState == GOLDTORIZOWALKRIGHT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false && m_IsHit == false)
 	{
 		velocity.x += 2.0f;
 	}
@@ -1447,10 +1482,61 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
+	if (m_IsHit == false)
+	{
+		m_SheetlessAnimations[GOLDTORIZOWALKLEFTFLASHING]->reset();
+		m_SheetlessAnimations[GOLDTORIZOWALKRIGHTFLASHING]->reset();
+		m_SheetlessAnimations[GOLDTORIZOJUMPLEFTFLASHING]->reset();
+		m_SheetlessAnimations[GOLDTORIZOJUMPRIGHTFLASHING]->reset();
+	}
+
+	if (m_IsHit == true)
+	{
+		switch (m_CurrentAnimationState)
+		{
+			case GOLDTORIZOWALKLEFT:
+				m_CurrentAnimationState = GOLDTORIZOWALKLEFTFLASHING;
+				break;
+			case GOLDTORIZOWALKRIGHT:
+				m_CurrentAnimationState = GOLDTORIZOWALKRIGHTFLASHING;
+				break;
+
+			case GOLDTORIZOJUMPBACKLEFT:
+			case GOLDTORIZOJUMPFORWARDLEFT:
+				m_CurrentAnimationState = GOLDTORIZOJUMPLEFTFLASHING;
+				break;
+
+			case GOLDTORIZOJUMPBACKRIGHT:
+			case GOLDTORIZOJUMPFORWARDRIGHT:
+				m_CurrentAnimationState = GOLDTORIZOJUMPRIGHTFLASHING;
+				break;
+			default:
+				break;
+		}
+
+		if (m_SheetlessAnimations[m_CurrentAnimationState]->checkPlaying() == false)
+		{
+			m_IsHit = false;
+		}
+	}
+
 	body->SetLinearVelocity(velocity);
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
-	m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
+	if (attributes.health == 0)
+	{
+		m_BossComplete = true;
+	}
+
+	if (m_BossComplete == true)
+	{
+		menuManager.setSwitchScreen(VICTORY);
+	}
+	
+	if (m_BossComplete == false)
+	{
+		m_SheetlessAnimations[m_CurrentAnimationState]->update(deltaTime);
+	}
 }
 
 void GoldTorizo::draw(Renderer& renderer)
@@ -1505,12 +1591,12 @@ void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
 		projectileDestroyed = otherData;
-		m_IsHit = true;
 	}
 
-	if (otherData->type == MISSILE)
+	if (otherData->type == MISSILE && m_IntroOver == true && m_Attacking == false)
 	{
-		attributes.health -= 600;
+		attributes.health -= 300;
+		m_IsHit = true;
 	}
 }
 
