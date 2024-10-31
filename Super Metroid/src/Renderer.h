@@ -4,6 +4,9 @@
 #include <filesystem>
 #include "Resources.h"
 
+#include "imgui-SFML.h"
+#include "imgui.h"
+
 enum Direction
 {
 	RIGHT,

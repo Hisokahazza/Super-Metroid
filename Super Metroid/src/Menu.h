@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "Resources.h"
 #include "Animation.h"
+#include <array>
 
 enum MenuState
 {
@@ -10,6 +11,13 @@ enum MenuState
 	VICTORY,
 	GAMEOVER,
 	BOSSMENU
+};
+
+enum MenuButton
+{
+	// Boss select menu buttons
+	BOSSSELECT,
+	EXIT
 };
 
 class Menu
@@ -39,7 +47,7 @@ class GameOver : public Menu
 {
 private:
 	sf::Text m_GameOvertext;
-	std::vector<sf::Texture> m_ReturnTextures;
+	std::vector<sf::Texture> m_ReturnTextTextures;
 	SheetlessAnimation* m_ReturnTextAnim;
 public:
 	void begin() override;
@@ -50,13 +58,25 @@ public:
 class BossMenu : public Menu
 {
 private:
-	sf::Text m_GameOvertext;
-	std::vector<sf::Texture> m_ReturnTextures;
-	SheetlessAnimation* m_ReturnTextAnim;
+	std::vector<sf::Texture> m_BossSelectTextTextures;
+	std::vector<sf::Texture> m_ExitTextTextures;
+
+	SheetlessAnimation* m_BossSelectTextAnim;
+	SheetlessAnimation* m_ExitTextAnim;
+
+	unsigned int m_CurrentButtonIndex = 0;
+	int m_SelectedBossItem;
+	std::vector<MenuButton> m_Buttons;
+
+	bool m_BossSelectMenuOpen = false;
+	bool startBoss = false;
 public:
 	void begin() override;
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
+
+	// Getters and setters
+	int const getSelectedBossItem() { return m_SelectedBossItem; };
 };
 
 class NoMenu : public Menu

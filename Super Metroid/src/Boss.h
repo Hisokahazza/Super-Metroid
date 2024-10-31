@@ -148,7 +148,7 @@ private:
 	
 	void createFixture() override;
 
-	std::vector<sf::Texture> m_SporeFrames;
+	std::vector<sf::Texture> m_SporeTextures;
 	SheetlessAnimation* m_SporeAnimation;
 public:
 	~Spore();

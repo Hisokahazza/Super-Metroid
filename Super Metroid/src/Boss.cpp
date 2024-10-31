@@ -46,8 +46,13 @@ void Spore::begin(unsigned int positionIndex)
 	position = m_SporeInitialPositions[positionIndex];
 	createFixture();
 
-	m_SporeFrames = { Resources::textures["SSP_Spore_Proj_01.png"], Resources::textures["SSP_Spore_Proj_02.png"], Resources::textures["SSP_Spore_Proj_03.png"]};
-	m_SporeAnimation = new SheetlessAnimation(m_SporeFrames, 0.1f);
+	m_SporeTextures = 
+	{
+		Resources::textures["SSP_Spore_Proj_01.png"], 
+		Resources::textures["SSP_Spore_Proj_02.png"], 
+		Resources::textures["SSP_Spore_Proj_03.png"]
+	};
+	m_SporeAnimation = new SheetlessAnimation(m_SporeTextures, 0.1f);
 
 	m_SporeAnimation->begin();
 }
@@ -188,7 +193,8 @@ void SporeSpawn::createActiveAnimations()
 	m_ActiveStates = { COREOPENING, COREOPENED, CORECLOSING, CORECLOSED, COREFLASHING };
 
 	// Initialise textures for sheetless Animations
-	std::vector<sf::Texture> coreOpeningTextures = {
+	std::vector<sf::Texture> coreOpeningTextures = 
+	{
 		Resources::textures["SSP_Idle.png"],
 		Resources::textures["SSP_Anim_01.png"],
 		Resources::textures["SSP_Anim_02.png"],
@@ -197,15 +203,18 @@ void SporeSpawn::createActiveAnimations()
 		Resources::textures["SSP_Anim_05.png"],
 		Resources::textures["SSP_Anim_06.png"]
 	};
-	std::vector<sf::Texture> coreOpenedTextures = {
+	std::vector<sf::Texture> coreOpenedTextures = 
+	{
 		Resources::textures["SSP_Open_01.png"],
 		Resources::textures["SSP_Open_02.png"],
 		Resources::textures["SSP_Open_03.png"]
 	};
-	std::vector<sf::Texture> coreClosedTextures = {
+	std::vector<sf::Texture> coreClosedTextures = 
+	{
 		Resources::textures["SSP_Idle.png"]
 	};
-	std::vector<sf::Texture> coreFlashingTextures = {
+	std::vector<sf::Texture> coreFlashingTextures = 
+	{
 		Resources::textures["SSP_Open_Flash_01.png"],
 		Resources::textures["SSP_Open_Flash_02.png"],
 		Resources::textures["SSP_Open_Flash_03.png"],
