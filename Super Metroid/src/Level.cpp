@@ -4,30 +4,34 @@
 // Clear all bodies in a level
 void Level::clearLevel()
 {
-	for (auto& body : m_BodiesToDelete)
+	for (auto body : m_BodiesToDelete)
 	{
-		/*if (m_BodiesToDelete.size() > 0)
-		{
-			m_BodiesToDelete.erase(std::find(m_BodiesToDelete.begin(), m_BodiesToDelete.end(), body));
-		}*/
-
 		if (body)
 		{
+			std::cout << m_BodiesToDelete.size();
 			m_CurrentFixtureToDelete = body->GetFixtureList();
-
-			body->DestroyFixture(m_CurrentFixtureToDelete);
+			
+			while (m_CurrentFixtureToDelete)
+			{
+				m_NextFixtureToDelete = m_CurrentFixtureToDelete->GetNext();
+				body->DestroyFixture(m_CurrentFixtureToDelete);
+				m_CurrentFixtureToDelete = m_NextFixtureToDelete;
+			}
 
 			Physics::world.DestroyBody(body);
 
 			body = nullptr;
 		}
 	}
+	m_BodiesToDelete.clear();
+
 	for (auto door : m_InteractableDoors)
 	{
 
 		m_InteractableDoors.erase(std::find(m_InteractableDoors.begin(), m_InteractableDoors.end(), door));
 
-		door->destroyFixture();
+		door->destroyOpenBody();
+		door->destroyClosedBody();
 		delete door;
 	}
 }
@@ -39,7 +43,6 @@ StageHub::StageHub(float cellSize) : m_CellSize(cellSize)
 // Generates a grid with integr values to denote tiles based on an image comprised of colours
 std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 {
-
 	m_Grid.clear();
 	// Create a grid of the same size as the image using the fill constructor to fill each element with 0
 	m_Grid = std::vector(image.getSize().x, std::vector(image.getSize().y, 0));

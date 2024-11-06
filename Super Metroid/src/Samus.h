@@ -3,7 +3,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <Memory>
 
 #include <box2d/b2_body.h>
 #include <box2d/b2_polygon_shape.h>

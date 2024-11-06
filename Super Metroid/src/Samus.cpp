@@ -693,6 +693,9 @@ void Samus::update(float deltaTime)
 		m_Velocity = b2Vec2(0, 0);
 		m_CanShoot = false;
 
+		// set samus as dead in boss file
+		m_CurrentBoss->setIsSamusDead(true);
+
 		// Play death animation
 		m_CurrentAnimationState = SAMUSDEATHINTRO;
 		if (m_Animations[m_CurrentAnimationState]->checkPlaying() == false)
@@ -709,17 +712,6 @@ void Samus::update(float deltaTime)
 			}
 		}
 	}
-
-	/*if (m_CurrentAnimationState == SHOOTRIGHTSTATIC || m_CurrentAnimationState == SHOOTLEFTSTATIC)
-	{
-		for (auto state : m_ActiveStates)
-		{
-			if (state != SHOOTRIGHTSTATIC || state != SHOOTLEFTSTATIC)
-			{
-				m_Animations[state]->reset();
-			}
-		}
-	}*/
 
 	// Determine whether samus has died
 	if (m_CurrentHealth <= 0)
@@ -795,6 +787,7 @@ void Samus::reset()
 	m_IsSamusAlive = true;
 	m_SamusHit = false;
 	m_CurrentBoss->setIsSamusHit(false);
+	m_IsInvulnerable = false;
 
 	if (m_Body)
 	{
@@ -830,6 +823,7 @@ void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 		m_SamusHit = true;
 	}
 }
+
 void Samus::onEndContact(b2Fixture* self, b2Fixture* other)
 {
 	FixtureData* data = (FixtureData*)other->GetUserData().pointer;

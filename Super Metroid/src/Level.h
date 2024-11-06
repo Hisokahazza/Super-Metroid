@@ -37,10 +37,13 @@ enum Colour
 class Level
 {
 private:
+
+	int m_Count = 0;
 protected:
 	std::vector<std::vector<int>> m_Grid;
 	std::vector<b2Body*> m_BodiesToDelete;
 	b2Fixture* m_CurrentFixtureToDelete;
+	b2Fixture* m_NextFixtureToDelete;
 
 	std::unordered_map<Colour, sf::Color> colours = { 
 		{RED, sf::Color(255, 0, 0)},

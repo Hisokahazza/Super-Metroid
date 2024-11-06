@@ -75,16 +75,18 @@ protected:
 	FixtureData fixtureData{};
 
 	bool m_BossComplete = false;
+	bool m_IsSamusHit = false;
+	bool m_IsSamusDead = false;
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
 	
-	bool m_IsSamusHit = false;
 	sf::Vector2f samusPosition;
 	sf::Vector2f position;
 
 	virtual void createFixture() = 0;
 	virtual void resetFixture() = 0;
+	virtual void reset() = 0;
 
 	virtual void begin() = 0;
 	virtual void update(float deltaTime) = 0;
@@ -96,6 +98,8 @@ public:
 
 	bool const getIsSamusHit() { return m_IsSamusHit; }
 	void const setIsSamusHit(bool isSamusHit) { m_IsSamusHit = isSamusHit; }
+
+	void const setIsSamusDead(bool isSamusDead) { m_IsSamusDead = isSamusDead; };
 
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 
@@ -206,6 +210,7 @@ public:
 	void draw(Renderer& renderer) override;
 
 	void resetFixture() override;
+	void reset() override;
 
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;
@@ -332,10 +337,11 @@ private:
 
 public:
 	void begin() override;
-	void update(float deltaTime);
-	void draw(Renderer& renderer);
+	void update(float deltaTime) override; 
+	void draw(Renderer& renderer) override;
 
-	void resetFixture();
+	void resetFixture() override;
+	void reset() override;
 
 	// Inherited via Collisionlistener
 	void onBeginContact(b2Fixture* self, b2Fixture* other) override;

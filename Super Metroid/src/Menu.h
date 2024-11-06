@@ -76,7 +76,9 @@ public:
 	void draw(Renderer& renderer) override;
 
 	// Getters and setters
-	int const getSelectedBossItem() { return m_SelectedBossItem; };
+	int const getSelectedBossItem() { return m_SelectedBossItem; }
+	void const setSelectedBossItem(int selectedBossItem) { m_SelectedBossItem = selectedBossItem; }
+	void const setBossSelectMenuOpen(bool bossSelectMenuOpen) { m_BossSelectMenuOpen = bossSelectMenuOpen; }
 };
 
 class NoMenu : public Menu

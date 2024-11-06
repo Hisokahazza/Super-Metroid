@@ -107,8 +107,6 @@ void BossMenu::begin()
 
 void BossMenu::update(float deltaTime)
 {
-	std::cout << m_CurrentButtonIndex << std::endl;
-
 	m_BossSelectTextAnim->update(deltaTime);
 	m_ExitTextAnim->update(deltaTime);
 
@@ -158,19 +156,17 @@ void BossMenu::update(float deltaTime)
 			"Spore Spawn",
 			"Gold Torizo"
 		};
-		static int SelectedItem = 0;
 
+		// Create dropdown menu
 		ImGui::BeginChild("##", ImVec2(ImGui::GetContentRegionAvail().x, 260), ImGuiChildFlags_None);
 		ImGui::Text("Select A Boss");
-		ImGui::Combo("##", &SelectedItem, bossSelectionItems, IM_ARRAYSIZE(bossSelectionItems));
+		ImGui::Combo("##", &m_SelectedBossItem, bossSelectionItems, IM_ARRAYSIZE(bossSelectionItems));
 		ImGui::EndChild();
 
 		ImGui::PopStyleColor();
 		
 		// End window
 		ImGui::End();
-
-		m_SelectedBossItem = SelectedItem;
 	}
 }
 

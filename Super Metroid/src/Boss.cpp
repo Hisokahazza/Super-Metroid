@@ -494,6 +494,30 @@ void SporeSpawn::resetFixture()
 
 		Physics::world.DestroyBody(body);
 	}
+
+	m_Spores.clear();
+}
+
+void SporeSpawn::reset()
+{
+	m_IsCoreOpen = false;
+	m_IsCoreClosing = false;
+	m_IsCoreHit = false;
+	m_IsHittable = false;
+
+	m_SporeSwitchTime = 2.0f;
+	m_SporeTotalTime = 2.0f;
+
+	m_CoreTotalTime = 0.0f;
+	m_CoreOpenSwitchTime = 10.0f;
+	m_CoreClosedSwitchTime = 5.0f;
+
+	m_BossSpeed = 3;
+	m_BossChangedDirection = false;
+
+	m_BossComplete = false;
+	m_IsSamusHit = false;
+	m_IsSamusDead = false;
 }
 
 void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
@@ -1176,8 +1200,6 @@ void GoldTorizo::attack(float deltaTime)
 
 void GoldTorizo::activateJump(bool shouldJumpLeft)
 {
-	m_Jumping = true;
-	
 	if (shouldJumpLeft == true)
 	{
 		b2Vec2 newPosition = calculateJumpPosition(m_StartingJumpPosition, b2Vec2(-5.0f, -7.5f));
@@ -1223,7 +1245,11 @@ void GoldTorizo::update(float deltaTime)
 	b2Vec2 velocity = body->GetLinearVelocity();
 	velocity.x = 0;
 
-	std::cout << attributes.health << std::endl;
+	// Check if boss is dead
+	if (attributes.health == 0)
+	{
+		m_BossComplete = true;
+	}
 
 	// Update jump start position whilst boss is not mid jump
 	if (m_Jumping == false)
@@ -1285,7 +1311,7 @@ void GoldTorizo::update(float deltaTime)
 	m_BossPlayerDistance = m_SamusJumpStartingPosition.x - position.x;
 	m_BossWallDistance = std::make_pair(abs(m_StartingJumpPosition.x - m_RoomXDimensions.first), abs(m_StartingJumpPosition.x - m_RoomXDimensions.second));
 
-	// Determine whether boss can jumpp based on distance from the boundaries of the map
+	// Determine whether boss can jump based on distance from the boundaries of the map
 	if (m_BossWallDistance.first >= 8)
 	{
 		m_CanJumpLeft = true;
@@ -1313,6 +1339,16 @@ void GoldTorizo::update(float deltaTime)
 	{
 		m_Jumping = true;
 		m_ShouldJumpForward = false;
+	}
+
+	// Handle special cases where boss can jump to the left or right and can jump backwards but shouldn't
+	if (m_CanJumpLeft == true && m_ShouldJumpForward == false && m_BossPlayerDistance < 0)
+	{
+		m_Jumping = false;
+	}
+	if (m_CanJumpRight == true && m_ShouldJumpForward == false && m_BossPlayerDistance > 0)
+	{
+		m_Jumping = false;
 	}
 
 	// Handle events once boss hits the ground
@@ -1351,7 +1387,7 @@ void GoldTorizo::update(float deltaTime)
 				m_CurrentAnimationState = GOLDTORIZOJUMPFORWARDRIGHT;
 			}
 			
-			// Determine jumpp directioon and activate jump
+			// Determine jump direction and activate jump
 			if (m_BossPlayerDistance < 0 && m_CanJumpLeft == true)
 			{
 				activateJump(true);
@@ -1363,8 +1399,6 @@ void GoldTorizo::update(float deltaTime)
 		}
 		else if (m_ShouldJumpForward == false)
 		{
-			std::cout << m_CanJumpRight << std::endl;
-
 			// Determine jump animation orientation
 			if (m_Orientation == LEFT && m_CanJumpRight == true)
 			{
@@ -1374,8 +1408,6 @@ void GoldTorizo::update(float deltaTime)
 			{
 				m_CurrentAnimationState = GOLDTORIZOJUMPBACKRIGHT;
 			}
-
-			std::cout << m_CanJumpLeft << std::endl;
 
 			// Determine jump direction and activate jump
 			if (m_BossPlayerDistance < 0 && m_CanJumpRight == true)
@@ -1389,6 +1421,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
+	// Start attacking
 	if (m_Attacking == true)
 	{
 		if (m_ArkTotalActivatonTime < m_ArkStopActivatonTime)
@@ -1403,7 +1436,6 @@ void GoldTorizo::update(float deltaTime)
 			m_ArksActive = false;
 		}
 	}
-
 
 	// Spawn bombs
 	if (m_BombsActive == true)
@@ -1449,7 +1481,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 
 		// Delete or update bombs
-		if (bomb->destroyed == true)
+		if (bomb->destroyed == true || m_BossComplete == true || m_IsSamusDead == true)
 		{
 			bomb->~TorizoBomb();
 			bomb->currentSheetlessAnimation->update(deltaTime);
@@ -1477,7 +1509,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 
 		// Delete or update arks
-		if (ark->destroyed == true)
+		if (ark->destroyed == true || m_BossComplete == true || m_IsSamusDead == true)
 		{
 			ark->~TorizoArk();
 			m_Arks.erase(std::find(m_Arks.begin(), m_Arks.end(), ark));
@@ -1532,11 +1564,6 @@ void GoldTorizo::update(float deltaTime)
 	body->SetLinearVelocity(velocity);
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
-	if (attributes.health == 0)
-	{
-		m_BossComplete = true;
-	}
-
 	if (m_BossComplete == true)
 	{
 		menuManager.setSwitchScreen(VICTORY);
@@ -1571,8 +1598,8 @@ void GoldTorizo::resetFixture()
 {
 	if (body)
 	{
-		b2Fixture* fixturesToDelete = body->GetFixtureList();
-		body->DestroyFixture(fixturesToDelete);
+		b2Fixture* fixtureToDelete = body->GetFixtureList();
+		body->DestroyFixture(fixtureToDelete);
 
 		Physics::world.DestroyBody(body);
 	}
@@ -1582,6 +1609,29 @@ void GoldTorizo::resetFixture()
 		bomb->destroyFixture();
 	}
 	m_Bombs.clear();
+}
+
+void GoldTorizo::reset()
+{
+	m_BossComplete = false;
+	m_IsSamusHit = false;
+	m_IsSamusDead = false;
+
+	m_IntroOver = false;
+	m_IsHit = false;
+
+	m_BombsActive = false;
+	m_ArksActive = false;
+
+	m_CanJumpLeft = false;
+	m_CanJumpRight = false;
+
+	m_Jumping = false;
+	m_Attacking = false;
+
+	m_ArkSwitchTime = 0.75f;
+	m_ArkTotalTime = 0.75f;
+	m_ArkTotalActivatonTime = 0.0f;
 }
 
 void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)

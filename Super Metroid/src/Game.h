@@ -27,6 +27,7 @@ private:
 	void createBosses();
 
 	void setCurrentStage(std::string& currentStage, bool initStage);
+	void setCurrentBoss(BossName boss);
 
 	std::unordered_map<std::string, Level*> m_Stages;
 	std::unordered_map<BossName, Boss*> m_Bosses;
@@ -38,6 +39,10 @@ private:
 	bool m_IsThroughDoor;
 
 	std::string m_HubStage = "res/Level_Hub.png";
+	std::string m_GoldTorizoStage = "res/Level_Gold_Torizo.png";
+	std::string m_SporeSpawnStage = "res/Level_Spore_Spawn.png";
+
+	BossMenu* m_BossMenu;
 public:
 	Game();
 	~Game();

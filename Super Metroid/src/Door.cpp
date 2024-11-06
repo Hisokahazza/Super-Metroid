@@ -49,7 +49,7 @@ Door::Door(MenuState doorLink, Direction Orientation) : m_DoorLink(doorLink), m_
 {
 }
 
-void Door::destroyFixture()
+void Door::destroyOpenBody()
 {
 	if (m_OpenBody)
 	{
@@ -58,6 +58,18 @@ void Door::destroyFixture()
 		Physics::world.DestroyBody(m_OpenBody);
 
 		m_OpenBody = nullptr;
+	}
+}
+
+void Door::destroyClosedBody()
+{
+	if (m_ClosedBody)
+	{
+		m_ClosedBody->DestroyFixture(m_DoorClosedFixture);
+
+		Physics::world.DestroyBody(m_ClosedBody);
+
+		m_ClosedBody = nullptr;
 	}
 }
 

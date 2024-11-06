@@ -23,7 +23,10 @@ void Game::createBosses()
 
 void Game::setCurrentStage(std::string& currentStage, bool initStage)
 {
+	std::cout << m_CurrentStage << std::endl;
+
 	m_Bosses[m_CurrentBoss]->resetFixture();
+	m_Bosses[m_CurrentBoss]->reset();
 
 	m_Stages[m_CurrentStage]->clearLevel();
 	
@@ -33,10 +36,20 @@ void Game::setCurrentStage(std::string& currentStage, bool initStage)
 	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
 	samus.position = m_MapPositions[0];
 
+	m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
+	m_Bosses[m_CurrentBoss]->begin();
+	samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
+	
+	
 	if (initStage == false)
 	{
 		samus.reset();
 	}
+}
+
+void Game::setCurrentBoss(BossName boss)
+{
+	m_CurrentBoss = boss;
 }
 
 Game::Game()
@@ -58,9 +71,11 @@ void Game::Begin(const sf::Window& window)
 	//load map image
 	setCurrentStage(m_CurrentStage, true);
 
+	// Handle samus object startup
 	samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
 	samus.begin();
 
+	// set initial camera position to initial samus position
 	camera.position = samus.position;
 
 	if (m_CurrentStage != m_HubStage)
@@ -68,6 +83,8 @@ void Game::Begin(const sf::Window& window)
 		m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
 		m_Bosses[m_CurrentBoss]->begin();
 	}
+
+	m_BossMenu = (BossMenu*)menuManager.menus[BOSSMENU];
 }
 
 // update function(called every frame)
@@ -88,11 +105,38 @@ void Game::update(float deltaTime)
 		setCurrentStage(m_HubStage, false);
 	}
 
+
 	menuManager.menus[menuManager.getSwitchScreen()]->update(deltaTime);
 	
 	Physics::update(deltaTime);
 
 	samus.update(deltaTime);
+
+	switch (m_BossMenu->getSelectedBossItem())
+	{
+	case 0:
+		break;
+	case 1:
+		m_BossMenu->setSelectedBossItem(0);
+		m_BossMenu->setBossSelectMenuOpen(false);
+
+		menuManager.setSwitchScreen(NOMENU);
+		menuManager.setMenued(false);
+
+		setCurrentBoss(SPORESPAWN);
+		setCurrentStage(m_SporeSpawnStage, false);
+		break;
+	case 2:
+		m_BossMenu->setSelectedBossItem(0);
+		m_BossMenu->setBossSelectMenuOpen(false);
+
+		menuManager.setSwitchScreen(NOMENU);
+		menuManager.setMenued(false);
+
+		setCurrentBoss(GOLDTORIZO);
+		setCurrentStage(m_GoldTorizoStage, false);
+		break;
+	}
 
 	if (m_CurrentStage == m_HubStage)
 	{

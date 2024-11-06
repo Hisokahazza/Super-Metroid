@@ -38,7 +38,8 @@ public:
 	void Update(float deltaTime);
 	void draw(Renderer& renderer);
 
-	void destroyFixture();
+	void destroyOpenBody();
+	void destroyClosedBody();
 
 	// Getters and setters
 	void const setPosition(sf::Vector2f position) { m_Position = position; }
