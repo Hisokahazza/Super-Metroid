@@ -23,8 +23,6 @@ void Game::createBosses()
 
 void Game::setCurrentStage(std::string& currentStage, bool initStage)
 {
-	std::cout << m_CurrentStage << std::endl;
-
 	m_Bosses[m_CurrentBoss]->resetFixture();
 	m_Bosses[m_CurrentBoss]->reset();
 
@@ -36,10 +34,15 @@ void Game::setCurrentStage(std::string& currentStage, bool initStage)
 	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
 	samus.position = m_MapPositions[0];
 
-	m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
-	m_Bosses[m_CurrentBoss]->begin();
-	samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
-	
+	if (m_IsFirstBoss == false)
+	{
+		m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
+		m_Bosses[m_CurrentBoss]->begin();
+		samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
+	}
+
+	// Ensures no boss fixture is created before a boss stage is loaded
+	m_IsFirstBoss = false;
 	
 	if (initStage == false)
 	{
@@ -84,6 +87,7 @@ void Game::Begin(const sf::Window& window)
 		m_Bosses[m_CurrentBoss]->begin();
 	}
 
+	m_BossStages = { {SPORESPAWN, m_SporeSpawnStage}, {GOLDTORIZO, m_GoldTorizoStage} };
 	m_BossMenu = (BossMenu*)menuManager.menus[BOSSMENU];
 }
 
@@ -112,6 +116,7 @@ void Game::update(float deltaTime)
 
 	samus.update(deltaTime);
 
+	// Handle single boss selection
 	switch (m_BossMenu->getSelectedBossItem())
 	{
 	case 0:
@@ -157,6 +162,49 @@ void Game::update(float deltaTime)
 				}
 			}
 		}
+	}
+
+	// Push boss rush elements to a queue when boss rush start button is pressed
+	if (m_BossMenu->getIsBossRushStarted() == true)
+	{
+		// Interface between bossName enum and boss strings used in menu class
+		for (auto boss : m_BossMenu->getBossRushSelections())
+		{
+			if (boss == "Spore Spawn")
+			{
+				m_BossRushQueue.push(SPORESPAWN);
+			}
+			else if (boss == "Gold Torizo")
+			{
+				m_BossRushQueue.push(GOLDTORIZO);
+			}
+		}
+
+		m_BossMenu->setIsBossRushStarted(false);
+		m_BossMenu->resetBossRushSelections();
+	}
+
+	if (m_BossRushQueue.empty() == false && m_IsBossInRushActive == false)
+	{
+		if (m_IsFirstBoss == false)
+		{
+			m_Bosses[m_CurrentBoss]->resetFixture();
+			m_Bosses[m_CurrentBoss]->reset();
+		}
+
+		menuManager.setSwitchScreen(NOMENU);
+		menuManager.setMenued(false);
+
+		setCurrentBoss(m_BossRushQueue.front());
+		setCurrentStage(m_BossStages[m_BossRushQueue.front()], false);
+
+		m_BossRushQueue.pop();
+		m_IsBossInRushActive = true;
+	}
+
+	if (m_Bosses[m_CurrentBoss]->getIsBossComplete() == true)
+	{
+		m_IsBossInRushActive = false;
 	}
 
 	if (m_CurrentStage != m_HubStage)

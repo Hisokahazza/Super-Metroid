@@ -201,7 +201,8 @@ Missile::~Missile()
 		// Destroy the body
 		Physics::world.DestroyBody(body);
 
-		body = nullptr;  // Set the pointer to nullptr to avoid using it accidentally later
+		// Set the pointer to nullptr to avoid using it accidentally later
+		body = nullptr;  
 	}
 }
 

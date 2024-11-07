@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <filesystem>
+#include <Queue>
 
 #include "Renderer.h"
 #include "Resources.h"
@@ -42,7 +43,13 @@ private:
 	std::string m_GoldTorizoStage = "res/Level_Gold_Torizo.png";
 	std::string m_SporeSpawnStage = "res/Level_Spore_Spawn.png";
 
+	std::unordered_map<BossName, std::string> m_BossStages;
+
 	BossMenu* m_BossMenu;
+	std::queue<BossName> m_BossRushQueue;
+
+	bool m_IsBossInRushActive = false;
+	bool m_IsFirstBoss = true;
 public:
 	Game();
 	~Game();

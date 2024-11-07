@@ -128,16 +128,16 @@ void BossMenu::update(float deltaTime)
 
 	if (m_Buttons[m_CurrentButtonIndex] == EXIT && sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 	{
-		m_BossSelectMenuOpen = false;
+		m_IsBossSelectMenuOpen = false;
 		m_CurrentButtonIndex = 0;
 		returnToHub = true;
 	}
 	else if (m_Buttons[m_CurrentButtonIndex] == BOSSSELECT && sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 	{
-		m_BossSelectMenuOpen = true;
+		m_IsBossSelectMenuOpen = true;
 	}
 
-	if (m_BossSelectMenuOpen == true)
+	if (m_IsBossSelectMenuOpen == true)
 	{
 		ImVec2 windowSize = ImVec2(1920, 1080);
 		ImVec2 windowPos = ImVec2(0, 0);
@@ -158,11 +158,68 @@ void BossMenu::update(float deltaTime)
 		};
 
 		// Create dropdown menu
-		ImGui::BeginChild("##", ImVec2(ImGui::GetContentRegionAvail().x, 260), ImGuiChildFlags_None);
+		ImGui::BeginGroup();
 		ImGui::Text("Select A Boss");
-		ImGui::Combo("##", &m_SelectedBossItem, bossSelectionItems, IM_ARRAYSIZE(bossSelectionItems));
-		ImGui::EndChild();
+		ImGui::Combo("##Combo00", &m_SelectedBossItem, bossSelectionItems, IM_ARRAYSIZE(bossSelectionItems));
+		ImGui::EndGroup();
 
+		ImGui::NewLine();
+
+		// Create boss rush menu
+		ImGui::BeginGroup();
+		ImGui::Text("Custom Boss Rush:");
+
+		ImGui::PushItemWidth(50.0f);
+		ImGui::SameLine(windowSize.x - 425.0f);
+
+		bool shouldRemoveBoss = ImGui::Button("-");
+
+		ImGui::PopItemWidth();
+
+		ImGui::PushItemWidth(350.0f);
+		ImGui::SameLine(windowSize.x - 400.0f);
+
+		ImGui::Combo("##Combo01", &m_SelectedBossRushItem, bossSelectionItems, IM_ARRAYSIZE(bossSelectionItems));
+
+		ImGui::SameLine(windowSize.x - 550.0f);
+
+		m_IsBossRushStarted = ImGui::Button("Start Boss Rush");
+
+		ImGui::NewLine();
+		
+		if (m_SelectedBossRushItem > 0)
+		{
+			m_BossRushSelections.push_back(bossSelectionItems[m_SelectedBossRushItem]);
+			m_SelectedBossRushItem = 0;
+		}
+
+		// Handle removal of bosses from boss rushes
+		if (shouldRemoveBoss == true && m_BossRushSelections.size() > 0)
+		{
+			m_BossRushSelections.pop_back();
+			shouldRemoveBoss = false;
+		}
+
+		for (int count = 0; count < m_BossRushSelections.size(); count++)
+		{
+			ImGui::Button(m_BossRushSelections[count]);
+
+			m_ButtonLine = (count % 20);
+
+			if (m_ButtonLine == 19)
+			{
+				ImGui::NewLine();
+			}
+			else
+			{
+				ImGui::SameLine();
+			}
+		}
+		
+		ImGui::PopItemWidth();
+		ImGui::EndGroup();
+
+		// Pop style colour for future windows
 		ImGui::PopStyleColor();
 		
 		// End window
@@ -184,4 +241,9 @@ void BossMenu::draw(Renderer& renderer)
 		renderer.draw(m_ExitTextAnim->getCurrentFrame(), sf::Vector2f(0, -5.0f), sf::Vector2f(11.7f, 3.2f));
 		renderer.draw(m_BossSelectTextTextures[0], sf::Vector2f(0, -10.0f), sf::Vector2f(24.2f, 3.2f));
 	}
+}
+
+void BossMenu::resetBossRushSelections()
+{
+	m_BossRushSelections.clear();
 }

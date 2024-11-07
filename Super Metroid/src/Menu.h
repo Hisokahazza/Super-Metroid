@@ -66,19 +66,31 @@ private:
 
 	unsigned int m_CurrentButtonIndex = 0;
 	int m_SelectedBossItem;
+	int m_SelectedBossRushItem;
 	std::vector<MenuButton> m_Buttons;
+	std::vector<const char*> m_BossRushSelections;
 
-	bool m_BossSelectMenuOpen = false;
-	bool startBoss = false;
+	int m_ButtonLine = 0;
+
+	bool m_IsBossSelectMenuOpen = false;
+	bool m_IsBossRushStarted;
 public:
 	void begin() override;
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
 
+	void resetBossRushSelections();
+
 	// Getters and setters
 	int const getSelectedBossItem() { return m_SelectedBossItem; }
 	void const setSelectedBossItem(int selectedBossItem) { m_SelectedBossItem = selectedBossItem; }
-	void const setBossSelectMenuOpen(bool bossSelectMenuOpen) { m_BossSelectMenuOpen = bossSelectMenuOpen; }
+
+	void const setBossSelectMenuOpen(bool bossSelectMenuOpen) { m_IsBossSelectMenuOpen = bossSelectMenuOpen; }
+
+	bool const getIsBossRushStarted() { return m_IsBossRushStarted; };
+	void const setIsBossRushStarted(bool isBossRushStarted) { m_IsBossRushStarted = isBossRushStarted; };
+
+	std::vector<const char*> const getBossRushSelections() { return m_BossRushSelections; };
 };
 
 class NoMenu : public Menu

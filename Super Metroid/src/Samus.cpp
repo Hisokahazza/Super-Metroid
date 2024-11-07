@@ -801,6 +801,7 @@ void Samus::reset()
 	m_ActiveProjectile = BULLETPROJ;
 
 	playerHUD.reset();
+	m_MissilesUsed = 0;
 }
 
 // Implement collision listener in physics module

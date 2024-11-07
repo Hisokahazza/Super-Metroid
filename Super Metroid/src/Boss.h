@@ -103,11 +103,13 @@ public:
 
 	FixtureData* const getProjectileDestroyed() { return projectileDestroyed; }
 
-	void setPlayerHitbox(b2Fixture* hitbox) { playerHitbox = hitbox; }
+	void const setPlayerHitbox(b2Fixture* hitbox) { playerHitbox = hitbox; }
 
-	void setPlayerinvulnerabillity(bool isInvulnerable) { isPlayerInvulnerable = isInvulnerable; }
+	void const setPlayerinvulnerabillity(bool isInvulnerable) { isPlayerInvulnerable = isInvulnerable; }
 
-	void setSamusPosition(sf::Vector2f position) { samusPosition = position; }
+	void const setSamusPosition(sf::Vector2f position) { samusPosition = position; }
+
+	bool const getIsBossComplete() { return m_BossComplete; };
 };
 
 class BossComponent : public Collisionlistener

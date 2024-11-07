@@ -344,7 +344,6 @@ void SporeSpawn::update(float deltaTime)
 		if (spore->destroyed == true)
 		{
 			m_Spores.erase(std::find(m_Spores.begin(), m_Spores.end(), spore));
-			spore->~Spore();
 			delete spore;
 		}
 		else
@@ -495,6 +494,10 @@ void SporeSpawn::resetFixture()
 		Physics::world.DestroyBody(body);
 	}
 
+	for (auto spore : m_Spores)
+	{
+		delete spore;
+	}
 	m_Spores.clear();
 }
 

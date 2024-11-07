@@ -8,7 +8,6 @@ void Level::clearLevel()
 	{
 		if (body)
 		{
-			std::cout << m_BodiesToDelete.size();
 			m_CurrentFixtureToDelete = body->GetFixtureList();
 			
 			while (m_CurrentFixtureToDelete)
