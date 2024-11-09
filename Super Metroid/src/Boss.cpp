@@ -412,7 +412,7 @@ void SporeSpawn::update(float deltaTime)
 			{
 				m_BossChangedDirection = true;
 			}
-			else if (position.x <= 2.3f)
+			else if (position.x <= 3.0f)
 			{
 				m_BossChangedDirection = false;
 			}
