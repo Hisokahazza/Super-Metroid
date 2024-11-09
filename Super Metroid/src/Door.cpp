@@ -53,10 +53,13 @@ void Door::destroyOpenBody()
 {
 	if (m_OpenBody)
 	{
+		// Destroy fixture
 		m_OpenBody->DestroyFixture(m_DoorOpenFixture);
-
+		
+		// Destroy body
 		Physics::world.DestroyBody(m_OpenBody);
 
+		// Set body to nullptr to avoid accidentally using it later
 		m_OpenBody = nullptr;
 	}
 }
@@ -65,15 +68,18 @@ void Door::destroyClosedBody()
 {
 	if (m_ClosedBody)
 	{
+		// Destroy fixture
 		m_ClosedBody->DestroyFixture(m_DoorClosedFixture);
 
+		// Destroy body
 		Physics::world.DestroyBody(m_ClosedBody);
 
+		// Set body to nullptr to avoid accidentally using it later
 		m_ClosedBody = nullptr;
 	}
 }
 
-void Door::Begin()
+void Door::begin()
 {
 	createFixture();
 
@@ -95,6 +101,7 @@ void Door::Begin()
 		Resources::textures["HUB_Door_R_05.png"]
 	};
 
+	// Initialise sheetless animations
 	m_DoorOpenLeftAnimation = new SheetlessAnimation(doorOpenLeftTextures, 0.1f, false, false, 1);
 	m_DoorOpenRightAnimation = new SheetlessAnimation(doorOpenRightTextures, 0.1f, false, false, 1);
 
@@ -102,9 +109,9 @@ void Door::Begin()
 	m_DoorOpenRightAnimation->begin();
 }
 
-void Door::Update(float deltaTime)
+void Door::update(float deltaTime)
 {
-	// Handle door animation updating and door destruction 
+	// Handle door animation updating based on door orientation and door destruction 
 	if (m_IsDoorOpen == true)
 	{
 		if (m_Orientation == LEFT)
@@ -167,11 +174,13 @@ void Door::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// Handle bullet or missile collision with door
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
 		m_IsDoorOpen = true;
 	}
 
+	// Handle samus collision with open door
 	if (self == m_DoorOpenFixture && otherData->type == SAMUS && m_IsDoorOpen == true)
 	{
 		m_IsThroughDoor = true;

@@ -72,7 +72,7 @@ private:
 	Direction m_MissileDirection;
 	b2Fixture* missileFixture;
 
-	float m_MaxSpeed;
+	float const m_MaxSpeed = 15.0f;
 	void createFixture(b2Vec2 inititalPosition);
 
 	SheetlessAnimation* m_MissileDestructionAnim;

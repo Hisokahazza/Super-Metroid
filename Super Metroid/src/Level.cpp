@@ -195,7 +195,7 @@ std::vector<sf::Vector2f> StageHub::createFromImg(const sf::Image& image)
 				
 				m_Door->setPosition(sf::Vector2f(m_CellSize* x + m_CellSize / 2.0f,
 					m_CellSize* y + m_CellSize / 2.0f));
-				m_Door->Begin();
+				m_Door->begin();
 
 				m_InteractableDoors.push_back(m_Door);
 			}

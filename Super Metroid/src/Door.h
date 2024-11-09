@@ -7,8 +7,6 @@
 #include "Animation.h"
 #include "Menu.h"
 
-#include <iostream>
-
 class Door : public Collisionlistener
 {
 private:
@@ -34,8 +32,8 @@ private:
 public:
 	Door(MenuState doorLink = NOMENU, Direction Orientation = LEFT);
 	
-	void Begin();
-	void Update(float deltaTime);
+	void begin();
+	void update(float deltaTime);
 	void draw(Renderer& renderer);
 
 	void destroyOpenBody();

@@ -22,7 +22,7 @@ private:
 	std::string m_CurrentStage = "res/Level_Hub.png";
 	BossName m_CurrentBoss = GOLDTORIZO;
 
-	bool m_IsSamusAlive = true;
+	bool m_IsSamusDead = false;
 
 	void createStages();
 	void createBosses();
@@ -50,11 +50,13 @@ private:
 
 	bool m_IsBossInRushActive = false;
 	bool m_IsFirstBoss = true;
+	bool m_IsGameOver = false;
+	BossName m_LastBossInRush = GOLDTORIZO;
 public:
 	Game();
 	~Game();
 
-	void Begin(const sf::Window& window);
+	void begin(const sf::Window& window);
 	void update(float deltaTime);
 
 	void draw(Renderer& renderer);

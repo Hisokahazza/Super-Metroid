@@ -20,7 +20,7 @@ int main()
 	window.setFramerateLimit(60);
 
 	// Run begin function
-	game.Begin(window);
+	game.begin(window);
 
 	// Init Imgui
 	ImGui::SFML::Init(window);

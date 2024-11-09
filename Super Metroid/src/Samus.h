@@ -90,7 +90,7 @@ private:
 
 	int m_JumpDelayCount = 0;
 	int m_ProjectileDelayCount = 20;
-	int m_ProjectileDelay = 20;
+	int const m_ProjectileDelay = 20;
 
 	int m_NumGroundContacts = 0;
 
@@ -102,7 +102,9 @@ private:
 	int m_MissilesUsed;
 
 	std::unordered_map<AnimationState, Animation*> m_Animations;
-	std::vector<AnimationState> m_ActiveStates = { IDLE,
+	std::vector<AnimationState> m_ActiveStates = 
+	{ 
+		IDLE,
 		RUNRIGHT,
 		RUNLEFT,
 		JUMPRIGHT,
@@ -134,6 +136,7 @@ private:
 		SAMUSDEATHINTRO,
 		SAMUSDEATH
 	};
+
 	AnimationState m_CurrentAnimationState;
 	void setAnimationState(AnimationState AnimationState);
 
@@ -158,8 +161,8 @@ private:
 public:
 	b2Fixture* currentHitbox;
 
-	const float movementSpeed = 8.0f;
-	const float jumpVelocity = 11.0f;
+	float const movementSpeed = 8.0f;
+	float const jumpVelocity = 11.0f;
 
 	sf::Texture spriteSheet;
 

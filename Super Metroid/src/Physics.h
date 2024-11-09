@@ -46,7 +46,7 @@ struct FixtureData
 	bool isActive = true;
 
 	// Union with pointers to collidable objects 
-	// (union is only allocated as much memory as its largest member ensuring each fixture can only collide with a fixture of one other type at a time)
+	// (Union is only allocated as much memory as its largest member ensuring each fixture can only collide with a fixture of one other type at a time)
 	union
 	{
 		Samus* samus;

@@ -1,7 +1,5 @@
 #include "Projectile.h"
 
-#include <iostream>
-
 // Collision handling 
 void Projectile::onBeginContact(b2Fixture* self, b2Fixture* other)
 {
@@ -12,7 +10,7 @@ void Projectile::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		return;
 	}
-
+	// Handle collition with map or door
 	if (otherData->type == MAPTILE || otherData->type == DOOR)
 	{
 		destroyed = true;
@@ -70,11 +68,12 @@ DefaultBullet::~DefaultBullet()
 	}
 }
 
-// Create default bullet fixture
 void DefaultBullet::begin(b2Vec2 initialPosition)
 {
+	// Create bullet fixture at position based on samus position
 	createFixture(initialPosition);
 
+	// Initialise sheetless animation textures
 	std::vector <sf::Texture> bulletDestructionTextures = {
 		Resources::textures["Default_Bullet.png"],
 		Resources::textures["Default_Bullet_Destroy_01.png"],
@@ -86,7 +85,7 @@ void DefaultBullet::begin(b2Vec2 initialPosition)
 		Resources::textures["Default_Bullet.png"]
 	};
 
-	// Create animation objects
+	// Initialise sheetless animations
 	m_BulletDestructionAnim = new SheetlessAnimation(bulletDestructionTextures, 0.1f, false, false, 1);
 	m_BulletAnim = new SheetlessAnimation(defaultBulletTextures, 0.1f);
 
@@ -140,16 +139,14 @@ void DefaultBullet::update(float deltaTime)
 	// Set new velocity
 	body->SetLinearVelocity(velocity);
 
-	// Alter position each frame
+	// Alter position variable each frame
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
-	// Update animation
 	currentSheetlessAnimation->update(deltaTime);
 }
 
 void DefaultBullet::draw(Renderer& renderer)
 {
-	// Handle projectile draw calls
 	if (currentSheetlessAnimation == m_BulletAnim)
 	{
 		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, sf::Vector2f(0.3f, 0.3f));
@@ -208,6 +205,7 @@ Missile::~Missile()
 
 void Missile::begin(b2Vec2 initialPosition)
 {
+	// Initialise sheetless animation textures
 	std::vector <sf::Texture> missileDestructionTextures = 
 	{
 		Resources::textures["Missile_Destroy_01.png"],
@@ -229,7 +227,7 @@ void Missile::begin(b2Vec2 initialPosition)
 		sf::Vector2f(1.6f, 1.6f),
 	};
 
-	// Initialise missile destruction animation
+	// Initialise sheetless animation
 	m_MissileDestructionAnim = new SheetlessAnimation(missileDestructionTextures, 0.1f, false, false, 1, missileDestructionFrameSizes);
 	m_MissileDestructionAnim->begin();
 
@@ -239,8 +237,6 @@ void Missile::begin(b2Vec2 initialPosition)
 
 void Missile::update(float deltaTime)
 {
-	m_MaxSpeed = 15.0f;
-
 	// Handle variable missile velocity
 	if (projectileSpeed <= m_MaxSpeed)
 	{
@@ -294,7 +290,7 @@ void Missile::update(float deltaTime)
 
 void Missile::draw(Renderer& renderer)
 {
-	// Handle missile rendering
+	// Handle missile rendering dependent on missile orientation
 	switch (m_MissileDirection)
 	{
 	case RIGHT:

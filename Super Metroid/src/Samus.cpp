@@ -1,15 +1,13 @@
 #include "Samus.h"
 
-#include <iostream>
-
 void Samus::setAnimationState(AnimationState state)
 {
 	m_CurrentAnimationState = state;
 }
 
-// Assign current direction every frame so that each bullet object can be assigned its own direction
 Direction Samus::currentDirection()
 {
+	// Assign current direction every frame so that each bullet object can be assigned its own direction
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
 	{
 		return UPLEFT;
@@ -115,8 +113,10 @@ void Samus::destroyFixture()
 {
 	if (m_Body)
 	{
+		// Destroy body
 		Physics::world.DestroyBody(m_Body);
 
+		// Set body to nullptr to avoid accidentally using it later
 		m_Body = nullptr;
 	}
 }
@@ -263,7 +263,6 @@ Samus::Samus() : m_NumGroundContacts(0), m_JumpDelayCount(0)
 {
 }
 
-// Call functions relating to samus character initialisation
 void Samus::begin()
 {
 	createFixture();
@@ -272,7 +271,6 @@ void Samus::begin()
 
 	m_CurrentHealth = (m_EnergyTanks + 1) * 99;
 
-	// Begin all active Animations
 	for (auto& state : m_ActiveStates)
 	{
 		m_Animations[state]->begin();
@@ -282,7 +280,6 @@ void Samus::begin()
 	playerHUD.begin(m_EnergyTanks);
 }
 
-// Update every frame (passed into game update function)
 void Samus::update(float deltaTime)
 {
 	float move = movementSpeed;
@@ -722,7 +719,7 @@ void Samus::update(float deltaTime)
 	// Update current animation
 	m_Animations[m_CurrentAnimationState]->update(deltaTime);
 
-	// Set the current samus hitbox and ositiion for bosses
+	// Set the current samus hitbox and position for bosses
 	m_CurrentBoss->setPlayerHitbox(currentHitbox);
 	m_CurrentBoss->setSamusPosition(position);
 
@@ -743,20 +740,17 @@ void Samus::update(float deltaTime)
 	
 	m_Sprint = false;
 
-	// Set velocity to new value
 	m_Body->SetLinearVelocity(m_Velocity);
 
 	// Assign new character position
 	position = sf::Vector2f(m_Body->GetPosition().x, m_Body->GetPosition().y);
 }
 
-// Handle render calls
 void Samus::draw(Renderer& renderer)
 {
 	renderer.draw(m_Animations[m_CurrentAnimationState]->getCurrentFrame(), position,
 		sf::Vector2f(4.0f, 3.7f));
 
-	// Draw all active bullets
 	if (m_Bullets.size() != 0)
 	{
 		for (auto& bullet : m_Bullets)
@@ -764,7 +758,7 @@ void Samus::draw(Renderer& renderer)
 			bullet->draw(renderer);
 		}
 	}
-	// Draw all active missiles
+
 	if (m_Missiles.size() != 0)
 	{
 		for (auto& missile : m_Missiles)
@@ -789,6 +783,9 @@ void Samus::reset()
 	m_CurrentBoss->setIsSamusHit(false);
 	m_IsInvulnerable = false;
 
+	m_Animations[SAMUSDEATHINTRO]->reset();
+	m_Animations[SAMUSDEATH]->reset();
+
 	if (m_Body)
 	{
 		m_Body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
@@ -804,7 +801,6 @@ void Samus::reset()
 	m_MissilesUsed = 0;
 }
 
-// Implement collision listener in physics module
 void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 {
 	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
@@ -815,10 +811,12 @@ void Samus::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// Handle samus collision with the map
 	if (samusGroundFixture == self && (otherData->type == MAPTILE || otherData->type == DOOR))
 	{
 		m_NumGroundContacts++;
 	}
+	// Handle samus collision with boss components
 	if (self == currentHitbox && otherData->type == BOSSCOMPONENT)
 	{
 		m_SamusHit = true;
@@ -834,6 +832,7 @@ void Samus::onEndContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// Reduce ground contacts when samus is in the air
 	if (samusGroundFixture == self && (data->type == MAPTILE || data->type == DOOR) && m_NumGroundContacts > 0)
 	{
 		m_NumGroundContacts--;

@@ -1,9 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include <queue>
-
-#include <iostream>
 
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_body.h>
@@ -18,7 +15,7 @@
 
 extern MenuManager menuManager;
 
-// bundle attributes in a struct
+// Bundle attributes in a struct
 struct BossAttributes
 {
 	unsigned int health;
@@ -33,7 +30,7 @@ enum BossName
 
 enum BossAnimationState
 {
-	// SporeSpawn animation states
+	// Spore Spawn animation states
 	COREOPENING,
 	COREOPENED,
 	CORECLOSING,
@@ -77,6 +74,10 @@ protected:
 	bool m_BossComplete = false;
 	bool m_IsSamusHit = false;
 	bool m_IsSamusDead = false;
+
+	unsigned int m_BossRushQueueSize = 0;
+
+	unsigned int const m_MissileDamage = 200;
 public:
 	b2Fixture* playerHitbox;
 	bool isPlayerInvulnerable = false;
@@ -110,26 +111,27 @@ public:
 	void const setSamusPosition(sf::Vector2f position) { samusPosition = position; }
 
 	bool const getIsBossComplete() { return m_BossComplete; };
+
+	void const setBossRushQueueSize(unsigned int bossRushQueueSize) { m_BossRushQueueSize = bossRushQueueSize; }
 };
 
 class BossComponent : public Collisionlistener
 {
 private:
 protected:
-	int m_PlayerHealthOffset = 0;
+	virtual void createFixture() = 0;
 
 	b2Body* body;
-
 	sf::Vector2f position;
-	virtual void createFixture() = 0;
 
 	FixtureData* projectileDestroyed;
 	b2Fixture* m_PlayerHitbox;
-	bool m_IsPlayerInvulnerable;
 
 	FixtureData fixtureData;
 	b2Fixture* fixture;
 
+	bool m_IsPlayerInvulnerable;
+	int m_PlayerHealthOffset = 0;
 public:
 	bool destroyed = false;
 	bool collided = false;
@@ -147,15 +149,14 @@ public:
 class Spore : public BossComponent
 {
 private:
-	float m_SwitchTime = 0.01f;
-	float m_TotalTime = 0.0f;
-
-	std::vector<sf::Vector2f> m_SporeInitialPositions = {sf::Vector2f(3.0f, 2.3f), sf::Vector2f(6.0f, 2.3f) , sf::Vector2f(9.0f, 2.3f) , sf::Vector2f(12.0f, 2.3f) };
-	
 	void createFixture() override;
 
+	std::vector<sf::Vector2f> m_SporeInitialPositions = { sf::Vector2f(3.0f, 2.3f), sf::Vector2f(6.0f, 2.3f) , sf::Vector2f(9.0f, 2.3f) , sf::Vector2f(12.0f, 2.3f) };
 	std::vector<sf::Texture> m_SporeTextures;
 	SheetlessAnimation* m_SporeAnimation;
+
+	float m_SwitchTime = 0.01f;
+	float m_TotalTime = 0.0f;
 public:
 	~Spore();
 
@@ -307,7 +308,6 @@ private:
 	bool m_ShouldJumpForward;
 
 	Direction m_Orientation;
-	std::queue<BossAnimationState> m_BossActions;
 
 	bool m_IntroOver = false;
 	bool m_IsHit = false;
@@ -330,12 +330,12 @@ private:
 	float m_BombSwitchTime = 0.2f;
 	float m_BombTotalTime = 0.2f;
 	float m_BombTotalActivatonTime = 0.0f;
-	float m_BombStopActivatonTime = 3.0f;
+	float const m_BombStopActivatonTime = 3.0f;
 
 	float m_ArkSwitchTime = 0.75f;
 	float m_ArkTotalTime = 0.75f;
 	float m_ArkTotalActivatonTime = 0.0f;
-	float m_ArkStopActivatonTime = 5.0f;
+	float const m_ArkStopActivatonTime = 5.0f;
 
 public:
 	void begin() override;

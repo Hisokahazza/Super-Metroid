@@ -10,6 +10,7 @@ float movementSpeed = 0.5f;
 
 void Game::createStages()
 {
+	// Initialise stage objects
 	m_Stages["res/Level_Hub.png"] = new StageHub();
 	m_Stages["res/Level_Spore_Spawn.png"] = new StageSporeSpawn();
 	m_Stages["res/Level_Gold_Torizo.png"] = new StageGoldTorizo();
@@ -17,33 +18,41 @@ void Game::createStages()
 
 void Game::createBosses()
 {
+	// Initialise boss objects
 	m_Bosses[SPORESPAWN] = new SporeSpawn();
 	m_Bosses[GOLDTORIZO] = new GoldTorizo();
 }
 
 void Game::setCurrentStage(std::string& currentStage, bool initStage)
 {
-	m_Bosses[m_CurrentBoss]->resetFixture();
-	m_Bosses[m_CurrentBoss]->reset();
+	// Reset fixtures and bosses inbetween bosses
+	if (m_BossRushQueue.empty() == true && m_CurrentStage != m_HubStage)
+	{
+		m_Bosses[m_CurrentBoss]->resetFixture();
+		m_Bosses[m_CurrentBoss]->reset();
+	}
 
 	m_Stages[m_CurrentStage]->clearLevel();
-	
+
 	m_CurrentStage = currentStage;
 
+	// Handle loading of new stage
 	m_MapImage.loadFromFile(currentStage);
 	m_MapPositions = m_Stages[currentStage]->createFromImg(m_MapImage);
 	samus.position = m_MapPositions[0];
 
-	if (m_IsFirstBoss == false)
+	// Handle startup of a new boss
+	if (m_IsFirstBoss == false && m_CurrentStage != m_HubStage)
 	{
 		m_Bosses[m_CurrentBoss]->position = m_MapPositions[1];
 		m_Bosses[m_CurrentBoss]->begin();
 		samus.setCurrentBoss(m_Bosses[m_CurrentBoss]);
 	}
 
-	// Ensures no boss fixture is created before a boss stage is loaded
+	// Ensures no boss fixture is created before a boss stage is loaded as m_CurrentBoss has a default value
 	m_IsFirstBoss = false;
 	
+	// Reset samus assuming it is not the first stage created
 	if (initStage == false)
 	{
 		samus.reset();
@@ -64,7 +73,7 @@ Game::~Game()
 }
 
 // Begin function
-void Game::Begin(const sf::Window& window)
+void Game::begin(const sf::Window& window)
 {
 	menuManager.begin();
 
@@ -87,7 +96,9 @@ void Game::Begin(const sf::Window& window)
 		m_Bosses[m_CurrentBoss]->begin();
 	}
 
+	// Initialise boss stages map to translate from c style string in menu to boss name enum
 	m_BossStages = { {SPORESPAWN, m_SporeSpawnStage}, {GOLDTORIZO, m_GoldTorizoStage} };
+	// Initialise general Menu object and cast to BossMenu*
 	m_BossMenu = (BossMenu*)menuManager.menus[BOSSMENU];
 }
 
@@ -98,9 +109,14 @@ void Game::update(float deltaTime)
 
 	if (samus.checkSamusAlive() == true)
 	{
-		m_IsSamusAlive = false;
+		m_IsSamusDead = false;
+	}
+	else
+	{
+		m_IsSamusDead = true;
 	}
 	
+	// Check if player should retyurn to hub stage every frame
 	if (menuManager.menus[menuManager.getSwitchScreen()]->returnToHub == true)
 	{
 		menuManager.menus[menuManager.getSwitchScreen()]->returnToHub = false;
@@ -109,13 +125,28 @@ void Game::update(float deltaTime)
 		setCurrentStage(m_HubStage, false);
 	}
 
-
 	menuManager.menus[menuManager.getSwitchScreen()]->update(deltaTime);
 	
 	Physics::update(deltaTime);
 
 	samus.update(deltaTime);
 
+	// Reset boss rush queue when single boss is selected
+	if (m_BossMenu->getSelectedBossItem() > 0)
+	{
+		m_BossRushQueue = {};
+		m_BossMenu->resetBossRushSelections();
+	}
+
+	// Reset boss rush queue when samus is dead
+	if (m_IsSamusDead == true)
+	{
+		m_BossRushQueue = {};
+		m_BossMenu->resetBossRushSelections();
+
+		m_IsGameOver = true;
+	}
+	
 	// Handle single boss selection
 	switch (m_BossMenu->getSelectedBossItem())
 	{
@@ -143,13 +174,15 @@ void Game::update(float deltaTime)
 		break;
 	}
 
+	// Handle door entrance
 	if (m_CurrentStage == m_HubStage)
 	{
 		m_InteractableDoors = m_Stages[m_CurrentStage]->getDoors();
+		// For every door check for entrance and menu appropriately
 		for (auto door : m_InteractableDoors)
 		{
 			m_IsThroughDoor = door->getIsThroughDoor();
-			door->Update(deltaTime);
+			door->update(deltaTime);
 
 			if (m_IsThroughDoor == true)
 			{
@@ -182,15 +215,21 @@ void Game::update(float deltaTime)
 
 		m_BossMenu->setIsBossRushStarted(false);
 		m_BossMenu->resetBossRushSelections();
+		m_BossMenu->setBossSelectMenuOpen(false);
 	}
 
+	// Handle boss rush
 	if (m_BossRushQueue.empty() == false && m_IsBossInRushActive == false)
 	{
-		if (m_IsFirstBoss == false)
+		// Reset fixtures and bosses inbetween bosses
+		if (m_CurrentStage != m_HubStage)
 		{
-			m_Bosses[m_CurrentBoss]->resetFixture();
-			m_Bosses[m_CurrentBoss]->reset();
+			m_Bosses[m_LastBossInRush]->resetFixture();
+			m_Bosses[m_LastBossInRush]->reset();
 		}
+
+		// Assign boss previous to current to a variable
+		m_LastBossInRush = m_BossRushQueue.front();
 
 		menuManager.setSwitchScreen(NOMENU);
 		menuManager.setMenued(false);
@@ -198,11 +237,16 @@ void Game::update(float deltaTime)
 		setCurrentBoss(m_BossRushQueue.front());
 		setCurrentStage(m_BossStages[m_BossRushQueue.front()], false);
 
+		// Pop boss from queue once boss is fully started
 		m_BossRushQueue.pop();
+
 		m_IsBossInRushActive = true;
 	}
 
-	if (m_Bosses[m_CurrentBoss]->getIsBossComplete() == true)
+	// Set boss rush queue size in boss file so that it knows whether or not to display victory screen 
+	m_Bosses[m_CurrentBoss]->setBossRushQueueSize(m_BossRushQueue.size());
+
+	if (m_Bosses[m_CurrentBoss]->getIsBossComplete() == true || m_IsSamusDead == true)
 	{
 		m_IsBossInRushActive = false;
 	}
@@ -214,7 +258,6 @@ void Game::update(float deltaTime)
 	}
 }
 
-// Final rendering step
 void Game::draw(Renderer& renderer)
 {
 	m_Stages[m_CurrentStage]->draw(renderer);

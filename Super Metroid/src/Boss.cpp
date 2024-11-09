@@ -46,12 +46,15 @@ void Spore::begin(unsigned int positionIndex)
 	position = m_SporeInitialPositions[positionIndex];
 	createFixture();
 
+	// Initialise textures for sheetless animation
 	m_SporeTextures = 
 	{
 		Resources::textures["SSP_Spore_Proj_01.png"], 
 		Resources::textures["SSP_Spore_Proj_02.png"], 
 		Resources::textures["SSP_Spore_Proj_03.png"]
 	};
+
+	// Initialise sheetless animation
 	m_SporeAnimation = new SheetlessAnimation(m_SporeTextures, 0.1f);
 
 	m_SporeAnimation->begin();
@@ -152,7 +155,7 @@ void SporeSpawn::createFixture()
 	polygonShape.SetAsBox(1.7f, 0.65f, b2Vec2(0.0f, 2.2f), 0.0f);
 	m_CoreOpenBottom = body->CreateFixture(&fixtureDef);
 
-	// create collidable body so player doesn't overlap with the boss
+	// Create collidable body so player doesn't overlap with the boss
 	circleShape.m_radius = 1.5f;
 	circleShape.m_p.Set(0, 0);
 	fixtureDef.isSensor = false;
@@ -163,6 +166,7 @@ void SporeSpawn::createFixture()
 
 void SporeSpawn::closeCore(float deltaTime)
 {
+	// Increment total time in accordance with frame rate (deltaTime is time between frames)
 	m_CoreTotalTime += deltaTime;
 
 	// Sets relevant boolean values for closing the core
@@ -177,6 +181,7 @@ void SporeSpawn::closeCore(float deltaTime)
 
 void SporeSpawn::openCore(float deltaTime)
 {
+	// Increment total time in accordance with frame rate(deltaTime is time between frames)
 	m_CoreTotalTime += deltaTime;
 
 	// Sets the relevant boolean values 
@@ -458,7 +463,7 @@ void SporeSpawn::update(float deltaTime)
 	}
 	
 	// Set switch screen when boss dies
-	if (m_BossComplete == true && m_CurrentAnimationState == CORECLOSED)
+	if (m_BossComplete == true && m_CurrentAnimationState == CORECLOSED && m_BossRushQueueSize == 0)
 	{
 		menuManager.setSwitchScreen(VICTORY);
 		m_BossComplete = false;
@@ -467,23 +472,19 @@ void SporeSpawn::update(float deltaTime)
 
 void SporeSpawn::draw(Renderer& renderer)
 {
-	// Render segments
 	for (float count = 1; count <= 1.8f; count += 0.4f)
 	{
 		renderer.draw(Resources::textures["SSP_Segment.png"], determineSegmentPos(count), sf::Vector2f(1.0f, 1.0f));
 	}
 
-	// Render boss
 	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), position, sf::Vector2f(4.0f, 6.0f));
 
-	// Render Spores
 	for (auto spore : m_Spores)
 	{
 		spore->draw(renderer);
 	}
 }
 
-// Destroy spore spawn fixture
 void SporeSpawn::resetFixture()
 {
 	if (body)
@@ -498,6 +499,7 @@ void SporeSpawn::resetFixture()
 	{
 		delete spore;
 	}
+
 	m_Spores.clear();
 }
 
@@ -521,6 +523,8 @@ void SporeSpawn::reset()
 	m_BossComplete = false;
 	m_IsSamusHit = false;
 	m_IsSamusDead = false;
+
+	m_BossRushQueueSize = 0;
 }
 
 void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
@@ -531,12 +535,13 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 	// Handle boss collisions with missiles when vulnerable
 	if (m_CoreFixture == self && otherData->type == MISSILE && m_IsCoreOpen == true)
 	{
-		attributes.health -= 200;
+		attributes.health -= m_MissileDamage;
 		m_IsCoreOpen = false;
 		m_IsCoreClosing = true;
 		m_IsCoreHit = true;
 		projectileDestroyed = otherData;
 	}
+	// Handle boss collisions with bullets
 	else if (m_CoreFixture == self && otherData->type == BULLET)
 	{
 		projectileDestroyed = otherData;
@@ -577,13 +582,10 @@ void SporeSpawn::onBeginContact(b2Fixture* self, b2Fixture* other)
 
 void SporeSpawn::onEndContact(b2Fixture* self, b2Fixture* other)
 {
-	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
-	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
 }
 
 // GOLDTORIZO
 
-// Create torizo bomb fixture
 void TorizoBomb::createFixture()
 {
 	fixtureData.type = BOSSCOMPONENT;
@@ -610,7 +612,6 @@ TorizoBomb::TorizoBomb(sf::Vector2f bossPosition) : m_BossPosition(bossPosition)
 {
 }
 
-// Destructor
 TorizoBomb::~TorizoBomb()
 {
 	currentSheetlessAnimation = m_BombDestructionAnim;
@@ -648,6 +649,7 @@ void TorizoBomb::destroyFixture()
 
 void TorizoBomb::begin()
 {
+	// Handle bomb spawn location based on boss orientation
 	if (m_Orientation == LEFT)
 	{
 		position = sf::Vector2f(m_BossPosition.x - 0.4f, m_BossPosition.y - 2.0f);
@@ -657,10 +659,9 @@ void TorizoBomb::begin()
 		position = sf::Vector2f(m_BossPosition.x + 0.4f, m_BossPosition.y - 2.0f);
 	}
 	
-
 	createFixture();
 
-	// Iinitialise textures for sheetless animations
+	// Initialise textures for sheetless animations
 	std::vector<sf::Texture> bombTextures
 	{
 		Resources::textures["GT_Bomb.png"]
@@ -673,7 +674,7 @@ void TorizoBomb::begin()
 		Resources::textures["GT_Bomb_Explosion_04.png"]
 	};
 
-	// Iinitialise sizes for sheetless animations
+	// Initialise sizes for sheetless animations
 	std::vector<sf::Vector2f> bombDestructionFrameSizes
 	{
 		sf::Vector2f(0.9f, 1.0f),
@@ -686,6 +687,7 @@ void TorizoBomb::begin()
 		sf::Vector2f(1.0f, 1.0f),
 	};
 
+	// Initialise sheetless animations
 	m_BombAnim = new SheetlessAnimation(bombTextures, 0.0f, false, false, -1, bombFrameSize);
 	m_BombDestructionAnim = new SheetlessAnimation(bombDestructionTextures, 0.1f, false, false, 1, bombDestructionFrameSizes);
 
@@ -694,6 +696,7 @@ void TorizoBomb::begin()
 
 	currentSheetlessAnimation = m_BombAnim;
 
+	// Handle direction of bomb impulse based on boss orientation
 	if (m_Orientation == LEFT)
 	{
 		body->ApplyLinearImpulseToCenter(b2Vec2(-0.5f, 1.0f), true);
@@ -735,12 +738,11 @@ void TorizoBomb::update(float deltaTime)
 
 void TorizoBomb::draw(Renderer& renderer)
 {
-	// Render bomb
 	if (currentSheetlessAnimation == m_BombAnim)
 	{
 		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, currentSheetlessAnimation->getCurrentFrameSize());
 	}
-	// Render destroyed bomb
+
 	else if (currentSheetlessAnimation == m_BombDestructionAnim)
 	{
 		renderer.draw(currentSheetlessAnimation->getCurrentFrame(), sf::Vector2f(position.x, position.y - 0.5f), currentSheetlessAnimation->getCurrentFrameSize());
@@ -757,12 +759,14 @@ void TorizoBomb::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// Handle bomb collision with samus
 	if (otherData->type == SAMUS && m_PlayerHitbox == other && m_IsPlayerInvulnerable == false && self == m_BombHitbox)
 	{
 		m_PlayerHealthOffset = -50;
 		collided = true;
 	}
 
+	// Handle bomb collision with map
 	if (otherData->type == MAPTILE && self == fixture)
 	{
 		m_CollidedWithMap = true;
@@ -773,7 +777,6 @@ void TorizoBomb::onEndContact(b2Fixture* self, b2Fixture* other)
 {
 }
 
-// Create torizo ark fixture
 void TorizoArk::createFixture()
 {
 	fixtureData.type = BOSSCOMPONENT;
@@ -796,7 +799,6 @@ void TorizoArk::createFixture()
 	fixture = body->CreateFixture(&fixtureDef);
 }
 
-// Destructor
 TorizoArk::~TorizoArk()
 {
 	if (body)
@@ -845,13 +847,14 @@ void TorizoArk::begin()
 		sf::Vector2f(0.3f, 2.0f),
 	};
 
+	// Initialise ark animations
 	m_ArkLeftAnim = new SheetlessAnimation(arkLeftTextures, 0.2f, false, false, 1, arkFrameSizes);
 	m_ArkRightAnim = new SheetlessAnimation(arkRightTextures, 0.2f, false, false, 1, arkFrameSizes);
 
 	m_ArkLeftAnim->begin();
 	m_ArkRightAnim->begin();
 
-	// Shift animation based on direction of ark
+	// Handle animation based on direction of ark
 	if (m_Orientation == LEFT)
 	{
 		currentSheetlessAnimation = m_ArkLeftAnim;
@@ -864,6 +867,7 @@ void TorizoArk::begin()
 
 void TorizoArk::update(float deltaTime)
 {
+	// Handle ark movement based on boss orientation
 	if (m_Orientation == LEFT)
 	{
 		position.x -= 0.1;
@@ -874,7 +878,7 @@ void TorizoArk::update(float deltaTime)
 			destroyed = true;
 		}
 	}
-	else
+	else if (m_Orientation == RIGHT)
 	{
 		position.x += 0.1;
 
@@ -886,14 +890,11 @@ void TorizoArk::update(float deltaTime)
 	
 	body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
 
-	
-
 	currentSheetlessAnimation->update(deltaTime);
 }
 
 void TorizoArk::draw(Renderer& renderer)
 {
-	// Render ark
 	renderer.draw(currentSheetlessAnimation->getCurrentFrame(), position, currentSheetlessAnimation->getCurrentFrameSize());
 }
 
@@ -907,32 +908,16 @@ void TorizoArk::onBeginContact(b2Fixture* self, b2Fixture* other)
 		return;
 	}
 
+	// Handle ark collision with samus
 	if (otherData->type == SAMUS && m_PlayerHitbox == other && m_IsPlayerInvulnerable == false)
 	{
 		m_PlayerHealthOffset = -20;
 		collided = true;
 	}
-
-	if (otherData->type == MAPTILE)
-	{
-		destroyed = true;
-	}
 }
 
 void TorizoArk::onEndContact(b2Fixture* self, b2Fixture* other)
 {
-	FixtureData* otherData = (FixtureData*)other->GetUserData().pointer;
-	FixtureData* selfData = (FixtureData*)self->GetUserData().pointer;
-
-	if (!otherData)
-	{
-		return;
-	}
-
-	if (otherData->type == MAPTILE)
-	{
-		destroyed = true;
-	}
 }
 
 void GoldTorizo::createFixture()
@@ -1156,6 +1141,7 @@ void GoldTorizo::activateBombs()
 {
 	m_BombsActive = true;
 
+	// Handle projectile spew animation based on boss orientation
 	if (m_Orientation == LEFT)
 	{
 		m_CurrentAnimationState = PROJECTILESPEWLEFT;
@@ -1170,6 +1156,7 @@ void GoldTorizo::activateArks()
 {
 	m_ArksActive = true;
 
+	// Handle projectile spew direction based on boss orientation
 	if (m_Orientation == LEFT)
 	{
 		m_CurrentAnimationState = PROJECTILESPEWLEFT;
@@ -1184,18 +1171,28 @@ void GoldTorizo::attack(float deltaTime)
 {
 	m_Attacking = true;
 	
+	// Increment total time in accordance with frame rate (deltaTime is time between frames)
 	m_BombTotalActivatonTime += deltaTime;
+
+	// Spawn bombs at a fixed rate
 	if (m_BombTotalActivatonTime < m_BombStopActivatonTime)
 	{
 		activateBombs();
 	}
+	// Stop spawning bombs at a fixed time
 	if (m_BombTotalActivatonTime > m_BombStopActivatonTime)
 	{
 		m_BombsActive = false;
-		m_ArkTotalActivatonTime += deltaTime;
-		if (m_ArkTotalActivatonTime < m_ArkStopActivatonTime)
+		// Begin to spawn arks after all bombs have been destroyed
+		if (m_Bombs.size() == 0)
 		{
-			activateArks();
+			// Increment total time in accordance with frame rate (deltaTime is time between frames)
+			m_ArkTotalActivatonTime += deltaTime;
+			// Spawn arks at a fixed rate
+			if (m_ArkTotalActivatonTime < m_ArkStopActivatonTime)
+			{
+				activateArks();
+			}
 		}
 	}
 	
@@ -1203,6 +1200,7 @@ void GoldTorizo::attack(float deltaTime)
 
 void GoldTorizo::activateJump(bool shouldJumpLeft)
 {
+	// Transform boss position based on calculated jump path and passed in direction
 	if (shouldJumpLeft == true)
 	{
 		b2Vec2 newPosition = calculateJumpPosition(m_StartingJumpPosition, b2Vec2(-5.0f, -7.5f));
@@ -1217,6 +1215,7 @@ void GoldTorizo::activateJump(bool shouldJumpLeft)
 
 b2Vec2 GoldTorizo::calculateJumpPosition(b2Vec2 startingPosition, b2Vec2 startingVelocity)
 {
+	// Calculate a simulated projectile path
 	m_JumpTimeStep++;
 	b2Vec2 positionRes;
 	float t = 1 / 60.0f;
@@ -1233,7 +1232,7 @@ void GoldTorizo::begin()
 	createFixture();
 	createActiveAnimations();
 
-	attributes = { 3600, 1 };
+	attributes = { 2000, 1 };
 
 	for (auto state : m_ActiveStates)
 	{
@@ -1284,7 +1283,7 @@ void GoldTorizo::update(float deltaTime)
 		m_IntroOver = true;
 	}
 
-	// Handle torizo walking
+	// Handle torizo walking based on difference between boss and samus position
 	if (m_IntroOver == true)
 	{
 		if (samusPosition.x <= position.x && m_Jumping == false)
@@ -1299,7 +1298,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 	}
 
-	// Handle result based on current action
+	// Handle boss movement based on current animation state
 	if (m_CurrentAnimationState == GOLDTORIZOWALKLEFT && m_BombsActive == false && m_ArksActive == false && m_Jumping == false && m_IsHit == false)	
 	{
 		velocity.x -= 2.0f;
@@ -1333,6 +1332,7 @@ void GoldTorizo::update(float deltaTime)
 		m_CanJumpRight = false;
 	}
 
+	// Determine whether boss should jump base on distance from samus
 	if (abs(m_BossPlayerDistance) > 10.0f && m_IntroOver == true && m_Jumping == false && m_Attacking == false)
 	{
 		m_Jumping = true;
@@ -1354,9 +1354,19 @@ void GoldTorizo::update(float deltaTime)
 		m_Jumping = false;
 	}
 
+	//if (m_SamusJumpStartingPosition.x - m_StartingJumpPosition.x > 0 && samusPosition.x - m_StartingJumpPosition.x < 0)
+	//{
+	//	m_Jumping = false;
+	//}
+	//if (m_SamusJumpStartingPosition.x - m_StartingJumpPosition.x < 0 && samusPosition.x - m_StartingJumpPosition.x > 0)
+	//{
+	//	m_Jumping = false;
+	//}
+
 	// Handle events once boss hits the ground
 	if (m_Jumping == true)
 	{
+		// Compare current y position to the y position at the beginning of the jump
 		if (position.y > m_StartingJumpPosition.y)
 		{
 			m_Jumping = false;
@@ -1364,12 +1374,11 @@ void GoldTorizo::update(float deltaTime)
 			m_CanJumpLeft = false;
 			m_CanJumpRight = false;
 
+			// Transform boss to ground height
 			body->SetTransform(b2Vec2(position.x, 14.5f), 0);
 
-			if (m_ShouldJumpForward == true)
-			{
-			}
-			else if (m_ShouldJumpForward == false)
+			// Call attack function after boss jumps backwards
+			if (m_ShouldJumpForward == false)
 			{
 				attack(deltaTime);
 			}
@@ -1399,6 +1408,10 @@ void GoldTorizo::update(float deltaTime)
 			{
 				activateJump(false);
 			}
+			else
+			{
+				m_Jumping = false;
+			}
 		}
 		else if (m_ShouldJumpForward == false)
 		{
@@ -1421,6 +1434,10 @@ void GoldTorizo::update(float deltaTime)
 			{
 				activateJump(true);
 			}
+			else
+			{
+				m_Jumping = false;
+			}
 		}
 	}
 
@@ -1431,6 +1448,7 @@ void GoldTorizo::update(float deltaTime)
 		{
 			attack(deltaTime);
 		}
+		// Stop spawning arks after a fixed time
 		else if (m_ArkTotalActivatonTime > m_ArkStopActivatonTime)
 		{
 			m_Attacking = false;
@@ -1443,8 +1461,10 @@ void GoldTorizo::update(float deltaTime)
 	// Spawn bombs
 	if (m_BombsActive == true)
 	{
+		// Increment total time in accordance with frame rate (deltaTime is time between frames)
 		m_BombTotalTime += deltaTime;
 
+		// Spawn bombs at a fixed rate
 		if (m_BombTotalTime >= m_BombSwitchTime)
 		{
 			m_BombTotalTime -= m_BombSwitchTime;
@@ -1459,9 +1479,9 @@ void GoldTorizo::update(float deltaTime)
 	// Spawn arks
 	if (m_ArksActive == true)
 	{
-		// Spawn arks
+		// Increment total time in accordance with frame rate (deltaTime is time between frames)
 		m_ArkTotalTime += deltaTime;
-
+		// Spawn arks at a fixed rate
 		if (m_ArkTotalTime >= m_ArkSwitchTime)
 		{
 			m_ArkTotalTime -= m_ArkSwitchTime;
@@ -1477,6 +1497,7 @@ void GoldTorizo::update(float deltaTime)
 	// Handle destruction and collision of bombs
 	for (auto bomb : m_Bombs)
 	{
+		// Handle player collision with bombs
 		if (bomb->collided == true)
 		{
 			playerHealthOffset += bomb->getPlayerHealthOffset();
@@ -1484,7 +1505,7 @@ void GoldTorizo::update(float deltaTime)
 		}
 
 		// Delete or update bombs
-		if (bomb->destroyed == true || m_BossComplete == true || m_IsSamusDead == true)
+		if (bomb->destroyed == true)
 		{
 			bomb->~TorizoBomb();
 			bomb->currentSheetlessAnimation->update(deltaTime);
@@ -1505,6 +1526,7 @@ void GoldTorizo::update(float deltaTime)
 	// Handle destruction and collision of arks
 	for (auto ark : m_Arks)
 	{
+		// Handle player collision with arks
 		if (ark->collided == true)
 		{
 			playerHealthOffset += ark->getPlayerHealthOffset();
@@ -1512,9 +1534,8 @@ void GoldTorizo::update(float deltaTime)
 		}
 
 		// Delete or update arks
-		if (ark->destroyed == true || m_BossComplete == true || m_IsSamusDead == true)
+		if (ark->destroyed == true)
 		{
-			ark->~TorizoArk();
 			m_Arks.erase(std::find(m_Arks.begin(), m_Arks.end(), ark));
 			delete ark;
 		}
@@ -1567,7 +1588,8 @@ void GoldTorizo::update(float deltaTime)
 	body->SetLinearVelocity(velocity);
 	position = sf::Vector2f(body->GetPosition().x, body->GetPosition().y);
 
-	if (m_BossComplete == true)
+	// Set screen to victory screen if the boss is defeated and a boss rush is not in progress
+	if (m_BossComplete == true && m_BossRushQueueSize == 0)
 	{
 		menuManager.setSwitchScreen(VICTORY);
 	}
@@ -1580,21 +1602,17 @@ void GoldTorizo::update(float deltaTime)
 
 void GoldTorizo::draw(Renderer& renderer)
 {
-	// Render gold torizo
 	renderer.draw(m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrame(), sf::Vector2f(position.x, position.y - 0.5f), m_SheetlessAnimations[m_CurrentAnimationState]->getCurrentFrameSize());
 
-	// Render bombs
 	for (auto& bomb : m_Bombs)
 	{
 		bomb->draw(renderer);
 	}
 
-	// Render arks 
 	for (auto& ark : m_Arks)
 	{
 		ark->draw(renderer);
 	}
-
 }
 
 void GoldTorizo::resetFixture()
@@ -1611,7 +1629,14 @@ void GoldTorizo::resetFixture()
 	{
 		bomb->destroyFixture();
 	}
+
 	m_Bombs.clear();
+
+	for (auto ark : m_Arks)
+	{
+		delete ark;
+	}
+	m_Arks.clear();
 }
 
 void GoldTorizo::reset()
@@ -1635,6 +1660,8 @@ void GoldTorizo::reset()
 	m_ArkSwitchTime = 0.75f;
 	m_ArkTotalTime = 0.75f;
 	m_ArkTotalActivatonTime = 0.0f;
+
+	m_BossRushQueueSize = 0;
 }
 
 void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
@@ -1649,15 +1676,16 @@ void GoldTorizo::onBeginContact(b2Fixture* self, b2Fixture* other)
 		m_IsSamusHit = true;
 	}
 
-	// Destroy projectiles on collision
+	// Handle collison of bullets or missiles with boss
 	if (otherData->type == BULLET || otherData->type == MISSILE)
 	{
 		projectileDestroyed = otherData;
 	}
 
+	// Handle collision of missiles with boss in a damage context
 	if (otherData->type == MISSILE && m_IntroOver == true && m_Attacking == false)
 	{
-		attributes.health -= 300;
+		attributes.health -= m_MissileDamage;
 		m_IsHit = true;
 	}
 }

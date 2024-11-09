@@ -1,5 +1,4 @@
 #include "Physics.h"
-#include "iostream"
 
 b2World Physics::world{ b2Vec2(0.0f, 9.81f) };
 DebugDrawImp* Physics::debugDrawObj{};
@@ -109,7 +108,7 @@ public:
 };
 
 
-// implement listener
+// Implement listener
 class CollisionListenerGlobal : public b2ContactListener
 {
 	virtual void BeginContact(b2Contact* contact) override
@@ -155,7 +154,6 @@ class CollisionListenerGlobal : public b2ContactListener
 void Physics::update(float deltaTime)
 {
 	world.Step(deltaTime, 6, 2);
-	// Sets world listener
 	world.SetContactListener(new CollisionListenerGlobal());
 }
 
@@ -165,7 +163,7 @@ void Physics::debugDraw(Renderer& renderer)
 	{
 		// Initialise debugDraw object 
 		debugDrawObj = new DebugDrawImp(renderer.target);
-		// Sets flags for debug drawer to pick up
+		// Sets flags for debug drawer to pick up (uncomment/comment to activate/deactivate debug draw)
 		debugDrawObj->SetFlags(b2Draw::e_shapeBit);
 		// Sets the world debug drawer
 		world.SetDebugDraw(debugDrawObj);

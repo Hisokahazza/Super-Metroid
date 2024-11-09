@@ -1,7 +1,5 @@
 #include "Animation.h"
 
-#include <iostream>
-
 SheetAnimation::SheetAnimation(const sf::Texture& spriteSheet, const std::string& sheetTag, const sf::Vector2u& rowsColumns, unsigned int keyFrames, bool isStatic, float switchTime, int timesPlayed, bool loop) :
     m_SpriteSheet(spriteSheet), m_SheetTag(sheetTag), m_RowsColumns(rowsColumns), m_KeyFrames(keyFrames), m_IsStatic(isStatic), m_SwitchTime(switchTime), m_TimesPlayed(timesPlayed), m_Loop(loop)
 {
@@ -9,14 +7,14 @@ SheetAnimation::SheetAnimation(const sf::Texture& spriteSheet, const std::string
 
 void SheetAnimation::begin()
 {
-    // set sheet dimensions and initial rect locally
+    // Set sheet dimensions and initial rect locally
     m_SheetDimensions = { m_SpriteSheet.getSize().x, m_SpriteSheet.getSize().y };
     m_InitialRect = { 0, 0, (int)(m_SheetDimensions.x / m_RowsColumns.x), (int)(m_SheetDimensions.y / m_RowsColumns.y) };
 }
 
 void SheetAnimation::update(float deltaTime)
 {
-    // handle single frame animations (still animations)
+    // Handle single frame animations (still animations)
     if (m_RowsColumns == sf::Vector2u(1, 1))
     {
         m_CurrentRect = m_InitialRect;
@@ -25,7 +23,7 @@ void SheetAnimation::update(float deltaTime)
 
     if (m_Loop == true)
     {
-        // increment total time in accordance with frame rate (deltaTime is time between frames)
+        // Increment total time in accordance with frame rate (deltaTime is time between frames)
         m_TotalTime += deltaTime;
 
         if (m_FrameCount == 0)
@@ -51,7 +49,7 @@ void SheetAnimation::update(float deltaTime)
             }
         }
 
-        // flip animation direction for looping animations
+        // Flip animation direction when end is reached for looping animations
         if (m_FrameCount == m_RowsColumns.x * m_RowsColumns.y)
         {
             m_AnimDirection = !m_AnimDirection;
@@ -62,7 +60,7 @@ void SheetAnimation::update(float deltaTime)
     if (m_Loop == false)
     {
 
-        // increment total time in accordance with frame rate (deltaTime is time between frames)
+        // Increment total time in accordance with frame rate (deltaTime is time between frames)
         m_TotalTime += deltaTime;
 
         if (m_FrameCount == 0)
@@ -77,10 +75,12 @@ void SheetAnimation::update(float deltaTime)
 
             if (m_FrameCount != m_RowsColumns.x * m_RowsColumns.y)
             {
+                // Increment current frame rect to the next frame
                 m_CurrentRect.left += m_InitialRect.width;
             }
             else if (m_FrameCount == m_RowsColumns.x * m_RowsColumns.y)
             {
+                // Reset current frane rect back to beginning 
                 m_CurrentRect.left = 0;
             }
 
@@ -106,12 +106,14 @@ void SheetAnimation::reset()
 
 sf::Texture SheetAnimation::getCurrentFrame()
 {
+    // Handle static animations
     if (m_IsStatic == true)
     {
         m_CurrentFrame.loadFromFile("res/textures/" + m_SheetTag, m_InitialRect);
         return m_CurrentFrame;
     }
 
+    // Handle dynamic animations
     m_CurrentFrame.loadFromFile("res/textures/" + m_SheetTag, m_CurrentRect);
     return m_CurrentFrame;
 }
@@ -133,23 +135,14 @@ void SheetlessAnimation::begin()
     }
     else
     {
-        if (m_Loop == true)
-        {
-            m_NextTextureIndex = 0;
-        }
-        else
-        {
-            m_NextTextureIndex = 0;
-        }
-        
+        m_NextTextureIndex = 0;
         m_CurrentTexture = m_AnimationTextures[0];
-
     }
 }
 
 void SheetlessAnimation::update(float deltaTime)
 {
-    // increment texture sizes on a frame by frame basis
+    // Increment texture sizes on a frame by frame basis
     if (m_FrameSizes.size() > 0)
     {
         if (m_Reverse == true)
@@ -174,12 +167,15 @@ void SheetlessAnimation::update(float deltaTime)
         playing = false;
     }
 
+    // Handle frame increment (non-loop)
     if (m_Loop == false)
     {
+        //Increment total time in accordance with frame rate (deltaTime is time between frames)
         m_TotalTime += deltaTime;
 
         m_CurrentTexture = m_AnimationTextures[m_NextTextureIndex];
         
+        // Increment frame once animation switch time is exceeded
         if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             m_TotalTime -= m_SwitchTime;
@@ -208,8 +204,10 @@ void SheetlessAnimation::update(float deltaTime)
 
     if (m_Loop == true)
     {
+        // Increment total time in accordance with frame rate (deltaTime is time between frames)
         m_TotalTime += deltaTime;
 
+        // Increment frame once switch time is exceeded
         if (m_TotalTime >= m_SwitchTime && playing == true)
         {
             m_TotalTime -= m_SwitchTime;
@@ -223,6 +221,7 @@ void SheetlessAnimation::update(float deltaTime)
                 m_NextTextureIndex--;
             }
 
+            // Flip animation direction when texture index is at the first or last texture
             if (m_NextTextureIndex == m_NumTextures || m_NextTextureIndex <= 0)
             {
                 m_AnimDirection = !m_AnimDirection;
@@ -237,8 +236,6 @@ void SheetlessAnimation::update(float deltaTime)
 
 void SheetlessAnimation::reset()
 {
-    m_FrameCount = 0;
-
     if (m_Reverse == true)
     {
         m_NextTextureIndex = m_NumTextures;
@@ -251,5 +248,7 @@ void SheetlessAnimation::reset()
     }
 
     playing = true;
+
     m_TotalTime = 0;
+    m_FrameCount = 0;
 }

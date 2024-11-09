@@ -1,14 +1,15 @@
 #include "Menu.h"
-#include <iostream>
 
 // Handles victory menu rendering
 void Victory::begin()
 {
+	// Initialise sheetless animation textures
 	m_ReturnTextures = {
 		Resources::textures["Return_Text_01.png"],
 		Resources::textures["Return_Text_02_Green.png"]
 	};
 
+	// Initialise sheetless animation
 	m_ReturnTextAnim = new SheetlessAnimation(m_ReturnTextures, 0.3f);
 	m_ReturnTextAnim->begin();
 }
@@ -36,11 +37,13 @@ void Victory::draw(Renderer& renderer)
 // Handles gameover menu rendering
 void GameOver::begin()
 {
+	// Initialise sheetless animation textures
 	m_ReturnTextTextures = {
 		Resources::textures["Return_Text_01.png"],
 		Resources::textures["Return_Text_02_Red.png"]
 	};
 
+	// Initialise sheetless animation
 	m_ReturnTextAnim = new SheetlessAnimation(m_ReturnTextTextures, 0.3f);
 	m_ReturnTextAnim->begin();
 }
@@ -81,6 +84,7 @@ void NoMenu::draw(Renderer& renderer)
 // Handles boss menu rendering
 void BossMenu::begin()
 {
+	// Initialise sheetless animation textures
 	m_BossSelectTextTextures = 
 	{
 		Resources::textures["BossSelectText_01.png"],
@@ -92,6 +96,7 @@ void BossMenu::begin()
 		Resources::textures["ExitText_02.png"]
 	};
 
+	// Initialise sheetless animations
 	m_BossSelectTextAnim = new SheetlessAnimation(m_BossSelectTextTextures, 0.3f);
 	m_ExitTextAnim = new SheetlessAnimation(m_ExitTextTextures, 0.3f);
 
@@ -139,9 +144,10 @@ void BossMenu::update(float deltaTime)
 
 	if (m_IsBossSelectMenuOpen == true)
 	{
-		ImVec2 windowSize = ImVec2(1920, 1080);
-		ImVec2 windowPos = ImVec2(0, 0);
+		ImVec2 const windowSize = ImVec2(1920, 1080);
+		ImVec2 const windowPos = ImVec2(0, 0);
 
+		// Set window size and push style colour
 		ImGui::SetNextWindowSize(windowSize);
 		ImGui::SetNextWindowPos(windowPos);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.06f, 0.0f, 0.2f, 1.0f));
@@ -187,6 +193,7 @@ void BossMenu::update(float deltaTime)
 
 		ImGui::NewLine();
 		
+		// Add dropdown selections to boss rush items vector
 		if (m_SelectedBossRushItem > 0)
 		{
 			m_BossRushSelections.push_back(bossSelectionItems[m_SelectedBossRushItem]);
@@ -200,6 +207,7 @@ void BossMenu::update(float deltaTime)
 			shouldRemoveBoss = false;
 		}
 
+		// Handle wrapping of bosses in boss rush buttons
 		for (int count = 0; count < m_BossRushSelections.size(); count++)
 		{
 			ImGui::Button(m_BossRushSelections[count]);

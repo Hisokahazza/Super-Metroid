@@ -16,6 +16,7 @@ public:
 	virtual void update(float deltaTime) = 0;
 	virtual void reset() = 0;
 
+	// Getters and setters
 	inline bool const checkPlaying() { return playing; }
 };
 
@@ -45,10 +46,11 @@ private:
 public:
 	SheetAnimation(const sf::Texture& spriteSheet = sf::Texture(), const std::string& sheetTag = "", const sf::Vector2u& rowsColumns = {}, unsigned int keyFrames = 0, bool isStatic = false, float switchTime = 0.1, int timesPlayed = -1, bool loop = true);
 
-	void begin();
-	void update(float deltaTime);
-	void reset();
+	void begin() override;
+	void update(float deltaTime) override;
+	void reset() override;
 
+	// Getters and setters
 	sf::Texture getCurrentFrame();
 };
 
@@ -78,10 +80,11 @@ private:
 public:
 	SheetlessAnimation(std::vector<sf::Texture> AnimationTextures, float switchTime = 0.0f, bool loop = false, bool reverse = false, int timesPlayed = -1, std::vector<sf::Vector2f> frameSizes = {});
 
-	void begin();
-	void update(float deltaTime);
-	void reset();
+	void begin() override;
+	void update(float deltaTime) override;
+	void reset() override;
 
+	// Getters and setters
 	sf::Texture getCurrentFrame() { return m_CurrentTexture; };
 	sf::Vector2f getCurrentFrameSize() { return m_CurrentTextureSize; };
 };
