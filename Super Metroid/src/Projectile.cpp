@@ -10,7 +10,7 @@ void Projectile::onBeginContact(b2Fixture* self, b2Fixture* other)
 	{
 		return;
 	}
-	// Handle collition with map or door
+	// Handle collision with map or door
 	if (otherData->type == MAPTILE || otherData->type == DOOR)
 	{
 		destroyed = true;
@@ -43,7 +43,7 @@ void DefaultBullet::createFixture(b2Vec2 initialPosition)
 	fixtureDef.userData.pointer = (uintptr_t)&fixtureData;
 	fixtureDef.shape = &circleShape;
 	fixtureDef.isSensor = true;
-	bulletFixture = body->CreateFixture(&fixtureDef);
+	m_BulletFixture = body->CreateFixture(&fixtureDef);
 }
 
 DefaultBullet::DefaultBullet(Direction bulletDirection) : m_BulletDirection(bulletDirection)
@@ -58,7 +58,7 @@ DefaultBullet::~DefaultBullet()
 	if (body)
 	{
 		// Destroy the fixture
-		body->DestroyFixture(bulletFixture);
+		body->DestroyFixture(m_BulletFixture);
 
 		// Destroy the body
 		Physics::world.DestroyBody(body);

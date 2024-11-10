@@ -34,6 +34,9 @@ public:
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Renderer& renderer) = 0;
 
+	FixtureData fixtureData{};
+	SheetlessAnimation* currentSheetlessAnimation;
+
 	bool destroyed = false;
 
 	// Inherited via Collisionlistener
@@ -57,10 +60,6 @@ public:
 	DefaultBullet(Direction bulletDirection);
 	~DefaultBullet();
 
-	FixtureData fixtureData{};
-
-	SheetlessAnimation* currentSheetlessAnimation;
-
 	void begin(b2Vec2 initialPosition) override;
 	void update(float deltaTime) override;
 	void draw(Renderer& renderer) override;
@@ -79,10 +78,6 @@ private:
 public:
 	Missile(Direction missileDirection);
 	~Missile();
-
-	SheetlessAnimation* currentSheetlessAnimation;
-
-	FixtureData fixtureData{};
 
 	void begin(b2Vec2 initialPosition) override;
 	void update(float deltaTime) override;
