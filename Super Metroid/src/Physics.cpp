@@ -164,7 +164,7 @@ void Physics::debugDraw(Renderer& renderer)
 		// Initialise debugDraw object 
 		debugDrawObj = new DebugDrawImp(renderer.target);
 		// Sets flags for debug drawer to pick up (uncomment/comment to activate/deactivate debug draw)
-		debugDrawObj->SetFlags(b2Draw::e_shapeBit);
+		//debugDrawObj->SetFlags(b2Draw::e_shapeBit);
 		// Sets the world debug drawer
 		world.SetDebugDraw(debugDrawObj);
 	}

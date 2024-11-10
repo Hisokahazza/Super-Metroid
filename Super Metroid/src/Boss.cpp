@@ -68,7 +68,7 @@ void Spore::update(float deltaTime)
 	{
 		m_TotalTime -= m_SwitchTime;
 
-		// Simulate a sin wave rotated 180 degrees for spore movement
+		// Simulate a sine wave rotated 180 degrees for spore movement
 		position.y += 0.025f;
 		position.x += sin(position.y) / 50;
 		body->SetTransform(b2Vec2(position.x, position.y), 0.0f);
@@ -417,7 +417,7 @@ void SporeSpawn::update(float deltaTime)
 				m_BossChangedDirection = false;
 			}
 
-			// Simulate sin wave for boss movement
+			// Simulate sine wave for boss movement
 			if (m_BossChangedDirection == false && m_IsCoreOpen == false)
 			{
 				position.x += 0.01f;
@@ -1354,15 +1354,6 @@ void GoldTorizo::update(float deltaTime)
 		m_Jumping = false;
 	}
 
-	//if (m_SamusJumpStartingPosition.x - m_StartingJumpPosition.x > 0 && samusPosition.x - m_StartingJumpPosition.x < 0)
-	//{
-	//	m_Jumping = false;
-	//}
-	//if (m_SamusJumpStartingPosition.x - m_StartingJumpPosition.x < 0 && samusPosition.x - m_StartingJumpPosition.x > 0)
-	//{
-	//	m_Jumping = false;
-	//}
-
 	// Handle events once boss hits the ground
 	if (m_Jumping == true)
 	{
@@ -1656,6 +1647,10 @@ void GoldTorizo::reset()
 
 	m_Jumping = false;
 	m_Attacking = false;
+
+	m_BombSwitchTime = 0.2f;
+	m_BombTotalTime = 0.2f;
+	m_BombTotalActivatonTime = 0.0f;
 
 	m_ArkSwitchTime = 0.75f;
 	m_ArkTotalTime = 0.75f;

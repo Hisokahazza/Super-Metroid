@@ -38,7 +38,8 @@ void Victory::draw(Renderer& renderer)
 void GameOver::begin()
 {
 	// Initialise sheetless animation textures
-	m_ReturnTextTextures = {
+	m_ReturnTextTextures = 
+	{
 		Resources::textures["Return_Text_01.png"],
 		Resources::textures["Return_Text_02_Red.png"]
 	};

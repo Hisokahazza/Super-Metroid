@@ -215,7 +215,11 @@ void Game::update(float deltaTime)
 
 		m_BossMenu->setIsBossRushStarted(false);
 		m_BossMenu->resetBossRushSelections();
-		m_BossMenu->setBossSelectMenuOpen(false);
+		// Ensure if empty boss rush is started the menu does not close
+		if (m_BossRushQueue.empty() == false)
+		{
+			m_BossMenu->setBossSelectMenuOpen(false);
+		}
 	}
 
 	// Handle boss rush

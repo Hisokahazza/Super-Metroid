@@ -80,7 +80,7 @@ void SheetAnimation::update(float deltaTime)
             }
             else if (m_FrameCount == m_RowsColumns.x * m_RowsColumns.y)
             {
-                // Reset current frane rect back to beginning 
+                // Reset current frame rect back to beginning 
                 m_CurrentRect.left = 0;
             }
 
