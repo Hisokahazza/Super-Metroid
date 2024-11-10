@@ -16,8 +16,7 @@
 enum ProjectileType
 {
 	BULLETPROJ,
-	MISSILEPROJ,
-	SUPERMISSILEPROJ
+	MISSILEPROJ
 };
 
 class Projectile : public Collisionlistener
