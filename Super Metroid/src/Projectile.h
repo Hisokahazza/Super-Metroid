@@ -46,6 +46,8 @@ class DefaultBullet : public Projectile
 {
 private:
 	Direction m_BulletDirection;
+	b2Fixture* m_BulletFixture;
+
 	void createFixture(b2Vec2 inititalPosition);
 
 	SheetlessAnimation* m_BulletDestructionAnim;
@@ -56,7 +58,6 @@ public:
 	~DefaultBullet();
 
 	FixtureData fixtureData{};
-	b2Fixture* bulletFixture;
 
 	SheetlessAnimation* currentSheetlessAnimation;
 
